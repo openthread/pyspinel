@@ -43,6 +43,7 @@ import os
 import sys
 import time
 import traceback
+import random
 
 import optparse
 
@@ -68,16 +69,78 @@ import spinel.util as util
 
 import ipaddress
 
-logging.getLogger("scapy.runtime").setLevel(logging.ERROR)
-from scapy.layers.inet6 import IPv6
-from scapy.layers.inet6 import ICMPv6EchoReply
-from scapy.layers.inet6 import ICMPv6EchoRequest
-
-
 __copyright__ = "Copyright (c) 2016 The OpenThread Authors."
 __version__ = "0.1.0"
 
 MASTER_PROMPT = "spinel-cli"
+
+
+import io
+import spinel.ipv6 as ipv6
+import spinel.common as common
+
+
+class IcmpV6Factory(object):
+
+    ipv6_factory = ipv6.IPv6PacketFactory(
+        ehf={
+            0:  ipv6.HopByHopFactory(
+                hop_by_hop_options_factory=ipv6.HopByHopOptionsFactory(
+                    options_factories={
+                        109: ipv6.MPLOptionFactory()
+                    }
+                )
+            )
+        },
+        ulpf={
+            58: ipv6.ICMPv6Factory(
+                body_factories={
+                    0: ipv6.ICMPv6DestinationUnreachableFactory(),
+                    128: ipv6.ICMPv6EchoBodyFactory(),
+                    129: ipv6.ICMPv6EchoBodyFactory()
+                }
+            )
+        }
+    )
+
+    def _any_identifier(self):
+        return random.getrandbits(16)
+
+    def _seq_number(self):
+        seq_number = 0
+
+        while True:
+            yield seq_number
+            seq_number += 1
+            seq_number if seq_number < (1 << 16) else 0
+
+    def build_icmp_echo_request(self, src, dst, data, hop_limit=64, identifier=None, sequence_number=None):
+        identifier = self._any_identifier() if identifier is None else identifier
+        sequence_number = next(self._seq_number()) if sequence_number is None else sequence_number
+
+        ping_req = ipv6.IPv6Packet(
+            ipv6_header=ipv6.IPv6Header(
+                source_address=src,
+                destination_address=dst,
+                hop_limit=hop_limit
+            ),
+            upper_layer_protocol=ipv6.ICMPv6(
+                header=ipv6.ICMPv6Header(
+                    _type=ipv6.ICMP_ECHO_REQUEST,
+                    code=0
+                ),
+                body=ipv6.ICMPv6EchoBody(
+                    identifier=identifier,
+                    sequence_number=sequence_number,
+                    data=data
+                )
+            )
+        )
+
+        return str(ping_req.to_bytes())
+
+    def from_bytes(self, data):
+        return self.ipv6_factory.parse(io.BytesIO(data), common.MessageInfo())
 
 
 class SpinelCliCmd(Cmd, SpinelCodec):
@@ -85,6 +148,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
     A command line shell for controlling OpenThread NCP nodes
     via the Spinel protocol.
     """
+
+    icmp_factory = IcmpV6Factory()
 
     def __init__(self, stream_desc, nodeid, *_a, **kw):
 
@@ -118,7 +183,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         except ImportError:
             print("Module readline unavailable")
         else:
-            #import rlcompleter
+            # import rlcompleter
             readline.parse_and_bind("tab: complete")
             if sys.platform == 'darwin':
                 readline.parse_and_bind("bind ^I rl_complete")
@@ -208,16 +273,20 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         if prop == SPINEL.PROP_STREAM_NET:
             consumed = True
 
-            pkt = IPv6(value[2:])
+            try:
+                pkt = cls.icmp_factory.from_bytes(value[2:])
 
-            if CONFIG.DEBUG_LOG_PKT:
-                pkt.show()
+                if CONFIG.DEBUG_LOG_PKT:
+                    logging.debug(pkt)
 
-            if ICMPv6EchoReply in pkt:
                 timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
-                timedelta = (timenow - struct.unpack('>I', pkt.data)[0])
-                print("\n%d bytes from %s: icmp_seq=%d hlim=%d time=%dms" % (
-                    pkt.plen, pkt.src, pkt.seq, pkt.hlim, timedelta))
+                timedelta = (timenow - struct.unpack('>I', pkt.upper_layer_protocol.body.data)[0])
+                print("\n%d bytes from %s: icmp_seq=%d hlim=%d time=%dms" % (pkt.ipv6_header.payload_length,
+                                                                             pkt.ipv6_header.source_address,
+                                                                             pkt.upper_layer_protocol.body.sequence_number,
+                                                                             pkt.ipv6_header.hop_limit, timedelta))
+            except RuntimeError:
+                pass
 
         return consumed
 
@@ -1030,17 +1099,17 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             Leader Router ID: 47
             Done
         """
-        partition_id   = self.prop_get_value(SPINEL.PROP_NET_PARTITION_ID)
-        weighting      = self.prop_get_value(SPINEL.PROP_THREAD_LEADER_WEIGHT)
-        data_version   = self.prop_get_value(SPINEL.PROP_THREAD_NETWORK_DATA_VERSION)
+        partition_id = self.prop_get_value(SPINEL.PROP_NET_PARTITION_ID)
+        weighting = self.prop_get_value(SPINEL.PROP_THREAD_LEADER_WEIGHT)
+        data_version = self.prop_get_value(SPINEL.PROP_THREAD_NETWORK_DATA_VERSION)
         stable_version = self.prop_get_value(SPINEL.PROP_THREAD_STABLE_NETWORK_DATA_VERSION)
-        leader_id      = self.prop_get_value(SPINEL.PROP_THREAD_LEADER_RID)
+        leader_id = self.prop_get_value(SPINEL.PROP_THREAD_LEADER_RID)
 
         if partition_id   is None or \
            weighting      is None or \
            data_version   is None or \
            stable_version is None or \
-           leader_id      is None:
+           leader_id is None:
             print("Error")
         else:
             print("Partition ID: %d" % partition_id)
@@ -1253,7 +1322,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         ext_addr, rloc = self.prop_get_value(SPINEL.PROP_THREAD_PARENT)
 
         if ext_addr is None or\
-           rloc     is None:
+           rloc is None:
             print("Error")
         else:
             print("Ext Addr: {}".format(binascii.hexlify(ext_addr)))
@@ -1288,8 +1357,9 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             ml64 = str(ipaddress.IPv6Address(ml64))
             timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
             timenow = struct.pack('>I', timenow)
-            ping_req = str(IPv6(src=ml64, dst=addr) /
-                           ICMPv6EchoRequest() / timenow)
+
+            ping_req = self.icmp_factory.build_icmp_echo_request(ml64, addr, timenow)
+
             self.wpan_api.ip_send(ping_req)
             # Let handler print result
         except:
@@ -1873,7 +1943,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             if self.tun_if:
                 self.tun_if.addr_del(ipaddr)
 
-        elif params[0] == "up":    
+        elif params[0] == "up":
             if os.geteuid() == 0:
                 self.tun_if = TunInterface(nodeid)
             else:
@@ -1881,7 +1951,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         elif params[0] == "down":
             if self.tun_if:
-                self.tun_if.close()            
+                self.tun_if.close()
             self.tun_if = None
 
         elif params[0] == "ping":
@@ -2035,6 +2105,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         pass
 
+
 def parse_args():
     """" Send spinel commands to initialize sniffer node. """
     args = sys.argv[1:]
@@ -2055,6 +2126,7 @@ def parse_args():
                           dest="debug", type="int", default=CONFIG.DEBUG_ENABLE)
 
     return opt_parser.parse_args(args)
+
 
 def main():
     """ Top-level main for spinel-cli tool. """
