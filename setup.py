@@ -29,7 +29,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='spinel',
+    name='pyspinel',
     version='1.0.0a1',
     description='A Python interface to the OpenThread Network Co-Processor (NCP)',
     url='https://github.com/openthread/openthread',
