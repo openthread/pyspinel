@@ -19,7 +19,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyspinel',
-    version='1.0.0a1',
+    version='1.0.0a2',
     description='A Python interface to the OpenThread Network Co-Processor (NCP)',
     url='https://github.com/openthread/openthread',
     author='The OpenThread Authors',
@@ -44,8 +44,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pyserial',
-        'ipaddress',
-        'scapy==2.3.2'
+        'ipaddress'
     ],
     scripts=['spinel-cli.py', 'sniffer.py']
 )
