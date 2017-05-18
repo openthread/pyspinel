@@ -95,8 +95,6 @@ class IcmpV6Factory(object):
         ulpf={
             58: ipv6.ICMPv6Factory(
                 body_factories={
-                    0: ipv6.ICMPv6DestinationUnreachableFactory(),
-                    128: ipv6.ICMPv6EchoBodyFactory(),
                     129: ipv6.ICMPv6EchoBodyFactory()
                 }
             )
