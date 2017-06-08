@@ -277,12 +277,20 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 if CONFIG.DEBUG_LOG_PKT:
                     logging.debug(pkt)
 
-                timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
-                timedelta = (timenow - struct.unpack('>I', pkt.upper_layer_protocol.body.data)[0])
-                print("\n%d bytes from %s: icmp_seq=%d hlim=%d time=%dms" % (pkt.ipv6_header.payload_length,
-                                                                             pkt.ipv6_header.source_address,
-                                                                             pkt.upper_layer_protocol.body.sequence_number,
-                                                                             pkt.ipv6_header.hop_limit, timedelta))
+                if isinstance(pkt.upper_layer_protocol, ipv6.ICMPv6):
+                    icmp = pkt.upper_layer_protocol
+
+                    if icmp.header.type == ipv6.ICMP_ECHO_RESPONSE:
+                        timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
+                        timedelta = (timenow - struct.unpack('>I', icmp.body.data)[0])
+
+                        print("\n%d bytes from %s: icmp_seq=%d hlim=%d time=%dms" % (
+                            pkt.ipv6_header.payload_length,
+                            pkt.ipv6_header.source_address,
+                            icmp.body.sequence_number,
+                            pkt.ipv6_header.hop_limit, timedelta)
+                        )
+
             except RuntimeError:
                 pass
 
@@ -1870,9 +1878,9 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         Set MAC filter mode:
 
-        0 = MAC_FILTER_MODE_NORMAL	Normal MAC filtering is in place.
-        1 = MAC_FILTER_MODE_PROMISCUOUS	All MAC packets matching network are passed up the stack.
-        2 = MAC_FILTER_MODE_MONITOR	All decoded MAC packets are passed up the stack.
+        0 = MAC_FILTER_MODE_NORMAL          Normal MAC filtering is in place.
+        1 = MAC_FILTER_MODE_PROMISCUOUS     All MAC packets matching network are passed up the stack.
+        2 = MAC_FILTER_MODE_MONITOR         All decoded MAC packets are passed up the stack.
         """
         self.handle_property(line, SPINEL.PROP_MAC_FILTER_MODE, 'B')
 
