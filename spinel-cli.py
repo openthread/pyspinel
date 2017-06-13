@@ -181,10 +181,11 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         except ImportError:
             print("Module readline unavailable")
         else:
-            # import rlcompleter
-            readline.parse_and_bind("tab: complete")
-            if sys.platform == 'darwin':
-                readline.parse_and_bind("bind ^I rl_complete")
+            import rlcompleter
+            if 'libedit' in readline.__doc__:
+                readline.parse_and_bind('bind ^I rl_complete')
+            else:
+                readline.parse_and_bind('tab: complete')
 
         self.prop_set_value(SPINEL.PROP_IPv6_ICMP_PING_OFFLOAD, 1)
         self.prop_set_value(SPINEL.PROP_THREAD_RLOC16_DEBUG_PASSTHRU, 1)
