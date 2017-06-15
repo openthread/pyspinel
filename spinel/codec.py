@@ -1013,7 +1013,7 @@ class WpanApi(SpinelCodec):
     def cmd_reset(self):
         self.queue_wait_prepare(None, SPINEL.HEADER_ASYNC)
         self.transact(SPINEL.CMD_RESET, "", SPINEL.HEADER_DEFAULT)
-        result = self.queue_wait_for_prop(SPINEL.PROP_LAST_STATUS, SPINEL.HEADER_ASYNC, 5)
+        result = self.queue_wait_for_prop(SPINEL.PROP_LAST_STATUS, SPINEL.HEADER_ASYNC)
         return (result is not None and result.value == 114)
 
     def cmd_send(self, command_id, payload="", tid=SPINEL.HEADER_DEFAULT):

@@ -232,6 +232,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'ping',
         'prefix',
         'releaserouterid',
+        'reset',
         'rloc16',
         'route',
         'router',
@@ -1481,6 +1482,16 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             Done
         """
         self.handle_property(line, SPINEL.PROP_THREAD_RLOC16, 'H')
+
+    def do_reset(self, line):
+        """
+        reset
+
+            Reset the NCP.
+
+            > reset
+        """
+        self.wpan_api.cmd_reset()
 
     def complete_route(self, text, _line, _begidx, _endidx):
         """ Subcommand completion handler for route command. """
