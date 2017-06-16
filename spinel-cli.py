@@ -1494,6 +1494,9 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         self.wpan_api.cmd_reset()
 
+        self.prop_set_value(SPINEL.PROP_IPv6_ICMP_PING_OFFLOAD, 1)
+        self.prop_set_value(SPINEL.PROP_THREAD_RLOC16_DEBUG_PASSTHRU, 1)
+
     def complete_route(self, text, _line, _begidx, _endidx):
         """ Subcommand completion handler for route command. """
         map_sub_commands = ('add', 'remove')
