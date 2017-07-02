@@ -102,11 +102,11 @@ class SPINEL(object):
     PROP_MAC__END = 0x40
 
     PROP_MAC_EXT__BEGIN = 0x1300
-    # Format: `A(T(Ec))`
-    # * `E`: EUI64 address of node
-    # * `c`: Optional fixed RSSI. -127 means not set.
-    PROP_MAC_WHITELIST = PROP_MAC_EXT__BEGIN + 0
-    PROP_MAC_WHITELIST_ENABLED = PROP_MAC_EXT__BEGIN + 1  # < [b]
+
+    PROP_MAC_ADDRESSFILTER = PROP_MAC_EXT__BEGIN + 0  # < [C]
+    PROP_MAC_ADDRESSFILTER_ENTRY = PROP_MAC_EXT__BEGIN + 1 # < [E]
+    PROP_MAC_LQINFILTER = PROP_MAC_EXT__BEGIN + 6  # < [C]
+    PROP_MAC_LQINFILTER_ENTRY = PROP_MAC_EXT__BEGIN + 7 # < [A(EC)]
     PROP_MAC_EXT__END = 0x1400
 
     PROP_NET__BEGIN = 0x40

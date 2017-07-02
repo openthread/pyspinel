@@ -35,3 +35,11 @@ def hex_to_bytes(s):
         v = int(hex, 16)
         result += chr(v)
     return result
+
+def flatten(t):
+    for ele in t:
+        if hasattr(ele, "__iter__") and not isinstance(ele, basestring):
+           for sub in flatten(ele):
+               yield sub
+        else:
+           yield ele
