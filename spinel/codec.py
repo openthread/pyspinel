@@ -240,7 +240,6 @@ class SpinelCodec(object):
     @classmethod
     def parse_fields(cls, payload, spinel_format):
         result = []
-
         idx = 0
         while idx < len(spinel_format):
             format = spinel_format[idx]
@@ -442,10 +441,15 @@ class SpinelPropertyHandler(SpinelCodec):
     def MAC_RAW_STREAM_ENABLED(self, _, payload):
         return self.parse_b(payload)
 
-    def MAC_WHITELIST(self, _, payload): pass
+    def MAC_ADDRESSFILTER(self, _, payload): return self.parse_C(payload)
 
-    def MAC_WHITELIST_ENABLED(self, _, payload):
-        return self.parse_b(payload)
+    def MAC_ADDRESSFILTER_ENTRY(self, _, payload):
+        return self.parse_fields(payload, 'A(E)')
+
+    def MAC_LQINFILTER(self, _, payload): return self.parse_C(payload)
+
+    def MAC_LQINFILTER_ENTRY(self, _, payload):
+        return self.parse_fields(payload, 'A(EC)')
 
     def NET_SAVED(self, _, payload): return self.parse_b(payload)
 
@@ -777,8 +781,11 @@ SPINEL_PROP_DISPATCH = {
     SPINEL.PROP_MAC_RAW_STREAM_ENABLED: WPAN_PROP_HANDLER.MAC_RAW_STREAM_ENABLED,
     SPINEL.PROP_MAC_FILTER_MODE:       WPAN_PROP_HANDLER.MAC_FILTER_MODE,
 
-    SPINEL.PROP_MAC_WHITELIST:         WPAN_PROP_HANDLER.MAC_WHITELIST,
-    SPINEL.PROP_MAC_WHITELIST_ENABLED: WPAN_PROP_HANDLER.MAC_WHITELIST_ENABLED,
+    SPINEL.PROP_MAC_ADDRESSFILTER:     WPAN_PROP_HANDLER.MAC_ADDRESSFILTER,
+    SPINEL.PROP_MAC_ADDRESSFILTER_ENTRY: WPAN_PROP_HANDLER.MAC_ADDRESSFILTER_ENTRY,
+
+    SPINEL.PROP_MAC_LQINFILTER:       WPAN_PROP_HANDLER.MAC_LQINFILTER,
+    SPINEL.PROP_MAC_LQINFILTER_ENTRY: WPAN_PROP_HANDLER.MAC_LQINFILTER_ENTRY,
 
     SPINEL.PROP_NET_SAVED:             WPAN_PROP_HANDLER.NET_SAVED,
     SPINEL.PROP_NET_IF_UP:             WPAN_PROP_HANDLER.NET_IF_UP,
@@ -1108,3 +1115,21 @@ class WpanApi(SpinelCodec):
             addr = addr[2:18]
             ipaddrs.append(ipaddress.IPv6Address(addr))
         return ipaddrs
+
+    def get_addressfilterentries(self, tid=SPINEL.HEADER_DEFAULT):
+        """
+        Return current filtered entries.
+        """
+        value = self.prop_get_value(SPINEL.PROP_MAC_ADDRESSFILTER_ENTRY)
+        gen = util.flatten(value)
+        arr = list(gen)
+        return arr
+
+    def get_lqinfilterentries(self, tid=SPINEL.HEADER_DEFAULT):
+        """
+        Return current filtered entries.
+        """
+        value = self.prop_get_value(SPINEL.PROP_MAC_LQINFILTER_ENTRY)
+        gen = util.flatten(value)
+        arr = list(gen)
+        return arr

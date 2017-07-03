@@ -20,21 +20,21 @@ spinel-cli.py
 
 available commands (type help <name> for more information):
 ============================================================
-channel            diag-sleep  leaderdata       releaserouterid
-child              diag-start  leaderweight     rloc16
-childmax           diag-stats  masterkey        route
-childtimeout       diag-stop   mode             router
-clear              discover    ncp-ll64         routerupgradethreshold
-commissioner       eidcache    ncp-ml64         scan
-contextreusedelay  exit        ncp-tun          state
-counter            extaddr     netdataregister  thread
-debug              extpanid    networkidtimeout tun
-debug-mem          h           networkname      v
-diag               help        panid            version
-diag-channel       history     ping             whitelist
-diag-power         ifconfig    prefix
-diag-repeat        ipaddr      q
-diag-send          keysequence quit
+addressfilter      diag-send   keysequence      q
+channel            diag-sleep  leaderdata       quit
+child              diag-start  leaderweight     releaserouterid
+childmax           diag-stats  lqinfilter       rloc16
+childtimeout       diag-stop   masterkey        route
+clear              discover    mode             router
+commissioner       eidcache    ncp-ll64         routerupgradethreshold
+contextreusedelay  exit        ncp-ml64         scan
+counter            extaddr     ncp-tun          state
+debug              extpanid    netdataregister  thread
+debug-mem          h           networkidtimeout tun
+diag               help        networkname      v
+diag-channel       history     panid            version
+diag-power         ifconfig    ping
+diag-repeat        ipaddr      prefix
 """
 
 from __future__ import print_function
@@ -205,6 +205,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         # OpenThread CLI commands
         'help',
+        'addressfilter',
         'bufferinfo',
         'channel',
         'child',
@@ -223,6 +224,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'keysequence',
         'leaderdata',
         'leaderweight',
+        'lqinfilter',
         'masterkey',
         'mode',
         'netdataregister',
@@ -244,7 +246,6 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'state',
         'thread',
         'version',
-        'whitelist',
 
         # OpenThread Diagnostics Module CLI
         'diag',
@@ -1774,98 +1775,230 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         self.handle_property(line, SPINEL.PROP_NCP_VERSION, 'U')
 
-    def complete_whitelist(self, text, _line, _begidx, _endidx):
-        """ Subcommand completion handler for whitelist command. """
-        map_sub_commands = ('add', 'remove', 'clear', 'enable', 'disable')
+    def complete_addressfilter(self, text, _line, _begidx, _endidx):
+        """ Subcommand completion handler for addressfilter command. """
+        map_sub_commands = ('off', 'on-whitelist', 'on-blacklist', 'add', 'remove', 'clear', 'reset')
         return [i for i in map_sub_commands if i.startswith(text)]
 
-    def do_whitelist(self, line):
+    def do_addressfilter(self, line):
         """
-        whitelist
+        AddressFilter
 
-            List the whitelist entries.
+            List the AddressFilter status and entries.
 
-            > whitelist
-            Enabled
+            > addressfilter
+            whitelist
             e2b3540590b0fd87
             d38d7f875888fccb
             c467a90a2060fa0e
             Done
 
-        whitelist add <extaddr> [rssi]
+        addressfilter off
 
-            Add an IEEE 802.15.4 Extended Address to the whitelist.
+            Disable MAC addressfilter.
 
-            > whitelist add dead00beef00cafe
+            > addressfilter disable
             Done
 
-        whitelist clear
+        addressfilter on-whitelist
 
-            Clear all entries from the whitelist.
+            Enable MAC addressfilter whitelist filtering.
 
-            > whitelist clear
+            > addressfilter on-whitelist
             Done
 
-        whitelist disable
+        addressfilter on-blacklist
 
-            Disable MAC whitelist filtering.
+            Enable MAC addressfilter blacklist filtering.
 
-            > whitelist disable
+            > addressfilter on-blacklist
             Done
 
-        whitelist enable
+        addressfilter add <extaddr>
 
-            Enable MAC whitelist filtering.
+            Add an IEEE 802.15.4 Extended Address to the addressfilter.
 
-            > whitelist enable
+            > addressfilter add dead00beef00cafe
             Done
 
-        whitelist remove <extaddr>
+        addressfilter remove <extaddr>
 
-            Remove an IEEE 802.15.4 Extended Address from the whitelist.
+            Remove an IEEE 802.15.4 Extended Address from the addressfilter.
 
-            > whitelist remove dead00beef00cafe
+            > addressfilter remove dead00beef00cafe
             Done
+
+        addressfilter clear
+
+            Clear all entries from the addressfilter.
+
+            > addressfilter clear
+            Done
+
+        addressfilter reset
+
+            Reset MAC addressfilter.
+
+            > addressfilter reset
+            Done
+
         """
         map_arg_value = {
             0: "Disabled",
-            1: "Enabled",
+            1: "Whitelist",
+            2: "Blacklist",
         }
 
         params = line.split(" ")
 
         if params[0] == "":
-            value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST_ENABLED)
+            value = self.prop_get_value(SPINEL.PROP_MAC_ADDRESSFILTER)
             if value != None:
                 print(map_arg_value[value])
-            value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST)
 
-        elif params[0] == "enable":
-            self.prop_set(SPINEL.PROP_MAC_WHITELIST_ENABLED, '1')
+                if value != 0:
+                    extaddrs = self.wpan_api.get_addressfilterentries()
+                    for addr in extaddrs:
+                        print("{}".format(binascii.hexlify(addr)))
+            else:
+                print("Error")
+                return
+        elif params[0] == "off":
+            self.prop_set(SPINEL.PROP_MAC_ADDRESSFILTER, '0')
             return
 
-        elif params[0] == "disable":
-            self.prop_set(SPINEL.PROP_MAC_WHITELIST_ENABLED, '0')
+        elif params[0] == "on-whitelist":
+            self.prop_set(SPINEL.PROP_MAC_ADDRESSFILTER, '1')
+            return
+
+        elif params[0] == "on-blacklist":
+            self.prop_set(SPINEL.PROP_MAC_ADDRESSFILTER, '2')
             return
 
         elif params[0] == "clear":
-            value = self.prop_set_value(SPINEL.PROP_MAC_WHITELIST, None, None)
+            value = self.prop_set_value(SPINEL.PROP_MAC_ADDRESSFILTER_ENTRY, None, None)
 
         elif params[0] == "add":
             arr = util.hex_to_bytes(params[1])
-            try:
-                rssi = int(params[2])
-            except:
-                rssi = SPINEL.RSSI_OVERRIDE
-            arr += struct.pack('b', rssi)
-            value = self.prop_insert_value(SPINEL.PROP_MAC_WHITELIST, arr,
+            value = self.prop_insert_value(SPINEL.PROP_MAC_ADDRESSFILTER_ENTRY, arr,
                                            str(len(arr)) + 's')
 
         elif params[0] == "remove":
             arr = util.hex_to_bytes(params[1])
-            arr += struct.pack('b', SPINEL.RSSI_OVERRIDE)
-            value = self.prop_remove_value(SPINEL.PROP_MAC_WHITELIST, arr,
+            value = self.prop_remove_value(SPINEL.PROP_MAC_ADDRESSFILTER_ENTRY, arr,
                                            str(len(arr)) + 's')
+        elif params[0] == "reset":
+            value = self.prop_set_value(SPINEL.PROP_MAC_ADDRESSFILTER_ENTRY, None, None)
+            value = self.prop_set_value(SPINEL.PROP_MAC_ADDRESSFILTER, 0)
+
+        print("Done")
+
+    def complete_lqinfilter(self, text, _line, _begidx, _endidx):
+        """ Subcommand completion handler for addressfilter command. """
+        map_sub_commands = ('set', 'unset', 'add', 'remove', 'clear', 'reset')
+        return [i for i in map_sub_commands if i.startswith(text)]
+
+    def do_lqinfilter(self, line):
+        """
+        LqinFilter
+
+            List the LqiFilter.
+
+            > lqinfilter
+            LinkQualityInFilter Entries:
+            42d2d7767b8ad6ff : 1
+            default lqin: fixed as 2
+            Done
+
+        lqinfilter set <lqi>
+
+            Set the default LinkQualityIn for all receiving messages from any link.
+
+            > lqinfilter set 2
+            Done
+
+        lqinfilter unset
+
+            Unset the default LinkQualityIn for all receiving messages from any link.
+
+            > lqinfilter unset
+            Done
+
+        lqinfilter add <extaddr> <lqi>
+
+            Specify the LinkQualityIn for the receiving messages from the <extaddr>.
+
+            > lqinfilter add 42d2d7767b8ad6ff 1
+            Done
+
+        lqinfilter remove <extaddr>
+
+            Remove the LinkQualityIn configuration for the receiving messages from the <extaddr>.
+
+            > lqinfilter remove 42d2d7767b8ad6ff 1
+            Done
+
+        lqinfilter clear
+
+            Clear the LinkQualityIn configuration for all entries in lqinfilter.
+
+            > lqinfilter clear
+            Done
+
+        lqinfilter reset
+            Reset the lqinfilter.
+
+            > lqinfilter reset
+            Done
+
+        """
+
+        LQIN_OVERRIDE_DISABLED = 0xff
+
+        params = line.split(" ")
+
+        if params[0] == "":
+            entries = self.wpan_api.get_lqinfilterentries()
+            if len(entries) > 0:
+                print('LinkQualityInFilter Entries:')
+                for i in range(0, len(entries), 2):
+                    print("{}".format(binascii.hexlify(entries[i])) + " : %d" % entries[i+1])
+
+            value = self.prop_get_value(SPINEL.PROP_MAC_LQINFILTER)
+            if value == LQIN_OVERRIDE_DISABLED:
+                print("default lqin: no")
+            else:
+                print("default lqin: fixed as " + str(value))
+
+        elif params[0] == "set":
+            lq = params[1]
+            self.prop_set(SPINEL.PROP_MAC_LQINFILTER, lq)
+            return
+
+        elif params[0] == "unset":
+            lq = str(LQIN_OVERRIDE_DISABLED)
+            self.prop_set(SPINEL.PROP_MAC_LQINFILTER, lq)
+
+        elif params[0] == "clear":
+            value = self.prop_set_value(SPINEL.PROP_MAC_LQINFILTER_ENTRY, None, None)
+
+        elif params[0] == "add":
+            arr = util.hex_to_bytes(params[1])
+            lq = int(params[2])
+            arr += struct.pack('B', lq)
+            value = self.prop_insert_value(SPINEL.PROP_MAC_LQINFILTER_ENTRY, arr,
+                                           str(len(arr)) + 's')
+
+        elif params[0] == "remove":
+            arr = util.hex_to_bytes(params[1])
+            lq = LQIN_OVERRIDE_DISABLED
+            arr += struct.pack('B', lq)
+            value = self.prop_remove_value(SPINEL.PROP_MAC_LQINFILTER_ENTRY, arr,
+                                           str(len(arr)) + 's')
+
+        elif params[0] == "reset":
+            value = self.prop_set_value(SPINEL.PROP_MAC_LQINFILTER_ENTRY, None, None)
+            value = self.prop_set_value(SPINEL.PROP_MAC_LQINFILTER, LQIN_OVERRIDE_DISABLED)
 
         print("Done")
 
