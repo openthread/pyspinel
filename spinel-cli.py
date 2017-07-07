@@ -1958,7 +1958,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         elif params[0] == "up":
             if os.geteuid() == 0:
-                self.tun_if = TunInterface(nodeid)
+                self.tun_if = TunInterface(self.nodeid)
             else:
                 print("Warning: superuser required to start tun interface.")
 
