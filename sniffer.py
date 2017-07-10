@@ -27,6 +27,7 @@
 
 import sys
 import optparse
+from datetime import datetime
 
 import spinel.util as util
 import spinel.config as CONFIG
@@ -138,6 +139,11 @@ def main():
     sys.stdout.write(hdr)
     sys.stdout.flush()
 
+    epoch = datetime(1970, 1, 1)
+    timebase = datetime.utcnow() - epoch
+    timebase_sec = timebase.days * 24 * 60 * 60 + timebase.seconds
+    timebase_usec = timebase.microseconds
+
     try:
         tid = SPINEL.HEADER_ASYNC
         prop_id = SPINEL.PROP_STREAM_RAW
@@ -148,7 +154,23 @@ def main():
                 pkt = result.value[2:2+length]
                 if options.crc:
                     pkt = crc(pkt)
-                pkt = pcap.encode_frame(pkt)
+
+                # metadata format:
+                # 0. RSSI(int8)
+                # 1. Noise Floor(int8)
+                # 2. Flags(uint16)
+                # 3. PHY-specific data struct contains:
+                #     3.0 Channel(uint8)
+                #     3.1 LQI(uint8)
+                #     3.2 Timestamp Msec(uint32)
+                #     3.3 Timestamp Usec(uint16)
+                metadata = wpan_api.parse_fields(result.value[2+length:2+length+14], "ccSt(CCLS)")
+
+                timestamp_usec = timebase_usec + metadata[3][2] * 1000 + metadata[3][3]
+                timestamp_sec = timebase_sec + timestamp_usec / 1000000
+                timestamp_usec = timestamp_usec % 1000000
+
+                pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec)
                 if options.hex:
                     pkt = util.hexify_str(pkt)+"\n"
                 sys.stdout.write(pkt)
