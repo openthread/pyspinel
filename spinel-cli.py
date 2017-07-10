@@ -20,21 +20,21 @@ spinel-cli.py
 
 available commands (type help <name> for more information):
 ============================================================
-channel            diag-sleep  leaderdata       releaserouterid
-child              diag-start  leaderweight     rloc16
-childmax           diag-stats  masterkey        route
-childtimeout       diag-stop   mode             router
-clear              discover    ncp-ll64         routerupgradethreshold
-commissioner       eidcache    ncp-ml64         scan
-contextreusedelay  exit        ncp-tun          state
-counter            extaddr     netdataregister  thread
-debug              extpanid    networkidtimeout tun
-debug-mem          h           networkname      v
-diag               help        panid            version
-diag-channel       history     ping             whitelist
-diag-power         ifconfig    prefix
-diag-repeat        ipaddr      q
-diag-send          keysequence quit
+channel            diag-sleep  leaderdata       quit
+child              diag-start  leaderweight     releaserouterid
+childmax           diag-stats  macfilter        rloc16
+childtimeout       diag-stop   masterkey        route
+clear              discover    mode             router
+commissioner       eidcache    ncp-ll64         routerupgradethreshold
+contextreusedelay  exit        ncp-ml64         scan
+counter            extaddr     ncp-tun          state
+debug              extpanid    netdataregister  thread
+debug-mem          h           networkidtimeout tun
+diag               help        networkname      v
+diag-channel       history     panid            version
+diag-power         ifconfig    ping
+diag-repeat        ipaddr      prefix
+diag-send          keysequence q
 """
 
 from __future__ import print_function
@@ -223,6 +223,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'keysequence',
         'leaderdata',
         'leaderweight',
+        'macfilter',
         'masterkey',
         'mode',
         'netdataregister',
@@ -244,7 +245,6 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'state',
         'thread',
         'version',
-        'whitelist',
 
         # OpenThread Diagnostics Module CLI
         'diag',
@@ -1774,98 +1774,208 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         self.handle_property(line, SPINEL.PROP_NCP_VERSION, 'U')
 
-    def complete_whitelist(self, text, _line, _begidx, _endidx):
-        """ Subcommand completion handler for whitelist command. """
-        map_sub_commands = ('add', 'remove', 'clear', 'enable', 'disable')
+    def complete_macfilter(self, text, _line, _begidx, _endidx):
+        """ Subcommand completion handler for macfilter command. """
+        #TODO: autocomplete the secondary sub commands
+        #for 'addr': 'disable', 'blacklist', 'whitelist', 'add', 'remove', 'clear'
+        #for 'rss' : 'add', 'remove', 'clear'
+        map_sub_commands = ('addr', 'rss')
         return [i for i in map_sub_commands if i.startswith(text)]
 
-    def do_whitelist(self, line):
+    def do_macfilter(self, line):
         """
-        whitelist
+        macfilter
 
-            List the whitelist entries.
+           List the macfilter status, including address and received signal strength filter settings.
 
-            > whitelist
-            Enabled
-            e2b3540590b0fd87
-            d38d7f875888fccb
-            c467a90a2060fa0e
+           > macfilter
+           Whitelist
+           Done
+
+        macfilter addr
+
+            List the address filter status.
+
+            > macfilter addr
+            Whitelist
             Done
 
-        whitelist add <extaddr> [rssi]
+        macfilter addr disable
+            Disable address filter mode.
 
-            Add an IEEE 802.15.4 Extended Address to the whitelist.
-
-            > whitelist add dead00beef00cafe
+            > macfilter addr disable
             Done
 
-        whitelist clear
+        macfilter addr whitelist
+            Enable whitelist address filter mode.
 
-            Clear all entries from the whitelist.
-
-            > whitelist clear
+            > macfilter addr whitelist
             Done
 
-        whitelist disable
+        macfilter addr blacklist
+            Enable blacklist address filter mode.
 
-            Disable MAC whitelist filtering.
-
-            > whitelist disable
+            > macfilter addr blacklist
             Done
 
-        whitelist enable
+        macfilter addr add <extaddr> [rssi]
 
-            Enable MAC whitelist filtering.
+            Add an IEEE 802.15.4 Extended Address to the address filter.
 
-            > whitelist enable
+            > macfilter addr add dead00beef00cafe -85
             Done
 
-        whitelist remove <extaddr>
-
-            Remove an IEEE 802.15.4 Extended Address from the whitelist.
-
-            > whitelist remove dead00beef00cafe
+            > macfilter addr add dead00beef00caff
             Done
+
+        macfilter addr remove <extaddr>
+
+            Remove an IEEE 802.15.4 Extended Address from the address filter.
+
+            > macfilter addr remove dead00beef00caff
+            Done
+
+
+        macfilter addr clear
+
+            Clear all entries from the address filter.
+
+            > macfilter addr clear
+            Done
+
+        macfilter rss
+
+            List the rss filter status.
+
+            > macfilter rss
+            Done
+
+        macfilter rss add <extaddr> <rssi>
+
+            Set the received signal strength for the messages from the IEEE802.15.4 Extended Address.
+            If extaddr is \*, default received signal strength for all received messages would be set.
+
+            > macfilter rss add * -50
+            Done
+
+            > macfilter rss add 0f6127e33af6b404 -85
+            Done
+
+        macfilter rss remove <extaddr>
+
+            Removes the received signal strength or received link quality setting on the Extended Address.
+            If extaddr is \*, default received signal strength or link quality for all received messages would be unset.
+
+            > macfilter rss remove *
+            Done
+
+            > macfilter rss remove 0f6127e33af6b404
+
+        macfilter rss clear
+
+            Clear all the the received signal strength.
+
+            > macfilter rss clear
         """
+
         map_arg_value = {
             0: "Disabled",
-            1: "Enabled",
+            1: "Whitelist",
+            2: "Blacklist",
         }
 
         params = line.split(" ")
 
         if params[0] == "":
             value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST_ENABLED)
-            if value != None:
-                print(map_arg_value[value])
+            if value == 1:
+                mode = 1
+            else:
+                value = self.prop_get_value(SPINEL.PROP_MAC_BLACKLIST_ENABLED)
+
+            if value == 1:
+                mode = 2
+            else:
+                mode = 0
+
+            print(map_arg_value[mode])
+
+            #TODO: parse and show the content of entries
             value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST)
+            value = self.prop_get_value(SPINEL.PROP_MAC_FIXED_RSS)
 
-        elif params[0] == "enable":
-            self.prop_set(SPINEL.PROP_MAC_WHITELIST_ENABLED, '1')
-            return
+        if params[0] == "addr":
+            if len(params) == 1:
+                value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST_ENABLED)
+                if value == 1:
+                    mode = 1
+                else:
+                    value = self.prop_get_value(SPINEL.PROP_MAC_BLACKLIST_ENABLED)
 
-        elif params[0] == "disable":
-            self.prop_set(SPINEL.PROP_MAC_WHITELIST_ENABLED, '0')
-            return
+                if value == 1:
+                    mode = 2
+                else:
+                    mode = 0
+                print(map_arg_value[mode])
+                #TODO: parse and show the content of entries
+                value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST)
 
-        elif params[0] == "clear":
-            value = self.prop_set_value(SPINEL.PROP_MAC_WHITELIST, None, None)
+            elif params[1] == "whitelist":
+                self.prop_set(SPINEL.PROP_MAC_WHITELIST_ENABLED, '1')
+                return
 
-        elif params[0] == "add":
-            arr = util.hex_to_bytes(params[1])
-            try:
-                rssi = int(params[2])
-            except:
-                rssi = SPINEL.RSSI_OVERRIDE
-            arr += struct.pack('b', rssi)
-            value = self.prop_insert_value(SPINEL.PROP_MAC_WHITELIST, arr,
+            elif params[1] == "blacklist":
+                self.prop_set(SPINEL.PROP_MAC_BLACKLIST_ENABLED, '1')
+                return
+
+            elif params[1] == "disable":
+                self.prop_set(SPINEL.PROP_MAC_WHITELIST_ENABLED, '0')
+                return
+
+            elif params[1] == "add":
+                arr = util.hex_to_bytes(params[2])
+                try:
+                    rssi = int(params[3])
+                except:
+                    rssi = SPINEL.RSSI_OVERRIDE
+
+                arr += struct.pack('b', rssi)
+                value = self.prop_insert_value(SPINEL.PROP_MAC_WHITELIST, arr,
+                        str(len(arr)) + 's')
+
+            elif params[1] == "remove":
+                arr = util.hex_to_bytes(params[2])
+                value = self.prop_remove_value(SPINEL.PROP_MAC_WHITELIST, arr,
                                            str(len(arr)) + 's')
+            elif params[1] == "clear":
+                 value = self.prop_set_value(SPINEL.PROP_MAC_WHITELIST, None, None)
 
-        elif params[0] == "remove":
-            arr = util.hex_to_bytes(params[1])
-            arr += struct.pack('b', SPINEL.RSSI_OVERRIDE)
-            value = self.prop_remove_value(SPINEL.PROP_MAC_WHITELIST, arr,
-                                           str(len(arr)) + 's')
+        elif params[0] == "rss":
+            if len(params) == 1:
+                #TODO: parse and show the content of entries
+                value = self.prop_get_value(SPINEL.PROP_MAC_FIXED_RSS)
+
+            elif params[1] == "add":
+                if params[2] == "*":
+                    arr = ""
+                else:
+                    arr = util.hex_to_bytes(params[2])
+                rssi = int(params[3])
+                arr += struct.pack('b', rssi)
+                value = self.prop_insert_value(SPINEL.PROP_MAC_FIXED_RSS, arr,
+                        str(len(arr)) + 's')
+
+            elif params[1] == "remove":
+                if params[2] == "*":
+                    arr = ""
+                else:
+                    arr = util.hex_to_bytes(params[2])
+
+                value = self.prop_remove_value(SPINEL.PROP_MAC_FIXED_RSS, arr,
+                        str(len(arr)) + 's')
+
+            elif params[1] == "clear":
+                value = self.prop_set_value(SPINEL.PROP_MAC_FIXED_RSS, NULL, 0)
 
         print("Done")
 
