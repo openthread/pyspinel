@@ -65,8 +65,8 @@ def parse_args():
     opt_parser.add_option("-c", "--channel", action="store",
                           dest="channel", type="int", default=DEFAULT_CHANNEL)
 
-    opt_parser.add_option('--ti-crc', action='store_true',
-                          dest='ti_crc', default=False )
+    opt_parser.add_option('--crc', action='store_true',
+                          dest='crc', default=False )
 
     return opt_parser.parse_args(args)
 
@@ -84,10 +84,8 @@ def sniffer_init(wpan_api, options):
     wpan_api.prop_set_value(SPINEL.PROP_NET_IF_UP, 1)
 
 
-def ti_crc( s ):
-    # TI Chips do not transmit the CRC
-    # See the data sheet for more details.
-    # Here we recalculate the CRC ...
+def crc( s ):
+    # Some chips do not transmit the CRC, here we recalculate the CRC.
 
     crc = 0
     # remove the last 2 bytes
@@ -148,8 +146,8 @@ def main():
             if result and result.prop == prop_id:
                 length = wpan_api.parse_S(result.value)
                 pkt = result.value[2:2+length]
-                if options.ti_crc:
-                    pkt = ti_crc(pkt)
+                if options.crc:
+                    pkt = crc(pkt)
                 pkt = pcap.encode_frame(pkt)
                 if options.hex:
                     pkt = util.hexify_str(pkt)+"\n"
