@@ -274,7 +274,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             consumed = True
 
             try:
-                pkt = cls.icmp_factory.from_bytes(value[2:])
+                pkt = cls.icmp_factory.from_bytes(value)
 
                 if CONFIG.DEBUG_LOG_PKT:
                     logging.debug(pkt)

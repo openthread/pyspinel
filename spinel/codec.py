@@ -119,7 +119,7 @@ class SpinelCodec(object):
     def parse_D(cls, payload): return payload
 
     @classmethod
-    def parse_d(cls, payload): return payload[2:unpack("<H", payload[:2])[0]]
+    def parse_d(cls, payload): return payload[2:2+unpack("<H", payload[:2])[0]]
 
     @classmethod
     def parse_i(cls, payload):
@@ -667,9 +667,9 @@ class SpinelPropertyHandler(SpinelCodec):
 
     def STREAM_RAW(self, _, payload): return self.parse_D(payload)
 
-    def STREAM_NET(self, _, payload): return self.parse_D(payload)
+    def STREAM_NET(self, _, payload): return self.parse_d(payload)
 
-    def STREAM_NET_INSECURE(self, _, payload): return self.parse_D(payload)
+    def STREAM_NET_INSECURE(self, _, payload): return self.parse_d(payload)
 
     def PIB_PHY_CHANNELS_SUPPORTED(self, _wpan_api, payload): pass
 
