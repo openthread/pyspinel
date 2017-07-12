@@ -59,12 +59,6 @@ sudo pip install --user ipaddress
     -n NODEID, --nodeid=<NODEID>
         The unique nodeid for the HOST and NCP instance.
 
-    -q, --quiet
-        Minimize debug and log output.
-
-    -v, --verbose
-        Maximize debug and log output.
-
     -d <DEBUG_LEVEL>, --debug=<DEBUG_LEVEL>
         Set the debug level.  Enabling debug output is typically coupled with -x.
            0: Supress all debug output.  Required to stream to Wireshark.
@@ -86,13 +80,11 @@ sudo pip install --user ipaddress
 
 ## Quick Start
 
-From openthread root:
-
 ```
-    sudo ./tools/spinel-cli/sniffer.py -c 11 -n 1 -u /dev/ttyUSB0 | wireshark -k -i -
+    sudo ./sniffer.py -c 11 -n 1 -u /dev/ttyUSB0 | wireshark -k -i -
 
-    For TI NCP sniffer
-    sudo ./tools/spinel-cli/sniffer.py -c 11 -n 1 --crc -u /dev/ttyUSB0 | wireshark -k -i -
+    For the sniffers that do not provide the crc:
+    sudo ./sniffer.py -c 11 -n 1 --crc -u /dev/ttyUSB0 | wireshark -k -i -
 ```
 
 This will connect to stock openthread ncp firmware over the given UART,
