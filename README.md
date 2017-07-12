@@ -92,17 +92,21 @@ spinel-cli > help
 
 Available commands (type help <name> for more information):
 ============================================================
-channel            extaddr       mode              route
-child              extpanid      netdataregister   router
-childtimeout       h             networkidtimeout  routerupgradethreshold
-clear              help          networkname       scan
-contextreusedelay  history       panid             state
-counter            ifconfig      ping              thread
-debug              ipaddr        prefix            v
-debug-term         keysequence   q                 version
-eidcache           leaderdata    quit              whitelist
-enabled            leaderweight  releaserouterid
-exit               masterkey     rloc16
+channel            diag-sleep  leaderdata       quit
+child              diag-start  leaderweight     releaserouterid
+childmax           diag-stats  macfilter        rloc16
+childtimeout       diag-stop   masterkey        route
+clear              discover    mode             router
+commissioner       eidcache    ncp-ll64         routerupgradethreshold
+contextreusedelay  exit        ncp-ml64         scan
+counter            extaddr     ncp-tun          state
+debug              extpanid    netdataregister  thread
+debug-mem          h           networkidtimeout tun
+diag               help        networkname      v
+diag-channel       history     panid            version
+diag-power         ifconfig    ping
+diag-repeat        ipaddr      prefix
+diag-send          keysequence q
 
 spinel-cli > version
 OPENTHREAD/gd4d4e9d-dirty; Aug 11 2016 14:40:44
@@ -199,21 +203,21 @@ spinel-cli > help
 
 Available commands (type help <name> for more information):
 ============================================================
-channel            diag-start   leaderdata        quit                  
-child              diag-stats   leaderweight      releaserouterid       
-childtimeout       diag-stop    masterkey         rloc16                
-clear              discover     mode              route                 
-contextreusedelay  eidcache     ncp-ll64          router                
-counter            exit         ncp-ml64          routerupgradethreshold
-debug              extaddr      ncp-tun           scan                  
-debug-term         extpanid     netdataregister   state                 
-diag               h            networkidtimeout  thread                
-diag-channel       help         networkname       tun                   
-diag-power         history      panid             v                     
-diag-repeat        ifconfig     ping              version               
-diag-send          ipaddr       prefix            whitelist             
-diag-sleep         keysequence  q               
-
+channel            diag-sleep  leaderdata       quit
+child              diag-start  leaderweight     releaserouterid
+childmax           diag-stats  macfilter        rloc16
+childtimeout       diag-stop   masterkey        route
+clear              discover    mode             router
+commissioner       eidcache    ncp-ll64         routerupgradethreshold
+contextreusedelay  exit        ncp-ml64         scan
+counter            extaddr     ncp-tun          state
+debug              extpanid    netdataregister  thread
+debug-mem          h           networkidtimeout tun
+diag               help        networkname      v
+diag-channel       history     panid            version
+diag-power         ifconfig    ping
+diag-repeat        ipaddr      prefix
+diag-send          keysequence q
 ```
 
 #### help \<command\>

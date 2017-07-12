@@ -447,6 +447,13 @@ class SpinelPropertyHandler(SpinelCodec):
     def MAC_WHITELIST_ENABLED(self, _, payload):
         return self.parse_b(payload)
 
+    def MAC_BLACKLIST(self, _, payload): pass
+
+    def MAC_BLACKLIST_ENABLED(self, _, payload):
+        return self.parse_b(payload)
+
+    def MAC_FIXED_RSS(self, _, payload): pass
+
     def NET_SAVED(self, _, payload): return self.parse_b(payload)
 
     def NET_IF_UP(self, _, payload): return self.parse_b(payload)
@@ -779,6 +786,9 @@ SPINEL_PROP_DISPATCH = {
 
     SPINEL.PROP_MAC_WHITELIST:         WPAN_PROP_HANDLER.MAC_WHITELIST,
     SPINEL.PROP_MAC_WHITELIST_ENABLED: WPAN_PROP_HANDLER.MAC_WHITELIST_ENABLED,
+    SPINEL.PROP_MAC_BLACKLIST:         WPAN_PROP_HANDLER.MAC_BLACKLIST,
+    SPINEL.PROP_MAC_BLACKLIST_ENABLED: WPAN_PROP_HANDLER.MAC_BLACKLIST_ENABLED,
+    SPINEL.PROP_MAC_FIXED_RSS:         WPAN_PROP_HANDLER.MAC_FIXED_RSS,
 
     SPINEL.PROP_NET_SAVED:             WPAN_PROP_HANDLER.NET_SAVED,
     SPINEL.PROP_NET_IF_UP:             WPAN_PROP_HANDLER.NET_IF_UP,
