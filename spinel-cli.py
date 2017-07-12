@@ -1887,16 +1887,14 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         params = line.split(" ")
 
         if params[0] == "":
+            mode = 0
             value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST_ENABLED)
             if value == 1:
                 mode = 1
             else:
                 value = self.prop_get_value(SPINEL.PROP_MAC_BLACKLIST_ENABLED)
-
-            if value == 1:
-                mode = 2
-            else:
-                mode = 0
+                if value == 1:
+                   mode = 2
 
             print(map_arg_value[mode])
 
@@ -1906,16 +1904,15 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         if params[0] == "addr":
             if len(params) == 1:
+                mode = 0
                 value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST_ENABLED)
                 if value == 1:
                     mode = 1
                 else:
                     value = self.prop_get_value(SPINEL.PROP_MAC_BLACKLIST_ENABLED)
+                    if value == 1:
+                       mode = 2
 
-                if value == 1:
-                    mode = 2
-                else:
-                    mode = 0
                 print(map_arg_value[mode])
                 #TODO: parse and show the content of entries
                 value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST)
