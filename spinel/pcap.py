@@ -17,7 +17,6 @@
 """ Module to provide codec utilities for .pcap formatters. """
 
 import struct
-from datetime import datetime
 
 DLT_IEEE802_15_4 = 195
 PCAP_MAGIC_NUMBER = 0xa1b2c3d4
@@ -39,13 +38,9 @@ class PcapCodec(object):
                            DLT_IEEE802_15_4)
 
     @classmethod
-    def encode_frame(cls, frame):
+    def encode_frame(cls, frame, sec, usec):
         """ Returns a pcap encapsulation of the given frame. """
         # write frame pcap header
-        epoch = datetime(1970, 1, 1)
-        d_time = datetime.utcnow() - epoch
-        sec = d_time.days * 24 * 60 * 60 + d_time.seconds
-        usec = d_time.microseconds
         length = len(frame)
         pcap_frame = struct.pack("<LLLL", sec, usec, length, length)
         pcap_frame += frame
