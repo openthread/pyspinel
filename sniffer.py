@@ -57,8 +57,6 @@ def parse_args():
     opt_parser.add_option("-n", "--nodeid", action="store",
                           dest="nodeid", type="string", default=str(DEFAULT_NODEID))
 
-    opt_parser.add_option("-q", "--quiet", action="store_true", dest="quiet")
-    opt_parser.add_option("-v", "--verbose", action="store_false", dest="verbose")
     opt_parser.add_option("-d", "--debug", action="store",
                           dest="debug", type="int", default=CONFIG.DEBUG_ENABLE)
     opt_parser.add_option("-x", "--hex", action="store_true", dest="hex")
@@ -76,14 +74,30 @@ def sniffer_init(wpan_api, options):
     wpan_api.queue_register(SPINEL.HEADER_DEFAULT)
     wpan_api.queue_register(SPINEL.HEADER_ASYNC)
 
+    sys.stderr.write("Initializing sniffer...\n")
     wpan_api.cmd_send(SPINEL.CMD_RESET)
-    wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
-    wpan_api.prop_set_value(SPINEL.PROP_MAC_FILTER_MODE, SPINEL.MAC_FILTER_MODE_MONITOR)
-    wpan_api.prop_set_value(SPINEL.PROP_PHY_CHAN, options.channel)
-    wpan_api.prop_set_value(SPINEL.PROP_MAC_15_4_PANID, 0xFFFF, 'H')
-    wpan_api.prop_set_value(SPINEL.PROP_MAC_RAW_STREAM_ENABLED, 1)
-    wpan_api.prop_set_value(SPINEL.PROP_NET_IF_UP, 1)
 
+    result = wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
+    if result is None:
+        return False
+
+    result = wpan_api.prop_set_value(SPINEL.PROP_MAC_FILTER_MODE, SPINEL.MAC_FILTER_MODE_MONITOR)
+    if result is None:
+        return False
+
+    result = wpan_api.prop_set_value(SPINEL.PROP_PHY_CHAN, options.channel)
+    if result is None:
+        return False
+
+    result = wpan_api.prop_set_value(SPINEL.PROP_MAC_15_4_PANID, 0xFFFF, 'H')
+    if result is None:
+        return False
+
+    result = wpan_api.prop_set_value(SPINEL.PROP_MAC_RAW_STREAM_ENABLED, 1)
+    if result is None:
+        return False
+
+    return True
 
 def crc( s ):
     # Some chips do not transmit the CRC, here we recalculate the CRC.
@@ -130,7 +144,12 @@ def main():
     stream = StreamOpen(stream_type, stream_descriptor, False)
     if stream is None: exit()
     wpan_api = WpanApi(stream, options.nodeid)
-    sniffer_init(wpan_api, options)
+    result = sniffer_init(wpan_api, options)
+    if not result:
+        sys.stderr.write("ERROR: failed to initialize sniffer\n")
+        exit()
+    else:
+        sys.stderr.write("SUCCESS: sniffer initialized\nSniffing...\n")
 
     pcap = PcapCodec()
     hdr = pcap.encode_header()
