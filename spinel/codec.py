@@ -561,6 +561,7 @@ class SpinelPropertyHandler(SpinelCodec):
         slaacPrefixSet = set()
         while len(pay) >= 22:
             (_structlen) = unpack('<H', pay[:2])
+            struct_len = _structlen[0]
             pay = pay[2:]
             prefix = Prefix(*unpack('16sBBBB', pay[:20]))
             if prefix.flags & kThread.PrefixSlaacFlag:
@@ -568,7 +569,7 @@ class SpinelPropertyHandler(SpinelCodec):
                 net6 = net6.supernet(new_prefix=prefix.prefixlen)
                 slaacPrefixSet.add(net6)
                 prefixes.append(prefix)
-            pay = pay[20:]
+            pay = pay[struct_len:]
 
         for prefix in prefixes:
             self.handle_ipaddr_insert(*prefix)
