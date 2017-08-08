@@ -78,18 +78,12 @@ def sniffer_init(wpan_api, options):
     wpan_api.cmd_send(SPINEL.CMD_RESET)
 
     result = wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
-    if result is None:
-        return False
 
     result = wpan_api.prop_set_value(SPINEL.PROP_MAC_FILTER_MODE, SPINEL.MAC_FILTER_MODE_MONITOR)
     if result is None:
         return False
 
     result = wpan_api.prop_set_value(SPINEL.PROP_PHY_CHAN, options.channel)
-    if result is None:
-        return False
-
-    result = wpan_api.prop_set_value(SPINEL.PROP_MAC_15_4_PANID, 0xFFFF, 'H')
     if result is None:
         return False
 
@@ -174,7 +168,7 @@ def main():
                 if options.crc:
                     pkt = crc(pkt)
 
-                # metadata format:
+                # metadata format (totally 17 bytes):
                 # 0. RSSI(int8)
                 # 1. Noise Floor(int8)
                 # 2. Flags(uint16)
@@ -183,11 +177,20 @@ def main():
                 #     3.1 LQI(uint8)
                 #     3.2 Timestamp Msec(uint32)
                 #     3.3 Timestamp Usec(uint16)
-                metadata = wpan_api.parse_fields(result.value[2+length:2+length+14], "ccSt(CCLS)")
+                # 4. Vendor data struct contains:
+                #     4.0 Receive error(uint8)
+                if len(result.value) == 2+length+17:
+                    metadata = wpan_api.parse_fields(result.value[2+length:2+length+17], "ccSt(CCLS)t(i)")
 
-                timestamp_usec = timebase_usec + metadata[3][2] * 1000 + metadata[3][3]
-                timestamp_sec = timebase_sec + timestamp_usec / 1000000
-                timestamp_usec = timestamp_usec % 1000000
+                    timestamp_usec = timebase_usec + metadata[3][2] * 1000 + metadata[3][3]
+                    timestamp_sec = timebase_sec + timestamp_usec / 1000000
+                    timestamp_usec = timestamp_usec % 1000000
+
+                # Some old version NCP doesn't contain timestamp information in metadata
+                else:
+                    timestamp = datetime.utcnow() - epoch
+                    timestamp_sec = timestamp.days * 24 * 60 * 60 + timestamp.seconds
+                    timestamp_usec = timestamp.microseconds
 
                 pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec)
                 if options.hex:
