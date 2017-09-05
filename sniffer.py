@@ -27,6 +27,7 @@
 
 import sys
 import optparse
+import time
 from datetime import datetime
 
 import spinel.util as util
@@ -76,6 +77,7 @@ def sniffer_init(wpan_api, options):
 
     sys.stderr.write("Initializing sniffer...\n")
     wpan_api.cmd_send(SPINEL.CMD_RESET)
+    time.sleep(1)
 
     result = wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
 
