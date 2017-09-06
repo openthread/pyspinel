@@ -41,6 +41,7 @@ from spinel.pcap import PcapCodec
 # This is maximum that works for MacOS.
 DEFAULT_NODEID = 34    # same as WELLKNOWN_NODE_ID
 DEFAULT_CHANNEL = 11
+DEFAULT_BAUDRATE = 115200
 
 def parse_args():
     """ Parse command line arguments for this applications. """
@@ -50,6 +51,8 @@ def parse_args():
     opt_parser = optparse.OptionParser()
     opt_parser.add_option("-u", "--uart", action="store",
                           dest="uart", type="string")
+    opt_parser.add_option("-b", "--baudrate", action="store",
+                          dest="baudrate", type="int", default=DEFAULT_BAUDRATE)
     opt_parser.add_option("-p", "--pipe", action="store",
                           dest="pipe", type="string")
     opt_parser.add_option("-s", "--socket", action="store",
@@ -135,7 +138,7 @@ def main():
         if len(remaining_args) > 0:
             stream_descriptor = " ".join(remaining_args)
 
-    stream = StreamOpen(stream_type, stream_descriptor, False)
+    stream = StreamOpen(stream_type, stream_descriptor, False, options.baudrate)
     if stream is None: exit()
     wpan_api = WpanApi(stream, options.nodeid)
     result = sniffer_init(wpan_api, options)

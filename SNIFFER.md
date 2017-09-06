@@ -43,6 +43,9 @@ sudo pip install --user ipaddress
        	Open a serial connection to the OpenThread NCP device
 	where <UART> is a device path such as "/dev/ttyUSB0".
 
+    -b <baudrate>, --baudrate=<baudrate>
+        Set the uart baud rate, default is 115200.
+
     -p <PIPE>, --pipe=<PIPE>
         Open a piped process connection to the OpenThread NCP device
         where <PIPE> is the command to start an emulator, such as
@@ -92,9 +95,9 @@ make the node into a promiscuous mode sniffer on the given channel,
 open up wireshark, and start streaming packets into wireshark.
 
 ## Troubleshooting
-Q: sniffer.py throws ```ImportError: No module named dnet``` on OSX
+Q1: sniffer.py throws ```ImportError: No module named dnet``` on OSX
 
-A: install the libdnet package for OSX -
+A1: install the libdnet package for OSX -
 ```
 brew install --with-python libdnet
 mkdir -p /Users/YourUsernameHere/Library/Python/2.7/lib/python/site-packages
@@ -104,3 +107,10 @@ echo 'import site; site.addsitedir("/usr/local/lib/python2.7/site-packages")' >>
 you may need to reinstall the scapy pip dependency listed above
 
 you can read more about this issue here: http://stackoverflow.com/questions/26229057/scapy-installation-fails-on-osx-with-dnet-import-error
+
+
+Q2: high packet loss rate when sniffing heavy traffic
+
+A2: use higher uart baud rate in Sniffer firmware(NCP), and use '-b <baudrate>' option to set the same baud rate on host side.
+
+to avoid packet loss, the baud rate should be higher than 250kbps, which is the maximum bitrate of the 802.15.4 2.4GHz PHY

@@ -124,7 +124,7 @@ class StreamPipe(IStream):
             self.pipe = None
 
 
-def StreamOpen(stream_type, descriptor, verbose=True):
+def StreamOpen(stream_type, descriptor, verbose=True, baudrate=115200):
     """
     Factory function that creates and opens a stream connection.
 
@@ -153,7 +153,6 @@ def StreamOpen(stream_type, descriptor, verbose=True):
 
     elif stream_type == 'u':
         dev = str(descriptor)
-        baudrate = 115200
         if verbose:
             print("Opening serial to " + dev + " @ " + str(baudrate))
         return StreamSerial(dev, baudrate)
