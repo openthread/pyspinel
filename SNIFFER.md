@@ -79,15 +79,31 @@ sudo pip install --user ipaddress
 
     --crc
         Recalculate crc for NCP sniffer (useful for platforms that do not provide the crc).
+
+    --rssi
+        Include RSSI information in pcap output.
 ```
 
 ## Quick Start
 
 ```
+    For building an OpenThread ncp to support sniffer:
+    add --enable-raw-link-api as a build option
+
     sudo ./sniffer.py -c 11 -n 1 -u /dev/ttyUSB0 | wireshark -k -i -
 
     For the sniffers that do not provide the crc:
     sudo ./sniffer.py -c 11 -n 1 --crc -u /dev/ttyUSB0 | wireshark -k -i -
+
+    To display RSSI on Wireshark:
+    1. Configue Wireshark:
+        Edit->Preferences->Protocols->IEEE802.15.4, enable "TI CC24xx FCS format" option
+        Edit->Preferences->Appearance->Columns, add a new entry:
+            Title:   RSSI
+            Type:    Custom
+            Fields:  wpan.rssi
+    2. Run by command:
+        sudo ./sniffer.py -c 11 -n 1 --rssi -u /dev/ttyUSB0 | wireshark -k -i -
 ```
 
 This will connect to stock openthread ncp firmware over the given UART,
