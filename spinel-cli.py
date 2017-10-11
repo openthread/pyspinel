@@ -1699,13 +1699,11 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         map_arg_value = {
             0: "stop",
             1: "start",
-            2: "start",
-            3: "start",
         }
 
         map_arg_name = {
             "stop": "0",
-            "start": "2",
+            "start": "1",
         }
 
         if line:
