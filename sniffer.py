@@ -37,7 +37,6 @@ from spinel.codec import WpanApi
 from spinel.stream import StreamOpen
 from spinel.pcap import PcapCodec
 
-
 # Nodeid is required to execute ot-ncp-ftd for its sim radio socket port.
 # This is maximum that works for MacOS.
 DEFAULT_NODEID = 34    # same as WELLKNOWN_NODE_ID
@@ -70,6 +69,9 @@ def parse_args():
 
     opt_parser.add_option('--crc', action='store_true',
                           dest='crc', default=False )
+
+    opt_parser.add_option('--rssi', action='store_true',
+                          dest='rssi', default=False )
 
     return opt_parser.parse_args(args)
 
@@ -191,11 +193,18 @@ def main():
                     timestamp_sec = timebase_sec + timestamp_usec / 1000000
                     timestamp_usec = timestamp_usec % 1000000
 
+                    if options.rssi:
+                        pkt = pkt[:-2] + chr(metadata[0] & 0xff) + chr(0x80)
+
                 # Some old version NCP doesn't contain timestamp information in metadata
                 else:
                     timestamp = datetime.utcnow() - epoch
                     timestamp_sec = timestamp.days * 24 * 60 * 60 + timestamp.seconds
                     timestamp_usec = timestamp.microseconds
+                    
+                    if options.rssi:
+                        pkt = pkt[:-2] + chr(127) + chr(0x80)
+                        sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
 
                 pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec)
                 if options.hex:
