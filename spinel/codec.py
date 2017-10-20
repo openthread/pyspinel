@@ -698,6 +698,12 @@ class SpinelCommandHandler(SpinelCodec):
         if prop_id in SPINEL_PROP_DISPATCH:
             handler = SPINEL_PROP_DISPATCH[prop_id]
             prop_name = handler.__name__
+
+            # Skip any VALUE_INSERTED(CHILD_TABLE) or VALUE_REMOVED(CHILD_TABLE)
+            if prop_id == SPINEL.PROP_THREAD_CHILD_TABLE:
+                if name in ["INSERTED", "REMOVED"]:
+                    return
+
             prop_value = handler(wpan_api, payload[prop_len:])
 
             if CONFIG.DEBUG_LOG_PROP:
