@@ -63,6 +63,8 @@ def parse_args():
     opt_parser.add_option("-d", "--debug", action="store",
                           dest="debug", type="int", default=CONFIG.DEBUG_ENABLE)
     opt_parser.add_option("-x", "--hex", action="store_true", dest="hex")
+    opt_parser.add_option("-o", "--output", action="store",
+                          dest="output", type="string")
 
     opt_parser.add_option("-c", "--channel", action="store",
                           dest="channel", type="int", default=DEFAULT_CHANNEL)
@@ -156,8 +158,14 @@ def main():
     hdr = pcap.encode_header()
     if options.hex:
         hdr = util.hexify_str(hdr)+"\n"
-    sys.stdout.write(hdr)
-    sys.stdout.flush()
+    
+    if (options.output):
+        output = open(options.output, 'wb')
+    else:
+        output = sys.stdout
+
+    output.write(hdr)
+    output.flush()
 
     epoch = datetime(1970, 1, 1)
     timebase = datetime.utcnow() - epoch
@@ -209,8 +217,8 @@ def main():
                 pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec)
                 if options.hex:
                     pkt = util.hexify_str(pkt)+"\n"
-                sys.stdout.write(pkt)
-                sys.stdout.flush()
+                output.write(pkt)
+                output.flush()
 
     except KeyboardInterrupt:
         pass
@@ -218,6 +226,7 @@ def main():
     if wpan_api:
         wpan_api.stream.close()
 
+    output.close()
 
 if __name__ == "__main__":
     main()
