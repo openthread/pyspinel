@@ -29,7 +29,7 @@
 include $(abs_top_nlbuild_autotools_dir)/automake/pre.am
 
 EXTRA_DIST                              = \
-    spinel-cli.py                         \
+    spinel_cli.py                         \
     sniffer.py                            \
     test_spinel.py                        \
     $(NULL)
