@@ -80,7 +80,7 @@ sudo pip install --user ipaddress
     --crc
         Recalculate crc for NCP sniffer (useful for platforms that do not provide the crc).
 
-    --no_reset
+    --no-reset
         Do not reset the NCP during initialization (useful for some NCPs with the native USB connection).
 
     --rssi
@@ -99,7 +99,7 @@ sudo pip install --user ipaddress
     sudo ./sniffer.py -c 11 -n 1 --crc -u /dev/ttyUSB0 | wireshark -k -i -
 
     For the sniffers that are connected to the host with the native USB connection and reset during init results in failed start:
-    sudo ./sniffer.py -c 11 -n 1 --no_reset -u /dev/ttyUSB0 | wireshark -k -i -
+    sudo ./sniffer.py -c 11 -n 1 --no-reset -u /dev/ttyUSB0 | wireshark -k -i -
 
     To display RSSI on Wireshark:
     1. Configue Wireshark:

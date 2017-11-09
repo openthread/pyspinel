@@ -73,7 +73,7 @@ def parse_args():
     opt_parser.add_option('--rssi', action='store_true',
                           dest='rssi', default=False )
 
-    opt_parser.add_option('--no_reset', action='store_true',
+    opt_parser.add_option('--no-reset', action='store_true',
                           dest='no_reset', default=False )
 
     return opt_parser.parse_args(args)
