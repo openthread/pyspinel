@@ -31,7 +31,7 @@ sudo pip install --user ipaddress
     sniffer.py - shell tool for controlling OpenThread NCP instances
 
 ### SYNOPSIS
-    sniffer.py [-hupsnqvdxc]
+    sniffer.py [-hupsnqvdxco]
 
 ### DESCRIPTION
 
@@ -76,6 +76,9 @@ sudo pip install --user ipaddress
 
     -c, --channel
         Set the channel upon which to listen.
+
+    -o <FILE_NAME>, --output=<FILE_NAME>
+        Write capture to a file named <FILE_NAME>
 
     --crc
         Recalculate crc for NCP sniffer (useful for platforms that do not provide the crc).
