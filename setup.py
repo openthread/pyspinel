@@ -46,5 +46,11 @@ setup(
         'pyserial',
         'ipaddress'
     ],
-    scripts=['spinel-cli.py', 'sniffer.py']
+    entry_points={
+        'console_scripts': [
+            'sniffer = sniffer:main',
+            'spinel_cli = spinel_cli:main'
+        ]
+    },
+    scripts=['spinel-cli.py']
 )

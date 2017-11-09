@@ -29,19 +29,23 @@ The power of this tool is three fold:
 
 ### Package Installation
 
+The package can be installed using pip:
 ```
-# From openthread root
-cd tools/spinel-cli
+sudo pip install pyspinel
+```
+
+To install manually run the following from package root:
+```
 sudo python setup.py install
 ```
 
 ## Usage
 
 ### NAME
-    spinel-cli.py - shell tool for controlling OpenThread NCP instances
+    spinel_cli.py - shell tool for controlling OpenThread NCP instances
 
 ### SYNOPSIS
-    spinel-cli.py [-hupsnqv]
+    spinel_cli.py [-hupsnqv]
 
 ### DESCRIPTION
 
@@ -56,7 +60,7 @@ sudo python setup.py install
     -p <PIPE>, --pipe=<PIPE>
         Open a piped process connection to the OpenThread NCP device
         where <PIPE> is the command to start an emulator, such as
-        "ot-ncp-ftd".  Spinel-cli will communicate with the child process
+        "ot-ncp-ftd".  Spinel_cli will communicate with the child process
         via stdin/stdout.
 
     -s <SOCKET>, --socket=<SOCKET>
@@ -78,16 +82,15 @@ sudo python setup.py install
 
 ## Quick Start
 
-The spinel-cli tool provides an intuitive command line interface, including
+The spinel_cli tool provides an intuitive command line interface, including
 all the standard OpenThread CLI commands, plus full history accessible by
 pressing the up/down keys, or searchable via ^R.  There are a few commands
-that spinel-cli provides as well that aren't part of the standard set
+that spinel_cli provides as well that aren't part of the standard set
 documented in the command reference section.
 
 ```
-openthread$ cd tools/spinel-cli/
-spinel-cli$ ./spinel-cli.py
-Opening pipe to ../../examples/apps/ncp/ot-ncp-ftd 1
+$ spinel_cli -u /dev/ttyUSB0
+Opening serial to /dev/ttyUSB0 @ 115200
 spinel-cli > help
 
 Available commands (type help <name> for more information):
