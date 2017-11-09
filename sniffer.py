@@ -73,6 +73,9 @@ def parse_args():
     opt_parser.add_option('--rssi', action='store_true',
                           dest='rssi', default=False )
 
+    opt_parser.add_option('--no-reset', action='store_true',
+                          dest='no_reset', default=False )
+
     return opt_parser.parse_args(args)
 
 def sniffer_init(wpan_api, options):
@@ -81,8 +84,10 @@ def sniffer_init(wpan_api, options):
     wpan_api.queue_register(SPINEL.HEADER_ASYNC)
 
     sys.stderr.write("Initializing sniffer...\n")
-    wpan_api.cmd_send(SPINEL.CMD_RESET)
-    time.sleep(1)
+
+    if not options.no_reset:
+        wpan_api.cmd_send(SPINEL.CMD_RESET)
+        time.sleep(1)
 
     result = wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
 
