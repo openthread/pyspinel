@@ -280,8 +280,9 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                     logging.debug(pkt)
 
                 timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
-                timedelta = (timenow - struct.unpack('>I', pkt.upper_layer_protocol.body.data)[0])
-                print("\n%d bytes from %s: icmp_seq=%d hlim=%d time=%dms" % (pkt.ipv6_header.payload_length,
+                timestamp = (pkt.upper_layer_protocol.body.identifier << 16 | pkt.upper_layer_protocol.body.sequence_number)
+                timedelta = (timenow - timestamp)
+                print("\n%d bytes from %s: icmp_seq=%d hlim=%d time=%dms" % (len(pkt.upper_layer_protocol.body.data),
                                                                              pkt.ipv6_header.source_address,
                                                                              pkt.upper_layer_protocol.body.sequence_number,
                                                                              pkt.ipv6_header.hop_limit, timedelta))
@@ -1356,9 +1357,9 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             ml64 = self.prop_get_value(SPINEL.PROP_IPV6_ML_ADDR)
             ml64 = str(ipaddress.IPv6Address(ml64))
             timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
-            timenow = struct.pack('>I', timenow)
+            data = 'f' * int(_size)
 
-            ping_req = self.icmp_factory.build_icmp_echo_request(ml64, addr, timenow)
+            ping_req = self.icmp_factory.build_icmp_echo_request(ml64, addr, data, identifier=(timenow >> 16), sequence_number=(timenow & 0xffff))
 
             self.wpan_api.ip_send(ping_req)
             # Let handler print result
