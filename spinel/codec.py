@@ -732,6 +732,11 @@ class SpinelCommandHandler(SpinelCodec):
                     logging.debug("DEBUG: " + prop_value)
 
             if wpan_api:
+                if prop_id == SPINEL.PROP_LAST_STATUS and \
+                        prop_value >= SPINEL.STATUS_RESET_BEGIN and \
+                        prop_value <= SPINEL.STATUS_RESET_END:
+                    wpan_api._ready.set()
+
                 wpan_api.queue_add(prop_id, prop_value, tid)
             else:
                 print("no wpan_api")
@@ -884,6 +889,7 @@ class WpanApi(SpinelCodec):
         self.tid_filter = set()
         self.__queue_prop = defaultdict(Queue.Queue)  # Map tid to Queue.
         self.queue_register()
+        self._ready = threading.Event()
         self.__start_reader()
 
     def __del__(self):
@@ -896,6 +902,7 @@ class WpanApi(SpinelCodec):
         self.receiver_thread = threading.Thread(target=self.stream_rx)
         self.receiver_thread.setDaemon(True)
         self.receiver_thread.start()
+        self._ready.wait(4)
 
     def transact(self, command_id, payload="", tid=SPINEL.HEADER_DEFAULT):
         pkt = self.encode_packet(command_id, payload, tid)

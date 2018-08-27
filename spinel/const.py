@@ -346,6 +346,9 @@ class SPINEL(object):
 
     #=========================================
 
+    STATUS_RESET_BEGIN = 112
+    STATUS_RESET_END = 120
+
 
 class kThread(object):
     """ OpenThread constant class. """
