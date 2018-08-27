@@ -149,12 +149,12 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
     icmp_factory = IcmpV6Factory()
 
-    def __init__(self, stream_desc, nodeid, *_a, **kw):
+    def __init__(self, stream, nodeid, *_a, **kw):
 
         self.nodeid = kw.get('nodeid', '1')
         self.tun_if = None
 
-        self.wpan_api = WpanApi(stream_desc, nodeid)
+        self.wpan_api = WpanApi(stream, nodeid)
         self.wpan_api.queue_register(SPINEL.HEADER_DEFAULT)
         self.wpan_api.callback_register(SPINEL.PROP_STREAM_NET,
                                         self.wpan_callback)
@@ -187,6 +187,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             else:
                 readline.parse_and_bind('tab: complete')
 
+        if hasattr(stream, 'pipe'):
+            self.wpan_api.queue_wait_for_prop(SPINEL.PROP_LAST_STATUS, SPINEL.HEADER_ASYNC)
         self.prop_set_value(SPINEL.PROP_IPv6_ICMP_PING_OFFLOAD, 1)
         self.prop_set_value(SPINEL.PROP_THREAD_RLOC16_DEBUG_PASSTHRU, 1)
 
