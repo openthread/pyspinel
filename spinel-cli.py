@@ -48,6 +48,7 @@ import random
 import optparse
 
 import binascii
+import socket
 import struct
 import string
 import textwrap
@@ -147,11 +148,25 @@ class SpinelCliCmd(Cmd, SpinelCodec):
     via the Spinel protocol.
     """
 
+    VIRTUAL_TIME = os.getenv('VIRTUAL_TIME') == '1'
+
     icmp_factory = IcmpV6Factory()
 
-    def __init__(self, stream, nodeid, *_a, **kw):
+    def _init_virtual_time(self):
+        """
+        compute addresses used for virtual time.
+        """
+        BASE_PORT = 9000
+        MAX_NODES = 34
+        PORT_OFFSET = int(os.getenv("PORT_OFFSET", "0"))
 
-        self.nodeid = kw.get('nodeid', '1')
+        self._addr = ('127.0.0.1', BASE_PORT * 2 + MAX_NODES * PORT_OFFSET)
+        self._simulator_addr = ('127.0.0.1', BASE_PORT + MAX_NODES * PORT_OFFSET)
+
+    def __init__(self, stream, nodeid, *_a, **kw):
+        if self.VIRTUAL_TIME:
+            self._init_virtual_time()
+        self.nodeid = nodeid
         self.tun_if = None
 
         self.wpan_api = WpanApi(stream, nodeid)
@@ -2226,6 +2241,22 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         pass
 
+    def _notify_simulator(self):
+        """
+        notify the simulator that there are no more UART data for the current command.
+        """
+        OT_SIM_EVENT_POSTCMD = 4
+
+        message = struct.pack('=QBHB', 0, OT_SIM_EVENT_POSTCMD, 1, int(self.nodeid))
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.bind(self._addr)
+        sock.sendto(message, self._simulator_addr)
+        sock.close()
+
+    def postcmd(self, stop, line):
+        if self.VIRTUAL_TIME:
+            self._notify_simulator()
+        return stop
 
 def parse_args():
     """" Send spinel commands to initialize sniffer node. """

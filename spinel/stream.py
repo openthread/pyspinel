@@ -23,6 +23,7 @@ from __future__ import print_function
 
 import sys
 import logging
+import time
 import traceback
 
 import subprocess
@@ -97,19 +98,28 @@ class StreamPipe(IStream):
     def __init__(self, filename):
         """ Create a stream object from a piped system call """
         try:
-            self.pipe = subprocess.Popen(filename, shell=True,
+            # use exec so that there will be no zombie processes on failure
+            self.pipe = subprocess.Popen('exec ' + filename, shell=True,
                                          stdin=subprocess.PIPE,
                                          stdout=subprocess.PIPE,
-                                         stderr=sys.stdout.fileno())
+                                         stderr=sys.stderr)
         except:
             logging.error("Couldn't open " + filename)
             traceback.print_exc()
+
+    def __del__(self):
+        if self.pipe:
+            self.pipe.terminate()
+            self.pipe.wait()
+            self.pipe = None
 
     def write(self, data):
         if CONFIG.DEBUG_STREAM_TX:
             logging.debug("TX Raw: (%d) %s",
                           len(data), spinel.util.hexify_bytes(data))
         self.pipe.stdin.write(data)
+        # let the NCP process UART events first
+        time.sleep(0)
 
     def read(self, size=1):
         """ Blocking read on stream object """
