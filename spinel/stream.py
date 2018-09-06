@@ -109,7 +109,7 @@ class StreamPipe(IStream):
 
     def __del__(self):
         if self.pipe:
-            self.pipe.terminate()
+            self.pipe.stdin.close()
             self.pipe.wait()
             self.pipe = None
 
