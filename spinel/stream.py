@@ -108,10 +108,7 @@ class StreamPipe(IStream):
             traceback.print_exc()
 
     def __del__(self):
-        if self.pipe:
-            self.pipe.stdin.close()
-            self.pipe.wait()
-            self.pipe = None
+        self.close()
 
     def write(self, data):
         if CONFIG.DEBUG_STREAM_TX:
@@ -126,11 +123,14 @@ class StreamPipe(IStream):
         pkt = self.pipe.stdout.read(size)
         if CONFIG.DEBUG_STREAM_RX:
             logging.debug("RX Raw: " + str(map(spinel.util.hexify_chr, pkt)))
+        if not pkt:
+            sys.exit(0)
         return map(ord, pkt)[0]
 
     def close(self):
         if self.pipe:
-            self.pipe.kill()
+            self.pipe.stdin.close()
+            self.pipe.wait()
             self.pipe = None
 
 
