@@ -16,22 +16,38 @@
 #  limitations under the License.
 #
 
-def hexify_chr(s): return "%02X" % ord(s)
+import binascii
+import sys
+
+def hexify_chr(s):
+    if isinstance(s, str) and sys.version_info[0] == 2:
+        s = ord(s)
+    return "%02X" % s
+
 def hexify_int(i): return "%02X" % i
-def hexify_bytes(data): return str(map(hexify_chr,data))
+def hexify_bytes(data): return str(list(map(hexify_chr,data)))
 def hexify_str(s,delim=':'):
-    return delim.join(x.encode('hex') for x in s)
+    if isinstance(s, str) and sys.version_info[0] == 2:
+        return delim.join(x.encode('hex') for x in s)
+    else:
+        return delim.join(str(binascii.hexlify(bytearray([x])))[2:-1] for x in s)
 
 def pack_bytes(packet): return pack("%dB" % len(packet), *packet)
-def packed_to_array(packet): return map(ord, packet)
+def packed_to_array(packet): return list(map(ord, packet))
 
 def asciify_int(i): return "%c" % (i)
 
 def hex_to_bytes(s):
-    result = ''
-    for i in xrange(0, len(s), 2):
+    if sys.version_info[0] == 2:
+        result = ''
+    else:
+        result = bytes()
+    for i in range(0, len(s), 2):
         (b1, b2) = s[i:i+2]
         hex = b1+b2
         v = int(hex, 16)
-        result += chr(v)
+        if sys.version_info[0] == 2:
+            result += chr(v)
+        else:
+            result += bytearray([v])
     return result

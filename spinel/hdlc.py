@@ -17,6 +17,7 @@
 """ High-Level Data Link Control (HDLC) module. """
 
 import logging
+import sys
 
 from struct import pack
 
@@ -102,12 +103,14 @@ class Hdlc(IStream):
             fcs = self.fcs16(byte, fcs)
 
         if CONFIG.DEBUG_HDLC:
-            logging.debug("RX Hdlc: " + str(map(hexify_int, raw)))
+            logging.debug("RX Hdlc: " + str(list(map(hexify_int, raw))))
 
         if fcs != HDLC_FCS_GOOD:
             packet = None
         else:
             packet = packet[:-2]        # remove FCS16 from end
+
+        packet = pack("%dB" % len(packet), *packet)
 
         return packet
 
@@ -127,7 +130,8 @@ class Hdlc(IStream):
         packet = []
         packet.append(HDLC_FLAG)
         for byte in payload:
-            byte = ord(byte)
+            if isinstance(byte, str) and sys.version_info[0] == 2:
+                byte = ord(byte)
             fcs = self.fcs16(byte, fcs)
             packet = self.encode_byte(byte, packet)
 

@@ -37,7 +37,8 @@ diag-repeat        ipaddr      prefix
 diag-send          keysequence q
 """
 
-from __future__ import print_function
+from __future__ import absolute_import, print_function
+from builtins import str
 
 import os
 import sys
@@ -136,7 +137,7 @@ class IcmpV6Factory(object):
             )
         )
 
-        return str(ping_req.to_bytes())
+        return ping_req.to_bytes()
 
     def from_bytes(self, data):
         return self.ipv6_factory.parse(io.BytesIO(data), common.MessageInfo())
@@ -1025,7 +1026,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         num = len(params)
         if num > 1:
             ipaddr = params[1]
-            prefix = ipaddress.IPv6Interface(unicode(ipaddr))
+            prefix = ipaddress.IPv6Interface(str(ipaddr))
             arr = prefix.ip.packed
 
         if params[0] == "":
@@ -1374,7 +1375,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             ml64 = self.prop_get_value(SPINEL.PROP_IPV6_ML_ADDR)
             ml64 = str(ipaddress.IPv6Address(ml64))
             timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
-            data = 'f' * int(_size)
+            data = bytearray(int(_size))
 
             ping_req = self.icmp_factory.build_icmp_echo_request(ml64, addr, data, identifier=(timenow >> 16), sequence_number=(timenow & 0xffff))
 
@@ -1420,7 +1421,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         num = len(params)
         if num > 1:
-            prefix = ipaddress.IPv6Interface(unicode(params[1]))
+            prefix = ipaddress.IPv6Interface(str(params[1]))
             arr = prefix.ip.packed
 
         if num > 2:
@@ -1545,7 +1546,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         num = len(params)
         if num > 1:
-            prefix = ipaddress.IPv6Interface(unicode(params[1]))
+            prefix = ipaddress.IPv6Interface(str(params[1]))
             arr = prefix.ip.packed
 
         if params[0] == "":
@@ -2065,7 +2066,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         num = len(params)
         if num > 1:
             ipaddr = params[1]
-            prefix = ipaddress.IPv6Interface(unicode(ipaddr))
+            prefix = ipaddress.IPv6Interface(str(ipaddr))
             _arr = prefix.ip.packed
 
         if params[0] == "":
