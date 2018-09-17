@@ -19,6 +19,7 @@ Module providing a Spienl coder / decoder class.
 """
 
 from __future__ import print_function
+from builtins import str
 
 import os
 import sys
@@ -113,7 +114,12 @@ class SpinelCodec(object):
     def parse_e(cls, payload): return payload[:6]
 
     @classmethod
-    def parse_U(cls, payload): return payload[:payload.index('\0')]  # strip null
+    def parse_U(cls, payload):
+        if isinstance(payload, bytes):
+            nullchar = bytes([0])
+        else:
+            nullchar = '\0'
+        return payload[:payload.index(nullchar)]  # strip null
 
     @classmethod
     def parse_D(cls, payload): return payload
@@ -129,7 +135,11 @@ class SpinelCodec(object):
         value_mul = 1
 
         while value_len < 4:
-            byte = ord(payload[value_len])
+            byte = payload[value_len]
+
+            if sys.version_info[0] == 2:
+                byte = ord(byte)
+
             value += (byte & 0x7F) * value_mul
             if byte < 0x80:
                 break
@@ -286,7 +296,7 @@ class SpinelCodec(object):
     @classmethod
     def encode_i(cls, data):
         """ Encode EXI integer format. """
-        result = ""
+        result = bytes()
         while data:
             value = data & 0x7F
             data >>= 7
@@ -365,7 +375,7 @@ class SpinelCodec(object):
         return code, spinel_format
 
     def encode_fields(self, spinel_format, *fields):
-        packed = ""
+        packed = bytes()
         for field in fields:
             code, spinel_format = self.next_code(spinel_format)
             if not code:
@@ -373,7 +383,7 @@ class SpinelCodec(object):
             packed += self.encode_field(code, field)
         return packed
 
-    def encode_packet(self, command_id, payload=None, tid=SPINEL.HEADER_DEFAULT):
+    def encode_packet(self, command_id, payload=bytes(), tid=SPINEL.HEADER_DEFAULT):
         """ Encode the given payload as a Spinel frame. """
         header = pack(">B", tid)
         cmd = self.encode_i(command_id)
@@ -536,7 +546,7 @@ class SpinelPropertyHandler(SpinelCodec):
         valid = 1
         preferred = 1
         flags = 0
-        ipaddr = ipaddress.IPv6Interface(unicode(ipaddr_str))
+        ipaddr = ipaddress.IPv6Interface(str(ipaddr_str))
         self.autoAddresses.add(ipaddr)
 
         arr = self.encode_fields('6CLLC',
@@ -709,7 +719,7 @@ class SpinelCommandHandler(SpinelCodec):
             if CONFIG.DEBUG_LOG_PROP:
 
                 # Generic output
-                if isinstance(prop_value, basestring):
+                if isinstance(prop_value, str):
                     prop_value_str = util.hexify_str(prop_value)
                     logging.debug("PROP_VALUE_%s [tid=%d]: %s = %s",
                                   name, (tid & 0xF), prop_name, prop_value_str)
@@ -897,7 +907,7 @@ class WpanApi(SpinelCodec):
         self.receiver_thread.setDaemon(True)
         self.receiver_thread.start()
 
-    def transact(self, command_id, payload="", tid=SPINEL.HEADER_DEFAULT):
+    def transact(self, command_id, payload=bytes(), tid=SPINEL.HEADER_DEFAULT):
         pkt = self.encode_packet(command_id, payload, tid)
         if CONFIG.DEBUG_LOG_SERIAL:
             msg = "TX Pay: (%i) %s " % (len(pkt), util.hexify_bytes(pkt))
@@ -913,14 +923,17 @@ class WpanApi(SpinelCodec):
 
         if CONFIG.DEBUG_LOG_SERIAL:
             msg = "RX Pay: (%i) %s " % (
-                len(pkt), str(map(util.hexify_int, pkt)))
+                len(pkt), str(list(map(util.hexify_int, pkt))))
             logging.debug(msg)
 
         length = len(pkt) - 2
         if length < 0:
             return
 
-        spkt = "".join(map(chr, pkt))
+        spkt = pkt
+
+        #if not isinstance(spkt, str):
+        #    spkt = "".join(map(chr, spkt))
 
         tid = self.parse_C(spkt[:1])
         (cmd_id, cmd_length) = self.parse_i(spkt[1:])
@@ -1037,18 +1050,18 @@ class WpanApi(SpinelCodec):
         pkt_len = len(pkt)
         pay += pack("<H", pkt_len)          # Start with length of IPv6 packet
 
-        pkt_len += 2                       # Increment to include length word
-        pay += pack("%ds" % pkt_len, pkt)  # Append packet after length
+        pkt_len += 2                        # Increment to include length word
+        pay += pkt                          # Append packet after length
 
         self.transact(SPINEL.CMD_PROP_VALUE_SET, pay)
 
     def cmd_reset(self):
         self.queue_wait_prepare(None, SPINEL.HEADER_ASYNC)
-        self.transact(SPINEL.CMD_RESET, "", SPINEL.HEADER_DEFAULT)
+        self.transact(SPINEL.CMD_RESET)
         result = self.queue_wait_for_prop(SPINEL.PROP_LAST_STATUS, SPINEL.HEADER_ASYNC)
         return (result is not None and result.value == 114)
 
-    def cmd_send(self, command_id, payload="", tid=SPINEL.HEADER_DEFAULT):
+    def cmd_send(self, command_id, payload=bytes(), tid=SPINEL.HEADER_DEFAULT):
         self.queue_wait_prepare(None, tid)
         self.transact(command_id, payload, tid)
         self.queue_wait_for_prop(None, tid)
@@ -1134,7 +1147,7 @@ class WpanApi(SpinelCodec):
         if value is None:
             return None
         size = 0x1B
-        addrs = [value[i:i + size] for i in xrange(0, len(value), size)]
+        addrs = [value[i:i + size] for i in range(0, len(value), size)]
         ipaddrs = []
         for addr in addrs:
             addr = addr[2:18]
