@@ -488,7 +488,7 @@ class SpinelPropertyHandler(SpinelCodec):
 
     def THREAD_PARENT(self, _wpan_api, payload): return self.parse_fields(payload, "ES")
 
-    def THREAD_CHILD_TABLE(self, _, payload): return self.parse_fields(payload, "A(t(ESLLCCcC))")
+    def THREAD_CHILD_TABLE(self, _, payload): return self.parse_fields(payload, "A(ESLLCCcCc)")
 
     def THREAD_LEADER_RID(self, _, payload): return self.parse_C(payload)
 
