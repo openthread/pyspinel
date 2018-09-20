@@ -109,8 +109,7 @@ class Hdlc(IStream):
             packet = None
         else:
             packet = packet[:-2]        # remove FCS16 from end
-
-        packet = pack("%dB" % len(packet), *packet)
+            packet = pack("%dB" % len(packet), *packet)
 
         return packet
 
