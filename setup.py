@@ -19,7 +19,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyspinel',
-    version='1.0.0a2',
+    version='1.0.0a3',
     description='A Python interface to the OpenThread Network Co-Processor (NCP)',
     url='https://github.com/openthread/openthread',
     author='The OpenThread Authors',
@@ -39,6 +39,7 @@ setup(
         'Topic :: Software Development :: Embedded Systems',
 
         'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
     ],
     keywords='openthread thread spinel ncp',
     packages=find_packages(),
