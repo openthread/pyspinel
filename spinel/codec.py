@@ -119,7 +119,10 @@ class SpinelCodec(object):
             nullchar = bytes([0])
         else:
             nullchar = '\0'
-        return payload[:payload.index(nullchar)]  # strip null
+        if payload.find(nullchar) >= 0:
+            return payload[:payload.index(nullchar)]  # strip null
+        else:
+            return payload
 
     @classmethod
     def parse_D(cls, payload): return payload
