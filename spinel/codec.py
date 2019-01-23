@@ -521,48 +521,6 @@ class SpinelPropertyHandler(SpinelCodec):
         self.prefix_thread.setDaemon(True)
         self.prefix_thread.start()
 
-    def handle_ipaddr_remove(self, ipaddr):
-        valid = 1
-        preferred = 1
-        flags = 0
-        prefix_len = 64  # always use /64
-
-        arr = self.encode_fields('6CLLC',
-                                 ipaddr.ip.packed,
-                                 prefix_len,
-                                 valid,
-                                 preferred,
-                                 flags)
-
-        self.wpan_api.prop_remove_async(SPINEL.PROP_IPV6_ADDRESS_TABLE,
-                                        arr, str(len(arr)) + 's',
-                                        SPINEL.HEADER_EVENT_HANDLER)
-
-    def handle_ipaddr_insert(self, prefix, prefix_len, _stable, flags, _is_local):
-        """ Add an ip address for each prefix on prefix change. """
-
-        ipaddr_str = str(ipaddress.IPv6Address(prefix)) + \
-            str(self.wpan_api.nodeid)
-        if CONFIG.DEBUG_LOG_PROP:
-            print("\n>>>> new PREFIX add ipaddr: " + ipaddr_str)
-
-        valid = 1
-        preferred = 1
-        flags = 0
-        ipaddr = ipaddress.IPv6Interface(str(ipaddr_str))
-        self.autoAddresses.add(ipaddr)
-
-        arr = self.encode_fields('6CLLC',
-                                 ipaddr.ip.packed,
-                                 prefix_len,
-                                 valid,
-                                 preferred,
-                                 flags)
-
-        self.wpan_api.prop_insert_async(SPINEL.PROP_IPV6_ADDRESS_TABLE,
-                                        arr, str(len(arr)) + 's',
-                                        SPINEL.HEADER_EVENT_HANDLER)
-
     def handle_prefix_change(self, payload):
         """ Automatically ipaddr add / remove addresses for each new prefix. """
         # As done by cli.cpp Interpreter::HandleNetifStateChanged
@@ -584,27 +542,11 @@ class SpinelPropertyHandler(SpinelCodec):
                 prefixes.append(prefix)
             pay = pay[struct_len:]
 
-        for prefix in prefixes:
-            self.handle_ipaddr_insert(*prefix)
-
         if CONFIG.DEBUG_LOG_PROP:
             print("\n========= PREFIX ============")
             print("ipaddrs: " + str(self.autoAddresses))
             print("slaac prefix set: " + str(slaacPrefixSet))
             print("==============================\n")
-
-        # ==> ipaddrs - query current addresses
-        #
-        # for ipaddr in ipaddrs:
-        #     if lifetime > 0 and not in slaac prefixes
-        #             ==> remove
-        for ipaddr in self.autoAddresses:
-            if not any(ipaddr in prefix for prefix in slaacPrefixSet):
-                self.handle_ipaddr_remove(ipaddr)
-
-        # for slaac prefix in prefixes:
-        #     if no ipaddr with lifetime > 0 in prefix:
-        #          ==> add
 
     def __run_prefix_handler(self):
         while 1:
