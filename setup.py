@@ -17,6 +17,8 @@
 #
 from setuptools import setup, find_packages
 
+import sys
+
 setup(
     name='pyspinel',
     version='1.0.0a3',
@@ -45,7 +47,11 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pyserial',
-        'ipaddress'
+        'ipaddress',
+    ] if sys.version_info >= (3, 0) else [
+        'future',
+        'ipaddress',
+        'pyserial',
     ],
     scripts=['spinel-cli.py', 'sniffer.py']
 )
