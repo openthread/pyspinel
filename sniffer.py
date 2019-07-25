@@ -163,9 +163,11 @@ def main():
     hdr = pcap.encode_header()
     if options.hex:
         hdr = util.hexify_str(hdr)+"\n"
-    
+
     if (options.output):
         output = open(options.output, 'wb')
+    elif hasattr(sys.stdout, 'buffer'):
+        output = sys.stdout.buffer
     else:
         output = sys.stdout
 
@@ -214,7 +216,7 @@ def main():
                     timestamp = datetime.utcnow() - epoch
                     timestamp_sec = timestamp.days * 24 * 60 * 60 + timestamp.seconds
                     timestamp_usec = timestamp.microseconds
-                    
+
                     if options.rssi:
                         pkt = pkt[:-2] + chr(127) + chr(0x80)
                         sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
