@@ -201,7 +201,7 @@ def main():
                 # 4. Vendor data struct contains:
                 #     4.0 Receive error(uint8)
                 if len(result.value) == 2+length+19:
-                    metadata = wpan_api.parse_fields(result.value[2+length:2+length+19], "ccSt(CCQ)t(i)")
+                    metadata = wpan_api.parse_fields(result.value[2+length:2+length+19], "ccSt(CCX)t(i)")
 
                     timestamp = metadata[3][2]
                     timestamp_sec = timestamp / 1000000
