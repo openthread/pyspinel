@@ -190,7 +190,27 @@ def main():
                 if options.crc:
                     pkt = crc(pkt)
 
-                # metadata format (totally 17 bytes):
+                # metadata format (totally 19 bytes):
+                # 0. RSSI(int8)
+                # 1. Noise Floor(int8)
+                # 2. Flags(uint16)
+                # 3. PHY-specific data struct contains:
+                #     3.0 Channel(uint8)
+                #     3.1 LQI(uint8)
+                #     3.2 Timestamp in microseconds(uint64)
+                # 4. Vendor data struct contains:
+                #     4.0 Receive error(uint8)
+                if len(result.value) == 2+length+19:
+                    metadata = wpan_api.parse_fields(result.value[2+length:2+length+19], "ccSt(CCX)t(i)")
+
+                    timestamp = metadata[3][2]
+                    timestamp_sec = timestamp / 1000000
+                    timestamp_usec = timestamp % 1000000
+
+                    if options.rssi:
+                        pkt = pkt[:-2] + chr(metadata[0] & 0xff) + chr(0x80)
+
+                # (deprecated) metadata format (totally 17 bytes):
                 # 0. RSSI(int8)
                 # 1. Noise Floor(int8)
                 # 2. Flags(uint16)
@@ -201,7 +221,7 @@ def main():
                 #     3.3 Timestamp Usec(uint16)
                 # 4. Vendor data struct contains:
                 #     4.0 Receive error(uint8)
-                if len(result.value) == 2+length+17:
+                elif len(result.value) == 2+length+17:
                     metadata = wpan_api.parse_fields(result.value[2+length:2+length+17], "ccSt(CCLS)t(i)")
 
                     timestamp_usec = timebase_usec + metadata[3][2] * 1000 + metadata[3][3]

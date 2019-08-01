@@ -105,6 +105,9 @@ class SpinelCodec(object):
     def parse_L(cls, payload): return unpack("<L", payload[:4])[0]
 
     @classmethod
+    def parse_X(cls, payload): return unpack("<Q", payload[:8])[0]
+
+    @classmethod
     def parse_6(cls, payload): return payload[:16]
 
     @classmethod
@@ -183,6 +186,7 @@ class SpinelCodec(object):
             'L': cls.parse_L,
             'l': cls.parse_l,
             '6': cls.parse_6,
+            'X': cls.parse_X,
             'E': cls.parse_E,
             'e': cls.parse_e,
             'U': cls.parse_U,
@@ -207,6 +211,7 @@ class SpinelCodec(object):
             'l': 4,
             'L': 4,
             '6': 16,
+            'X': 8,
             'E': 8,
             'e': 6,
         }
