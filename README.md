@@ -160,7 +160,7 @@ thread-cert automated test suite against NCP targets.
 
 See [cli module][1] for more information on these commands.
 
-[1]:../../src/cli/README.md
+[1]:https://github.com/openthread/openthread/blob/master/src/cli/README.md
 
 ### Diagnostics CLI Commands
 
@@ -169,7 +169,7 @@ the --enable-diag configure option.
 
 See [diag module][2] for more information on these commands.
 
-[2]:../../src/diag/README.md
+[2]:https://github.com/openthread/openthread/blob/master/src/core/diags/README.md
 
 
 ### NCP CLI Commands
