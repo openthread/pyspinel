@@ -81,6 +81,7 @@ import io
 import spinel.ipv6 as ipv6
 import spinel.common as common
 
+DEFAULT_BAUDRATE = 115200
 
 class IcmpV6Factory(object):
 
@@ -2266,6 +2267,8 @@ def parse_args():
     opt_parser = optparse.OptionParser(usage=optparse.SUPPRESS_USAGE)
     opt_parser.add_option("-u", "--uart", action="store",
                           dest="uart", type="string")
+    opt_parser.add_option("-b", "--baudrate", action="store",
+                          dest="baudrate", type="int", default=DEFAULT_BAUDRATE)
     opt_parser.add_option("-p", "--pipe", action="store",
                           dest="pipe", type="string")
     opt_parser.add_option("-s", "--socket", action="store",
@@ -2274,7 +2277,7 @@ def parse_args():
                           dest="nodeid", type="string", default="1")
     opt_parser.add_option("-q", "--quiet", action="store_true", dest="quiet")
     opt_parser.add_option(
-        "-v", "--verbose", action="store_false", dest="verbose")
+        "-v", "--verbose", action="store_true", dest="verbose")
     opt_parser.add_option("-d", "--debug", action="store",
                           dest="debug", type="int", default=CONFIG.DEBUG_ENABLE)
 
@@ -2307,7 +2310,7 @@ def main():
         if len(remaining_args) > 0:
             stream_descriptor = " ".join(remaining_args)
 
-    stream = StreamOpen(stream_type, stream_descriptor)
+    stream = StreamOpen(stream_type, stream_descriptor, options.verbose, options.baudrate)
     shell = SpinelCliCmd(stream, nodeid=options.nodeid)
 
     try:
