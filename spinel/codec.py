@@ -118,10 +118,9 @@ class SpinelCodec(object):
 
     @classmethod
     def parse_U(cls, payload):
-        if isinstance(payload, bytes):
-            nullchar = bytes([0])
-        else:
-            nullchar = '\0'
+        payload = payload.decode('utf-8')
+        nullchar = '\0'
+
         if payload.find(nullchar) >= 0:
             return payload[:payload.index(nullchar)]  # strip null
         else:
@@ -647,6 +646,8 @@ class SpinelPropertyHandler(SpinelCodec):
 
     def MSG_BUFFER_COUNTERS(self, _wpan_api, payload): return self.parse_fields(payload, "SSSSSSSSSSSSSSSS")
 
+    def NEST_STREAM_MFG(self, _wpan_api, payload): return self.parse_U(payload)
+
 #=========================================
 
 
@@ -820,7 +821,9 @@ SPINEL_PROP_DISPATCH = {
     SPINEL.PROP_PIB_15_4_MAC_PROMISCUOUS_MODE: WPAN_PROP_HANDLER.PIB_MAC_PROMISCUOUS_MODE,
     SPINEL.PROP_PIB_15_4_MAC_SECURITY_ENABLED: WPAN_PROP_HANDLER.PIB_MAC_SECURITY_ENABLED,
 
-    SPINEL.PROP_MSG_BUFFER_COUNTERS: WPAN_PROP_HANDLER.MSG_BUFFER_COUNTERS
+    SPINEL.PROP_MSG_BUFFER_COUNTERS: WPAN_PROP_HANDLER.MSG_BUFFER_COUNTERS,
+
+    SPINEL.PROP_NEST_STREAM_MFG: WPAN_PROP_HANDLER.NEST_STREAM_MFG
 }
 
 
