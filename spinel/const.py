@@ -333,6 +333,11 @@ class SPINEL(object):
     #     `S`, (CoapClientMessages)     The number of messages in the CoAP client send queue.
     #     `S`  (CoapClientBuffers)      The number of buffers in the CoAP client send queue.
     PROP_MSG_BUFFER_COUNTERS = PROP_CNTR__BEGIN + 400
+    PROP_CNTR__END = 0x800
+
+    PROP_NEST__BEGIN = 0x3BC0
+    PROP_NEST_STREAM_MFG = PROP_NEST__BEGIN + 0  # < [U]
+    PROP_NEST__END = 0x3C00
 
     #=========================================
 

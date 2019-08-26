@@ -20,21 +20,21 @@ spinel-cli.py
 
 available commands (type help <name> for more information):
 ============================================================
-channel            diag-sleep  leaderdata       quit
-child              diag-start  leaderweight     releaserouterid
-childmax           diag-stats  macfilter        rloc16
-childtimeout       diag-stop   masterkey        route
-clear              discover    mode             router
-commissioner       eidcache    ncp-ll64         routerupgradethreshold
-contextreusedelay  exit        ncp-ml64         scan
-counter            extaddr     ncp-tun          state
-debug              extpanid    netdataregister  thread
-debug-mem          h           networkidtimeout tun
-diag               help        networkname      v
-diag-channel       history     panid            version
-diag-power         ifconfig    ping
-diag-repeat        ipaddr      prefix
-diag-send          keysequence q
+bufferinfo         extaddr       ncp-filter        reset
+channel            extpanid      ncp-ll64          rloc16
+child              h             ncp-ml64          route
+childmax           help          ncp-raw           router
+childtimeout       history       ncp-tun           routerdowngradethreshold
+clear              ifconfig      netdataregister   routerselectionjitter
+commissioner       ipaddr        networkidtimeout  routerupgradethreshold
+contextreusedelay  joiner        networkname       scan
+counter            keysequence   panid             state
+debug              leaderdata    parent            thread
+debug-mem          leaderweight  ping              v
+diag               macfilter     prefix            version
+discover           masterkey     q
+eidcache           mfg           quit
+exit               mode          releaserouterid
 """
 
 from __future__ import absolute_import, print_function
@@ -232,6 +232,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'commissioner',
         'contextreusedelay',
         'counter',
+        'diag',
         'discover',
         'eidcache',
         'extaddr',
@@ -244,6 +245,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'leaderweight',
         'macfilter',
         'masterkey',
+        'mfg',
         'mode',
         'netdataregister',
         'networkidtimeout',
@@ -264,17 +266,6 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'state',
         'thread',
         'version',
-
-        # OpenThread Diagnostics Module CLI
-        'diag',
-        'diag-start',
-        'diag-channel',
-        'diag-power',
-        'diag-send',
-        'diag-repeat',
-        'diag-sleep',
-        'diag-stats',
-        'diag-stop',
 
         # OpenThread Spinel-specific commands
         'ncp-ml64',
@@ -373,7 +364,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         value = line
         if line != None:
             if mixed_format == 'U':         # For UTF8, just a pass through line unmodified
-                value = line.encode('utf-8') + '\0'
+                line += '\0'
+                value = line.encode('utf-8')
             elif mixed_format == 'D':     # Expect raw data to be hex string w/o delimeters
                 value = util.hex_to_bytes(line)
             else:
@@ -406,11 +398,14 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         return value
 
-    def prop_set(self, prop_id, line, mixed_format='B'):
+    def prop_set(self, prop_id, line, mixed_format='B', output=True):
         """ Helper to set a propery and output Done or Error. """
         value = self.prep_line(line, mixed_format)
         py_format = self.prep_format(value, mixed_format)
         result = self.prop_set_value(prop_id, value, py_format)
+
+        if not output:
+            return result
 
         if result is None:
             print("Error")
@@ -1176,6 +1171,35 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             Done
         """
         self.handle_property(line, SPINEL.PROP_NET_MASTER_KEY, 'D')
+
+    def do_mfg(self, line):
+        """
+        mfg <diagnostic command>
+
+        Check all the factory diagnostic commands here:
+        https://github.com/openthread/openthread/blob/master/src/core/diags/README.md
+
+        For example:
+
+            Start the diagnostic module.
+
+                > mfg start
+                start diagnostics mode
+                status 0x00
+
+            Retrieved radio statistics.
+
+                > mfg stats
+                received packets: 0
+                sent packets: 0
+                first received packet: rssi=0, lqi=0
+                last received packet: rssi=0, lqi=0
+        """
+        result = self.prop_set(SPINEL.PROP_NEST_STREAM_MFG, line, 'U', False)
+        if result != None:
+            print(result.rstrip())
+        else:
+            print("Error")
 
     def do_mode(self, line):
         """
@@ -2112,136 +2136,9 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
     def do_diag(self, line):
         """
-        diag
-
-            Show diagnostics mode status.
-
-            > diag
-            diagnostics mode is disabled
+        Follows "mfg" command.
         """
-        pass
-
-    def do_diagstart(self, line):
-        """
-        diag-start
-
-            Start diagnostics mode.
-
-            > diag-start
-            start diagnostics mode
-            status 0x00
-        """
-        pass
-
-    def do_diagchannel(self, line):
-        """
-        diag-channel
-
-            Get the IEEE 802.15.4 Channel value for diagnostics module.
-
-            > diag-channel
-            channel: 11
-
-        diag-channel <channel>
-
-            Set the IEEE 802.15.4 Channel value for diagnostics module.
-
-            > diag-channel 11
-            set channel to 11
-            status 0x00
-        """
-        pass
-
-    def do_diagpower(self, line):
-        """
-        diag-power
-
-            Get the tx power value(dBm) for diagnostics module.
-
-            > diag-power
-            tx power: -10 dBm
-
-        diag-power <power>
-
-            Set the tx power value(dBm) for diagnostics module.
-
-            > diag-power -10
-            set tx power to -10 dBm
-            status 0x00
-        """
-        pass
-
-    def do_diagsend(self, line):
-        """
-        diag-send <packets> <length>
-
-            Transmit a fixed number of packets with fixed length.
-
-            > diag-send 20 100
-            sending 0x14 packet(s), length 0x64
-            status 0x00
-        """
-        pass
-
-    def do_diagrepeat(self, line):
-        """
-        diag-repeat <delay> <length>
-
-            Transmit packets repeatedly with a fixed interval.
-
-            > diag repeat 100 100
-            sending packets of length 0x64 at the delay of 0x64 ms
-            status 0x00
-
-        diag-repeat stop
-
-            Stop repeated packet transmission.
-
-            > diag-repeat stop
-            repeated packet transmission is stopped
-            status 0x00
-        """
-        pass
-
-    def do_diagsleep(self, line):
-        """
-        diag-sleep
-
-            Enter radio sleep mode.
-
-            > diag-sleep
-            sleeping now...
-        """
-        pass
-
-    def do_diagstats(self, line):
-        """
-        diag-stats
-
-            Print statistics during diagnostics mode.
-
-            > diag-stats
-            received packets: 10
-            sent packets: 10
-            first received packet: rssi=-65, lqi=101
-        """
-        pass
-
-    def do_diagstop(self, line):
-        """
-        diag stop
-
-            Stop diagnostics mode and print statistics.
-
-            > diag-stop
-            received packets: 10
-            sent packets: 10
-            first received packet: rssi=-65, lqi=101
-
-            stop diagnostics mode
-            status 0x00
-        """
-        pass
+        self.do_mfg(line)
 
     def _notify_simulator(self):
         """
