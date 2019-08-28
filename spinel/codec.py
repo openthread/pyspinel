@@ -412,7 +412,7 @@ class SpinelPropertyHandler(SpinelCodec):
 
     def VENDOR_ID(self, _, payload): return self.parse_i(payload)[0]
 
-    def CAPS(self, _wpan_api, payload): pass
+    def CAPS(self, _wpan_api, payload): return self.parse_fields(payload, 'A(i)')
 
     def INTERFACE_COUNT(self, _, payload): return self.parse_C(payload)
 
