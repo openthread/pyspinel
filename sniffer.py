@@ -43,6 +43,9 @@ DEFAULT_NODEID = 34    # same as WELLKNOWN_NODE_ID
 DEFAULT_CHANNEL = 11
 DEFAULT_BAUDRATE = 115200
 
+DLT_IEEE802_15_4_WITHFCS = 195
+DLT_IEEE802_15_4_TAP = 283
+
 def parse_args():
     """ Parse command line arguments for this applications. """
 
@@ -163,7 +166,7 @@ def main():
         sys.stderr.write("SUCCESS: sniffer initialized\nSniffing...\n")
 
     pcap = PcapCodec()
-    hdr = pcap.encode_header(tap=options.tap)
+    hdr = pcap.encode_header(DLT_IEEE802_15_4_TAP if options.tap else DLT_IEEE802_15_4_WITHFCS)
 
     if options.hex:
         hdr = util.hexify_str(hdr)+"\n"
@@ -246,7 +249,7 @@ def main():
                         sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
 
                 if options.tap:
-                    pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec, True, metadata)
+                    pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec, metadata)
                 else:
                     pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec)
 
