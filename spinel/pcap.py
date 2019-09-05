@@ -18,30 +18,57 @@
 
 import struct
 
-DLT_IEEE802_15_4 = 195
+DLT_IEEE802_15_4_WITHFCS = 195
 PCAP_MAGIC_NUMBER = 0xa1b2c3d4
 PCAP_VERSION_MAJOR = 2
 PCAP_VERSION_MINOR = 4
 
+DLT_IEEE802_15_4_TAP = 283
+TLVS_LENGTH = 28
+RSS_TYPE = 1
+RSS_LEN = 4
+CHANNEL_TYPE = 3
+CHANNEL_LENGTH = 3
+CHANNEL_PAGE = 0
+LQI_TYPE = 10
+LQI_LENGTH = 1
 
 class PcapCodec(object):
     """ Utility class for .pcap formatters. """
 
     @classmethod
-    def encode_header(cls):
+    def encode_header(cls, tap=False):
         """ Returns a pcap file header. """
+        if tap:
+            dlt = DLT_IEEE802_15_4_TAP
+        else:
+            dlt = DLT_IEEE802_15_4_WITHFCS
+
         return struct.pack("<LHHLLLL",
                            PCAP_MAGIC_NUMBER,
                            PCAP_VERSION_MAJOR,
                            PCAP_VERSION_MINOR,
                            0, 0, 256,
-                           DLT_IEEE802_15_4)
+                           dlt)
 
     @classmethod
-    def encode_frame(cls, frame, sec, usec):
+    def encode_frame(cls, frame, sec, usec, tap=False, metadata=[]):
         """ Returns a pcap encapsulation of the given frame. """
         # write frame pcap header
-        length = len(frame)
+        if tap:
+            length = len(frame) + TLVS_LENGTH
+        else:
+            length = len(frame)
+
         pcap_frame = struct.pack("<LLLL", sec, usec, length, length)
+
+        if tap:
+            # Append TLVs according to 802.15.4 TAP specification:
+            # https://github.com/jkcko/ieee802.15.4-tap
+            pcap_frame += struct.pack('<HH', 0, TLVS_LENGTH)
+            pcap_frame += struct.pack('<HHf', RSS_TYPE, RSS_LEN, metadata[0])
+            pcap_frame += struct.pack('<HHHH', CHANNEL_TYPE, CHANNEL_LENGTH, metadata[3][0], CHANNEL_PAGE)
+            pcap_frame += struct.pack('<HHI', LQI_TYPE, LQI_LENGTH, metadata[3][1])
+
         pcap_frame += frame
         return pcap_frame

@@ -78,6 +78,9 @@ def parse_args():
     opt_parser.add_option('--no-reset', action='store_true',
                           dest='no_reset', default=False )
 
+    opt_parser.add_option('--tap', action='store_true',
+                          dest='tap', default=False)
+
     return opt_parser.parse_args(args)
 
 def sniffer_init(wpan_api, options):
@@ -160,7 +163,8 @@ def main():
         sys.stderr.write("SUCCESS: sniffer initialized\nSniffing...\n")
 
     pcap = PcapCodec()
-    hdr = pcap.encode_header()
+    hdr = pcap.encode_header(tap=options.tap)
+
     if options.hex:
         hdr = util.hexify_str(hdr)+"\n"
 
@@ -241,7 +245,11 @@ def main():
                         pkt = pkt[:-2] + chr(127) + chr(0x80)
                         sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
 
-                pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec)
+                if options.tap:
+                    pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec, True, metadata)
+                else:
+                    pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec)
+
                 if options.hex:
                     pkt = util.hexify_str(pkt)+"\n"
                 output.write(pkt)
