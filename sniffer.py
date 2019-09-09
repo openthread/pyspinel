@@ -113,22 +113,6 @@ def sniffer_init(wpan_api, options):
 
     return True
 
-# def crc( s ):
-#     # Some chips do not transmit the CRC, here we recalculate the CRC.
-# 
-#     crc = 0
-#     # remove the last 2 bytes
-#     for c in s[:-2]:
-#         c = ord(c)
-#         q = (crc ^ c) & 0x0f
-#         crc = (crc >> 4) ^ (q * 0x1081)
-#         q = (crc ^ (c >> 4)) & 0x0f
-#         crc = (crc >> 4) ^ (q * 0x1081)
-#     msb = chr( 0x0ff & (crc >> 8) )
-#     lsb = chr( 0x0ff & (crc >> 0) )
-#     s = s[:-2] + lsb + msb
-#     return s
-
 def main():
     """ Top-level main for sniffer host-side tool. """
     (options, remaining_args) = parse_args()
