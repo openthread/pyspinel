@@ -72,13 +72,15 @@ class PcapCodec(object):
         # write frame pcap header
         TLVs_length = TLVS_LENGTH_DEFAULT
         
-        if options_rssi:
-            frame = frame[:-2] + rssi
-            TLVs_length += 8
-        
         if options_crc:
             frame = crc(frame)
             TLVs_length += 8
+            
+        if options_rssi:
+            if (cls._dlt == DLT_IEEE802_15_4_TAP):
+                TLVs_length += 8
+            else:
+                frame = frame[:-2] + rssi
             
         if (cls._dlt == DLT_IEEE802_15_4_TAP):
             length = len(frame) + TLVs_length
