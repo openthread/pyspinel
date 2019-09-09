@@ -24,14 +24,33 @@ PCAP_VERSION_MINOR = 4
 
 DLT_IEEE802_15_4_WITHFCS = 195
 DLT_IEEE802_15_4_TAP = 283
-TLVS_LENGTH = 28
+TLVS_LENGTH_DEFAULT = 12
+
+FCS_TYPE = 0
+FCS_LEN = 1
+FCS_16bitCRC = 1
 RSS_TYPE = 1
 RSS_LEN = 4
 CHANNEL_TYPE = 3
-CHANNEL_LENGTH = 3
+CHANNEL_LEN = 3
 CHANNEL_PAGE = 0
-LQI_TYPE = 10
-LQI_LENGTH = 1
+
+
+def crc( s ):
+    # Some chips do not transmit the CRC, here we recalculate the CRC.
+
+    crc = 0
+    # remove the last 2 bytes
+    for c in s[:-2]:
+        c = ord(c)
+        q = (crc ^ c) & 0x0f
+        crc = (crc >> 4) ^ (q * 0x1081)
+        q = (crc ^ (c >> 4)) & 0x0f
+        crc = (crc >> 4) ^ (q * 0x1081)
+    msb = chr( 0x0ff & (crc >> 8) )
+    lsb = chr( 0x0ff & (crc >> 0) )
+    s = s[:-2] + lsb + msb
+    return s
 
 class PcapCodec(object):
     """ Utility class for .pcap formatters. """
@@ -48,11 +67,21 @@ class PcapCodec(object):
                            cls._dlt)
 
     @classmethod
-    def encode_frame(cls, frame, sec, usec, metadata=None):
+    def encode_frame(cls, frame, sec, usec, options_rssi, options_crc, rssi, metadata=None):
         """ Returns a pcap encapsulation of the given frame. """
         # write frame pcap header
+        TLVs_length = TLVS_LENGTH_DEFAULT
+        
+        if options_rssi:
+            frame = frame[:-2] + rssi
+            TLVs_length += 8
+        
+        if options_crc:
+            frame = crc(frame)
+            TLVs_length += 8
+            
         if (cls._dlt == DLT_IEEE802_15_4_TAP):
-            length = len(frame) + TLVS_LENGTH
+            length = len(frame) + TLVs_length
         else:
             length = len(frame)
 
@@ -61,10 +90,12 @@ class PcapCodec(object):
         if (cls._dlt == DLT_IEEE802_15_4_TAP):
             # Append TLVs according to 802.15.4 TAP specification:
             # https://github.com/jkcko/ieee802.15.4-tap
-            pcap_frame += struct.pack('<HH', 0, TLVS_LENGTH)
-            pcap_frame += struct.pack('<HHf', RSS_TYPE, RSS_LEN, metadata[0])
-            pcap_frame += struct.pack('<HHHH', CHANNEL_TYPE, CHANNEL_LENGTH, metadata[3][0], CHANNEL_PAGE)
-            pcap_frame += struct.pack('<HHI', LQI_TYPE, LQI_LENGTH, metadata[3][1])
+            pcap_frame += struct.pack('<HH', 0, TLVs_length)
+            pcap_frame += struct.pack('<HHHH', CHANNEL_TYPE, CHANNEL_LEN, metadata[3][0], CHANNEL_PAGE)
+            if options_rssi:
+                pcap_frame += struct.pack('<HHf', RSS_TYPE, RSS_LEN, metadata[0])
+            if options_crc:
+                pcap_frame += struct.pack('<HHI', FCS_TYPE, FCS_LEN, FCS_16bitCRC)
 
         pcap_frame += frame
         return pcap_frame
