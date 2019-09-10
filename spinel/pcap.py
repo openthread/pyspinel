@@ -26,11 +26,14 @@ DLT_IEEE802_15_4_WITHFCS = 195
 DLT_IEEE802_15_4_TAP = 283
 TLVS_LENGTH_DEFAULT = 12
 
+
 FCS_TYPE = 0
 FCS_LEN = 1
 FCS_16bitCRC = 1
 RSS_TYPE = 1
 RSS_LEN = 4
+LQI_TYPE = 10
+LQI_LEN = 1
 CHANNEL_TYPE = 3
 CHANNEL_LEN = 3
 CHANNEL_PAGE = 0
@@ -67,7 +70,7 @@ class PcapCodec(object):
                            cls._dlt)
 
     @classmethod
-    def encode_frame(cls, frame, sec, usec, options_rssi, options_crc, rssi, metadata=None):
+    def encode_frame(cls, frame, sec, usec, options_rssi, options_crc, metadata=None):
         """ Returns a pcap encapsulation of the given frame. """
         # write frame pcap header
         TLVs_length = TLVS_LENGTH_DEFAULT
@@ -78,9 +81,10 @@ class PcapCodec(object):
             
         if options_rssi:
             if (cls._dlt == DLT_IEEE802_15_4_TAP):
-                TLVs_length += 8
+                TLVs_length += 16
             else:
-                frame = frame[:-2] + rssi
+                # TI style FCS format: replace the last two bytes with RSSI and LQI
+                frame = frame[:-2] + chr(metadata[0] & 0xff) + chr(metadata[3][1] & 0xff)
             
         if (cls._dlt == DLT_IEEE802_15_4_TAP):
             length = len(frame) + TLVs_length
@@ -96,6 +100,7 @@ class PcapCodec(object):
             pcap_frame += struct.pack('<HHHH', CHANNEL_TYPE, CHANNEL_LEN, metadata[3][0], CHANNEL_PAGE)
             if options_rssi:
                 pcap_frame += struct.pack('<HHf', RSS_TYPE, RSS_LEN, metadata[0])
+                pcap_frame += struct.pack('<HHI', LQI_TYPE, LQI_LEN, metadata[3][1])
             if options_crc:
                 pcap_frame += struct.pack('<HHI', FCS_TYPE, FCS_LEN, FCS_16bitCRC)
 

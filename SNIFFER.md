@@ -90,7 +90,8 @@ sudo pip install --user ipaddress
         Include RSSI information in pcap output.
     
     --tap
-        Specify DLTs as IEEE802.15.4 TAP. Include Channel information in pcap output.
+        Specify DLT_IEEE802_15_4_TAP(283) for frame format, with a pseudo-header containing TLVs with metadata (e.g. FCS, RSSI, LQI, channel etc). 
+        If not specified, DLT_IEEE802_15_4_WITHFCS(195) would be used by default with the additional RSSI, LQI following the PHY frame directly (TI style FCS format).
 ```
 
 ## Quick Start

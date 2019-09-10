@@ -178,8 +178,6 @@ def main():
             if result and result.prop == prop_id:
                 length = wpan_api.parse_S(result.value)
                 pkt = result.value[2:2+length]
-                # if options.crc:
-                #     pkt = crc(pkt)
 
                 # metadata format (totally 19 bytes):
                 # 0. RSSI(int8)
@@ -197,8 +195,6 @@ def main():
                     timestamp = metadata[3][2]
                     timestamp_sec = timestamp / 1000000
                     timestamp_usec = timestamp % 1000000
-
-                    rssi = chr(metadata[0] & 0xff) + chr(0x80)
 
                 # (deprecated) metadata format (totally 17 bytes):
                 # 0. RSSI(int8)
@@ -218,21 +214,16 @@ def main():
                     timestamp_sec = timebase_sec + timestamp_usec / 1000000
                     timestamp_usec = timestamp_usec % 1000000
 
-                    rssi = chr(metadata[0] & 0xff) + chr(0x80)
-
                 # Some old version NCP doesn't contain timestamp information in metadata
                 else:
                     timestamp = datetime.utcnow() - epoch
                     timestamp_sec = timestamp.days * 24 * 60 * 60 + timestamp.seconds
                     timestamp_usec = timestamp.microseconds
 
-                    rssi = chr(127) + chr(0x80)
-                    sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
+                    if options.rssi:
+                        sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
 
-                if options.tap:
-                    pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec, options.rssi, options.crc, rssi, metadata)
-                else:
-                    pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec, options.rssi, options.crc, rssi)
+                pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec, options.rssi, options.crc, metadata)
 
                 if options.hex:
                     pkt = util.hexify_str(pkt)+"\n"
