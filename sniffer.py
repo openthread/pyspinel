@@ -43,6 +43,9 @@ DEFAULT_NODEID = 34    # same as WELLKNOWN_NODE_ID
 DEFAULT_CHANNEL = 11
 DEFAULT_BAUDRATE = 115200
 
+DLT_IEEE802_15_4_WITHFCS = 195
+DLT_IEEE802_15_4_TAP = 283
+
 def parse_args():
     """ Parse command line arguments for this applications. """
 
@@ -78,6 +81,9 @@ def parse_args():
     opt_parser.add_option('--no-reset', action='store_true',
                           dest='no_reset', default=False )
 
+    opt_parser.add_option('--tap', action='store_true',
+                          dest='tap', default=False)
+
     return opt_parser.parse_args(args)
 
 def sniffer_init(wpan_api, options):
@@ -106,22 +112,6 @@ def sniffer_init(wpan_api, options):
         return False
 
     return True
-
-def crc( s ):
-    # Some chips do not transmit the CRC, here we recalculate the CRC.
-
-    crc = 0
-    # remove the last 2 bytes
-    for c in s[:-2]:
-        c = ord(c)
-        q = (crc ^ c) & 0x0f
-        crc = (crc >> 4) ^ (q * 0x1081)
-        q = (crc ^ (c >> 4)) & 0x0f
-        crc = (crc >> 4) ^ (q * 0x1081)
-    msb = chr( 0x0ff & (crc >> 8) )
-    lsb = chr( 0x0ff & (crc >> 0) )
-    s = s[:-2] + lsb + msb
-    return s
 
 def main():
     """ Top-level main for sniffer host-side tool. """
@@ -160,7 +150,8 @@ def main():
         sys.stderr.write("SUCCESS: sniffer initialized\nSniffing...\n")
 
     pcap = PcapCodec()
-    hdr = pcap.encode_header()
+    hdr = pcap.encode_header(DLT_IEEE802_15_4_TAP if options.tap else DLT_IEEE802_15_4_WITHFCS)
+
     if options.hex:
         hdr = util.hexify_str(hdr)+"\n"
 
@@ -187,8 +178,6 @@ def main():
             if result and result.prop == prop_id:
                 length = wpan_api.parse_S(result.value)
                 pkt = result.value[2:2+length]
-                if options.crc:
-                    pkt = crc(pkt)
 
                 # metadata format (totally 19 bytes):
                 # 0. RSSI(int8)
@@ -206,9 +195,6 @@ def main():
                     timestamp = metadata[3][2]
                     timestamp_sec = timestamp / 1000000
                     timestamp_usec = timestamp % 1000000
-
-                    if options.rssi:
-                        pkt = pkt[:-2] + chr(metadata[0] & 0xff) + chr(0x80)
 
                 # (deprecated) metadata format (totally 17 bytes):
                 # 0. RSSI(int8)
@@ -228,9 +214,6 @@ def main():
                     timestamp_sec = timebase_sec + timestamp_usec / 1000000
                     timestamp_usec = timestamp_usec % 1000000
 
-                    if options.rssi:
-                        pkt = pkt[:-2] + chr(metadata[0] & 0xff) + chr(0x80)
-
                 # Some old version NCP doesn't contain timestamp information in metadata
                 else:
                     timestamp = datetime.utcnow() - epoch
@@ -238,10 +221,10 @@ def main():
                     timestamp_usec = timestamp.microseconds
 
                     if options.rssi:
-                        pkt = pkt[:-2] + chr(127) + chr(0x80)
                         sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
 
-                pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec)
+                pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec, options.rssi, options.crc, metadata)
+
                 if options.hex:
                     pkt = util.hexify_str(pkt)+"\n"
                 output.write(pkt)

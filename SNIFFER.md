@@ -88,6 +88,10 @@ sudo pip install --user ipaddress
 
     --rssi
         Include RSSI information in pcap output.
+    
+    --tap
+        Specify DLT_IEEE802_15_4_TAP(283) for frame format, with a pseudo-header containing TLVs with metadata (e.g. FCS, RSSI, LQI, channel etc). 
+        If not specified, DLT_IEEE802_15_4_WITHFCS(195) would be used by default with the additional RSSI, LQI following the PHY frame directly (TI style FCS format).
 ```
 
 ## Quick Start
@@ -113,6 +117,16 @@ sudo pip install --user ipaddress
             Fields:  wpan.rssi
     2. Run by command:
         sudo ./sniffer.py -c 11 -n 1 --rssi -u /dev/ttyUSB0 | wireshark -k -i -
+    
+    To display Channel on Wireshark: (only for Wireshark 3.0 and later)
+    1. Configue Wireshark:
+        Edit->Preferences->Appearance->Columns, add a new entry:
+            Title:   Channel
+            Type:    Custom
+            Fields:  wpan-tap.ch_num
+    2. Run by command:
+        sudo ./sniffer.py -c 11 --tap -u /dev/ttyUSB0 | wireshark -k -i -
+
 ```
 
 This will connect to stock openthread ncp firmware over the given UART,
