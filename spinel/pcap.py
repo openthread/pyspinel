@@ -22,21 +22,29 @@ PCAP_MAGIC_NUMBER = 0xa1b2c3d4
 PCAP_VERSION_MAJOR = 2
 PCAP_VERSION_MINOR = 4
 
+# https://www.tcpdump.org/linktypes.html
 DLT_IEEE802_15_4_WITHFCS = 195
 DLT_IEEE802_15_4_TAP = 283
+
+# Refer to the IEEE 802.15.4 TAP Link Type Specification on
+# https://github.com/jkcko/ieee802.15.4-tap
+# Default length of TAP Header and channel TLV
 TLVS_LENGTH_DEFAULT = 12
+CHANNEL_TYPE = 3
+CHANNEL_LEN = 3
+CHANNEL_PAGE = 0
 
-
+# FCS TLV (optional, depending on `--crc`)
 FCS_TYPE = 0
 FCS_LEN = 1
 FCS_16bitCRC = 1
+
+# RSSI TLV and LQI TLV (optional, depending on `--rssi`)
 RSS_TYPE = 1
 RSS_LEN = 4
 LQI_TYPE = 10
 LQI_LEN = 1
-CHANNEL_TYPE = 3
-CHANNEL_LEN = 3
-CHANNEL_PAGE = 0
+
 
 
 def crc( s ):
