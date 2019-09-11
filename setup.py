@@ -16,8 +16,23 @@
 #  limitations under the License.
 #
 from setuptools import setup, find_packages
-
 import sys
+import os
+
+WiresharkExtcapDir = ''
+
+if sys.platform.startswith('linux'):
+    WiresharkExtcapDir = os.popen('find /usr/ -type d -ipath *wireshark*extcap').read()
+    if WiresharkExtcapDir:
+        WiresharkExtcapDir = str(WiresharkExtcapDir).split()[0]
+elif sys.platform == 'darwin':
+    WiresharkExtcapDir = os.popen('find /Applications/ -type d -ipath *wireshark*extcap').read()
+    if WiresharkExtcapDir:
+        WiresharkExtcapDir = str(WiresharkExtcapDir).split()[0]
+elif sys.platform == 'win32':
+    WiresharkDir = input("Wireshark installation directory: ")
+    if WiresharkDir:
+        WiresharkExtcapDir = WiresharkDir + '\extcap'
 
 setup(
     name='pyspinel',
@@ -49,5 +64,6 @@ setup(
         'pyserial',
         'ipaddress',
     ],
-    scripts=['spinel-cli.py', 'sniffer.py']
+    scripts=['spinel-cli.py', 'sniffer.py', 'extcap_ot.py', 'extcap_ot.bat'],
+    data_files=[(WiresharkExtcapDir, ['extcap_ot.py', 'extcap_ot.bat'])]
 )
