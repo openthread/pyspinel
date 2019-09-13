@@ -27,10 +27,10 @@ def hexify_chr(s):
 def hexify_int(i): return "%02X" % i
 def hexify_bytes(data): return str(list(map(hexify_chr,data)))
 def hexify_str(s,delim=':'):
-    if isinstance(s, str) and sys.version_info[0] == 2:
+    if (isinstance(s, str) or isinstance(s, unicode)) and sys.version_info.major == 2:
         return delim.join(x.encode('hex') for x in s)
     else:
-        return delim.join(str(binascii.hexlify(bytearray([x])))[2:-1] for x in s)
+        return delim.join(str(binascii.hexlify(bytearray(x, "utf-8")))[2:-1] for x in s)
 
 def pack_bytes(packet): return pack("%dB" % len(packet), *packet)
 def packed_to_array(packet): return list(map(ord, packet))
