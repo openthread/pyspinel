@@ -20,7 +20,8 @@ import binascii
 import sys
 
 def hexify_str(s,delim=':'):
-    hex_str = binascii.hexlify(s.decode('utf-8'))
+    hex_str = binascii.hexlify(s.encode('utf-8')).decode('utf-8')
+    print(type(hex_str))
     return delim.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)])
 
 def pack_bytes(packet): return pack("%dB" % len(packet), *packet)
