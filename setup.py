@@ -21,7 +21,7 @@ import sys
 
 setup(
     name='pyspinel',
-    version='1.0.0a3',
+    version='1.0.1',
     description='A Python interface to the OpenThread Network Co-Processor (NCP)',
     url='https://github.com/openthread/openthread',
     author='The OpenThread Authors',

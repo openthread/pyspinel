@@ -63,9 +63,6 @@ class MessageInfo(object):
         if isinstance(value, bytearray):
             value = bytes(value)
 
-        elif isinstance(value, str) and sys.version_info[0] == 2:
-            value = value.decode("utf-8")
-
         return ipaddress.ip_address(value)
 
     @property

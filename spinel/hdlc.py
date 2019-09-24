@@ -128,8 +128,6 @@ class Hdlc(IStream):
         packet = []
         packet.append(HDLC_FLAG)
         for byte in payload:
-            if isinstance(byte, str) and sys.version_info[0] == 2:
-                byte = ord(byte)
             fcs = self.fcs16(byte, fcs)
             packet = self.encode_byte(byte, packet)
 

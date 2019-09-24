@@ -140,9 +140,6 @@ class SpinelCodec(object):
         while value_len < 4:
             byte = payload[value_len]
 
-            if sys.version_info[0] == 2:
-                byte = ord(byte)
-
             value += (byte & 0x7F) * value_mul
             if byte < 0x80:
                 break
@@ -861,7 +858,7 @@ class WpanApi(SpinelCodec):
     def transact(self, command_id, payload=bytes(), tid=SPINEL.HEADER_DEFAULT):
         pkt = self.encode_packet(command_id, payload, tid)
         if CONFIG.DEBUG_LOG_SERIAL:
-            msg = "TX Pay: (%i) %s " % (len(pkt), binascii.b2a_hex(pkt))
+            msg = "TX Pay: (%i) %s " % (len(pkt), binascii.hexlify(pkt))
             logging.debug(msg)
 
         if self.use_hdlc:

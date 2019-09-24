@@ -29,16 +29,12 @@ def packed_to_array(packet): return list(map(ord, packet))
 def asciify_int(i): return "%c" % (i)
 
 def hex_to_bytes(s):
-    if sys.version_info[0] == 2:
-        result = ''
-    else:
-        result = bytes()
+    result = bytes()
+
     for i in range(0, len(s), 2):
         (b1, b2) = s[i:i+2]
         hex = b1+b2
         v = int(hex, 16)
-        if sys.version_info[0] == 2:
-            result += chr(v)
-        else:
-            result += bytearray([v])
+        result += bytearray([v])
+
     return result

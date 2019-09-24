@@ -210,9 +210,6 @@ class IPv6PseudoHeader(ConvertibleToBytes):
         if isinstance(value, bytearray):
             value = bytes(value)
 
-        elif isinstance(value, str) and sys.version_info[0] == 2:
-            value = value.decode("utf-8")
-
         return ip_address(value)
 
     @property
@@ -263,9 +260,6 @@ class IPv6Header(ConvertibleToBytes, BuildableFromBytes):
     def _convert_to_ipaddress(self, value):
         if isinstance(value, bytearray):
             value = bytes(value)
-
-        elif isinstance(value, str) and sys.version_info[0] == 2:
-            value = value.decode("utf-8")
 
         return ip_address(value)
 
