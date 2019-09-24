@@ -16,8 +16,6 @@
 #
 """ Utility class for creating TUN network interfaces on Linux and OSX. """
 
-from __future__ import print_function
-
 import os
 import sys
 import struct

@@ -16,6 +16,7 @@
 #
 """ High-Level Data Link Control (HDLC) module. """
 
+import binascii
 import logging
 import sys
 
@@ -23,8 +24,6 @@ from struct import pack
 
 import spinel.config as CONFIG
 from spinel.stream import IStream
-from spinel.util import hexify_int
-from spinel.util import hexify_bytes
 
 HDLC_FLAG = 0x7e
 HDLC_ESCAPE = 0x7d
@@ -103,7 +102,7 @@ class Hdlc(IStream):
             fcs = self.fcs16(byte, fcs)
 
         if CONFIG.DEBUG_HDLC:
-            logging.debug("RX Hdlc: " + str(list(map(hexify_int, raw))))
+            logging.debug("RX Hdlc: " + binascii.hexlify(raw))
 
         if fcs != HDLC_FCS_GOOD:
             packet = None
@@ -143,7 +142,7 @@ class Hdlc(IStream):
         packet = pack("%dB" % len(packet), *packet)
 
         if CONFIG.DEBUG_HDLC:
-            logging.debug("TX Hdlc: " + hexify_bytes(packet))
+            logging.debug("TX Hdlc: " + binascii.hexlify(packet))
         return packet
 
     def write(self, data):

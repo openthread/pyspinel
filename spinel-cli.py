@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 #  Copyright (c) 2016-2017, The OpenThread Authors.
 #  All rights reserved.
@@ -36,9 +36,6 @@ discover           masterkey     q
 eidcache           mfg           quit
 exit               mode          releaserouterid
 """
-
-from __future__ import absolute_import, print_function
-from builtins import str
 
 import os
 import sys
@@ -429,7 +426,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             if mixed_format == '6':
                 print(str(ipaddress.IPv6Address(value)))
             elif (mixed_format == 'D') or (mixed_format == 'E'):
-                print(util.hexify_str(value, ''))
+                print(binascii.hexlify(value))
             elif mixed_format == 'H':
                 print("%04x" % value)
             else:

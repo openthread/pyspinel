@@ -18,9 +18,7 @@
 Module providing a Spienl coder / decoder class.
 """
 
-from __future__ import print_function
-from builtins import str
-
+import binascii
 import os
 import sys
 import time
@@ -863,7 +861,7 @@ class WpanApi(SpinelCodec):
     def transact(self, command_id, payload=bytes(), tid=SPINEL.HEADER_DEFAULT):
         pkt = self.encode_packet(command_id, payload, tid)
         if CONFIG.DEBUG_LOG_SERIAL:
-            msg = "TX Pay: (%i) %s " % (len(pkt), util.hexify_bytes(pkt))
+            msg = "TX Pay: (%i) %s " % (len(pkt), binascii.b2a_hex(pkt))
             logging.debug(msg)
 
         if self.use_hdlc:
@@ -876,7 +874,7 @@ class WpanApi(SpinelCodec):
 
         if CONFIG.DEBUG_LOG_SERIAL:
             msg = "RX Pay: (%i) %s " % (
-                len(pkt), str(list(map(util.hexify_int, pkt))))
+                len(pkt), binascii.hexlify(pkt))
             logging.debug(msg)
 
         length = len(pkt) - 2

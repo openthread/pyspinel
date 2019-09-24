@@ -19,15 +19,8 @@
 import binascii
 import sys
 
-def hexify_chr(s):
-    if isinstance(s, str) and sys.version_info[0] == 2:
-        s = ord(s)
-    return "%02X" % s
-
-def hexify_int(i): return "%02X" % i
-def hexify_bytes(data): return str(list(map(hexify_chr,data)))
 def hexify_str(s,delim=':'):
-    hex_str = binascii.b2a_hex(bytearray(s, "utf-8")).decode("utf-8")
+    hex_str = binascii.hexlify(s.decode('utf-8'))
     return delim.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)])
 
 def pack_bytes(packet): return pack("%dB" % len(packet), *packet)

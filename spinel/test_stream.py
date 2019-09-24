@@ -44,7 +44,7 @@ class MockStream(IStream):
         """ Write to the MockStream, triggering a lookup for mock response. """
         if CONFIG.DEBUG_STREAM_TX:
             logging.debug("TX Raw: (%d) %s", len(out_binary),
-                          util.hexify_bytes(out_binary))
+                          binascii.hexlify(out_binary))
         out_hex = binascii.hexlify(out_binary)
         in_hex = self.vector[out_hex]
         self.rx_queue.put_nowait(binascii.unhexlify(in_hex))
@@ -62,7 +62,7 @@ class MockStream(IStream):
             self.response = None
 
         if CONFIG.DEBUG_STREAM_RX:
-            logging.debug("RX Raw: " + util.hexify_bytes(in_binary))
+            logging.debug("RX Raw: " + binascii.hexlify(in_binary))
         return in_binary
 
     def write_child(self, out_binary):
