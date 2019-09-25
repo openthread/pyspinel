@@ -22,7 +22,7 @@ Tests for spinel.stream and implementation of MockStream class.
 import binascii
 import logging
 
-import Queue
+import queue
 
 import spinel.util as util
 import spinel.config as CONFIG
@@ -37,14 +37,14 @@ class MockStream(IStream):
         Pass a test vector as dictionary of hexstream outputs keyed on inputs.
         """
         self.vector = vector
-        self.rx_queue = Queue.Queue()
+        self.rx_queue = queue.Queue()
         self.response = None
 
     def write(self, out_binary):
         """ Write to the MockStream, triggering a lookup for mock response. """
         if CONFIG.DEBUG_STREAM_TX:
             logging.debug("TX Raw: (%d) %s", len(out_binary),
-                          util.hexify_bytes(out_binary))
+                          binascii.hexlify(out_binary))
         out_hex = binascii.hexlify(out_binary)
         in_hex = self.vector[out_hex]
         self.rx_queue.put_nowait(binascii.unhexlify(in_hex))
@@ -62,7 +62,7 @@ class MockStream(IStream):
             self.response = None
 
         if CONFIG.DEBUG_STREAM_RX:
-            logging.debug("RX Raw: " + util.hexify_bytes(in_binary))
+            logging.debug("RX Raw: " + binascii.hexlify(in_binary))
         return in_binary
 
     def write_child(self, out_binary):

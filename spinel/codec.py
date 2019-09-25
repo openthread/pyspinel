@@ -18,21 +18,12 @@
 Module providing a Spienl coder / decoder class.
 """
 
-from __future__ import print_function
-from builtins import str
-
-import os
-import sys
+import binascii
 import time
 import logging
 import threading
 import traceback
-
-is_py2 = sys.version[0] == '2'
-if is_py2:
-    import Queue as Queue
-else:
-    import queue as Queue
+import queue
 
 from struct import pack
 from struct import unpack
@@ -141,9 +132,6 @@ class SpinelCodec(object):
 
         while value_len < 4:
             byte = payload[value_len]
-
-            if sys.version_info[0] == 2:
-                byte = ord(byte)
 
             value += (byte & 0x7F) * value_mul
             if byte < 0x80:
@@ -520,7 +508,7 @@ class SpinelPropertyHandler(SpinelCodec):
         self.autoAddresses = set()
 
         self.wpan_api = None
-        self.__queue_prefix = Queue.Queue()
+        self.__queue_prefix = queue.Queue()
         self.prefix_thread = threading.Thread(target=self.__run_prefix_handler)
         self.prefix_thread.setDaemon(True)
         self.prefix_thread.start()
@@ -845,7 +833,7 @@ class WpanApi(SpinelCodec):
         # Fire up threads
         self._reader_alive = True
         self.tid_filter = set()
-        self.__queue_prop = defaultdict(Queue.Queue)  # Map tid to Queue.
+        self.__queue_prop = defaultdict(queue.Queue)  # Map tid to Queue.
         self.queue_register()
         self.__start_reader()
 
@@ -863,7 +851,7 @@ class WpanApi(SpinelCodec):
     def transact(self, command_id, payload=bytes(), tid=SPINEL.HEADER_DEFAULT):
         pkt = self.encode_packet(command_id, payload, tid)
         if CONFIG.DEBUG_LOG_SERIAL:
-            msg = "TX Pay: (%i) %s " % (len(pkt), util.hexify_bytes(pkt))
+            msg = "TX Pay: (%i) %s " % (len(pkt), binascii.hexlify(pkt))
             logging.debug(msg)
 
         if self.use_hdlc:
@@ -876,7 +864,7 @@ class WpanApi(SpinelCodec):
 
         if CONFIG.DEBUG_LOG_SERIAL:
             msg = "RX Pay: (%i) %s " % (
-                len(pkt), str(list(map(util.hexify_int, pkt))))
+                len(pkt), binascii.hexlify(pkt))
             logging.debug(msg)
 
         length = len(pkt) - 2
@@ -964,7 +952,7 @@ class WpanApi(SpinelCodec):
                 item = self.__queue_prop[tid].get(True, timeout)
             else:
                 item = self.__queue_prop[tid].get_nowait()
-        except Queue.Empty:
+        except queue.Empty:
             item = None
         return item
 
@@ -972,7 +960,7 @@ class WpanApi(SpinelCodec):
         if _prop is None:
             return None
 
-        processed_queue = Queue.Queue()
+        processed_queue = queue.Queue()
         timeout_time = time.time() + timeout
 
         while time.time() < timeout_time:

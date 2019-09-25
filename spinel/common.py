@@ -31,7 +31,6 @@ from binascii import hexlify
 
 import ipaddress
 import struct
-import sys
 
 
 def enum(*sequential, **named):
@@ -62,9 +61,6 @@ class MessageInfo(object):
     def _convert_value_to_ip_address(self, value):
         if isinstance(value, bytearray):
             value = bytes(value)
-
-        elif isinstance(value, str) and sys.version_info[0] == 2:
-            value = value.decode("utf-8")
 
         return ipaddress.ip_address(value)
 

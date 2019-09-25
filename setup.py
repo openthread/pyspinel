@@ -1,4 +1,4 @@
-#!/usr/bin/env python -u
+#!/usr/bin/env python3
 #
 #  Copyright (c) 2016-2017, The OpenThread Authors.
 #  All rights reserved.
@@ -21,7 +21,7 @@ import sys
 
 setup(
     name='pyspinel',
-    version='1.0.0a3',
+    version='1.0.1',
     description='A Python interface to the OpenThread Network Co-Processor (NCP)',
     url='https://github.com/openthread/openthread',
     author='The OpenThread Authors',
@@ -40,18 +40,14 @@ setup(
         'Topic :: System :: Hardware :: Hardware Drivers',
         'Topic :: Software Development :: Embedded Systems',
 
-        'Programming Language :: Python :: 2.7',
-        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3 :: Only',
+        'Programming Language :: Python :: 3.6',
     ],
     keywords='openthread thread spinel ncp',
     packages=find_packages(),
     install_requires=[
         'pyserial',
         'ipaddress',
-    ] if sys.version_info >= (3, 0) else [
-        'future',
-        'ipaddress',
-        'pyserial',
     ],
     scripts=['spinel-cli.py', 'sniffer.py']
 )

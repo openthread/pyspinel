@@ -17,35 +17,22 @@
 #
 
 import binascii
-import sys
 
-def hexify_chr(s):
-    if isinstance(s, str) and sys.version_info[0] == 2:
-        s = ord(s)
-    return "%02X" % s
-
-def hexify_int(i): return "%02X" % i
-def hexify_bytes(data): return str(list(map(hexify_chr,data)))
 def hexify_str(s,delim=':'):
-    hex_str = binascii.b2a_hex(bytearray(s, "utf-8")).decode("utf-8")
+    hex_str = binascii.hexlify(s.encode('utf-8')).decode('utf-8')
     return delim.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)])
 
-def pack_bytes(packet): return pack("%dB" % len(packet), *packet)
 def packed_to_array(packet): return list(map(ord, packet))
 
 def asciify_int(i): return "%c" % (i)
 
 def hex_to_bytes(s):
-    if sys.version_info[0] == 2:
-        result = ''
-    else:
-        result = bytes()
+    result = bytes()
+
     for i in range(0, len(s), 2):
         (b1, b2) = s[i:i+2]
         hex = b1+b2
         v = int(hex, 16)
-        if sys.version_info[0] == 2:
-            result += chr(v)
-        else:
-            result += bytearray([v])
+        result += bytearray([v])
+
     return result

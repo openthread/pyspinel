@@ -1,4 +1,4 @@
-#!/usr/bin/env python -u
+#!/usr/bin/env python3
 #
 #  Copyright (c) 2016-2017, The OpenThread Authors.
 #  All rights reserved.

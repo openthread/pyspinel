@@ -30,13 +30,8 @@ language: python
 
 dist: trusty
 compiler: clang
-
+python: "3.6"
 git:
   depth: 1
 
 script: .travis/script.sh
-
-matrix:
-  include:
-    - python: "2.7"
-    - python: "3.6"

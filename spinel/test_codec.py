@@ -56,8 +56,6 @@ class TestCodec(unittest.TestCase):
 
         for prop_id, truth_value in self.VECTOR.iteritems():
             value = wpan_api.prop_get_value(prop_id)
-            # print "value "+util.hexify_str(value)
-            # print "truth "+util.hexify_str(truth_value)
             self.failUnless(value == truth_value)
 
     def cb_test_callback(self, prop, value, tid):

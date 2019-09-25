@@ -19,9 +19,8 @@ Module providing a generic stream interface.
 Also includes adapter implementations for serial, socket, and pipes.
 """
 
-from __future__ import print_function
-
 import sys
+import binascii
 import logging
 import time
 import traceback
@@ -63,18 +62,14 @@ class StreamSerial(IStream):
     def write(self, data):
         self.serial.write(data)
         if CONFIG.DEBUG_STREAM_TX:
-            logging.debug("TX Raw: " + str(list(map(spinel.util.hexify_chr, data))))
+            logging.debug("TX Raw: " + binascii.hexlify(data))
 
     def read(self, size=1):
         pkt = self.serial.read(size)
         if CONFIG.DEBUG_STREAM_RX:
-            logging.debug("RX Raw: " + str(list(map(spinel.util.hexify_chr, pkt))))
+            logging.debug("RX Raw: " + binascii.hexlify(pkt))
 
-        byte = pkt[0]
-        if isinstance(byte, str) and sys.version_info[0] == 2:
-            byte = ord(byte)
-
-        return byte
+        return pkt[0]
 
 
 class StreamSocket(IStream):
@@ -88,18 +83,14 @@ class StreamSocket(IStream):
     def write(self, data):
         self.sock.send(data)
         if CONFIG.DEBUG_STREAM_TX:
-            logging.debug("TX Raw: " + str(list(map(spinel.util.hexify_chr, data))))
+            logging.debug("TX Raw: " + binascii.hexlify(data))
 
     def read(self, size=1):
         pkt = self.sock.recv(size)
         if CONFIG.DEBUG_STREAM_RX:
-            logging.debug("RX Raw: " + str(list(map(spinel.util.hexify_chr, pkt))))
+            logging.debug("RX Raw: " + binascii.hexlify(pkt))
 
-        byte = pkt[0]
-        if isinstance(byte, str) and sys.version_info[0] == 2:
-            byte = ord(byte)
-
-        return byte
+        return pkt[0]
 
 
 class StreamPipe(IStream):
@@ -123,7 +114,7 @@ class StreamPipe(IStream):
     def write(self, data):
         if CONFIG.DEBUG_STREAM_TX:
             logging.debug("TX Raw: (%d) %s",
-                          len(data), spinel.util.hexify_bytes(data))
+                          len(data), binascii.hexlify(data))
         self.pipe.stdin.write(data)
         self.pipe.stdin.flush()
         # let the NCP process UART events first
@@ -133,15 +124,11 @@ class StreamPipe(IStream):
         """ Blocking read on stream object """
         pkt = self.pipe.stdout.read(size)
         if CONFIG.DEBUG_STREAM_RX:
-            logging.debug("RX Raw: " + str(list(map(spinel.util.hexify_chr, pkt))))
+            logging.debug("RX Raw: " + binascii.hexlify(pkt))
         if not pkt:
             sys.exit(0)
 
-        byte = pkt[0]
-        if isinstance(byte, str) and sys.version_info[0] == 2:
-            byte = ord(byte)
-
-        return byte
+        return pkt[0]
 
     def close(self):
         if self.pipe:

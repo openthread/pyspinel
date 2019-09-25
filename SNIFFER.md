@@ -134,22 +134,8 @@ make the node into a promiscuous mode sniffer on the given channel,
 open up wireshark, and start streaming packets into wireshark.
 
 ## Troubleshooting
-Q1: sniffer.py throws ```ImportError: No module named dnet``` on OSX
+Q1: high packet loss rate when sniffing heavy traffic
 
-A1: install the libdnet package for OSX -
-```
-brew install --with-python libdnet
-mkdir -p /Users/YourUsernameHere/Library/Python/2.7/lib/python/site-packages
-touch /Users/YourUsernameHere/Library/Python/2.7/lib/python/site-packages/homebrew.pth
-echo 'import site; site.addsitedir("/usr/local/lib/python2.7/site-packages")' >> /Users/YourUsernameHere/Library/Python/2.7/lib/python/site-packages/homebrew.pth
-```
-you may need to reinstall the scapy pip dependency listed above
-
-you can read more about this issue here: http://stackoverflow.com/questions/26229057/scapy-installation-fails-on-osx-with-dnet-import-error
-
-
-Q2: high packet loss rate when sniffing heavy traffic
-
-A2: use higher uart baud rate in Sniffer firmware(NCP), and use '-b <baudrate>' option to set the same baud rate on host side.
+A1: use higher uart baud rate in Sniffer firmware(NCP), and use '-b <baudrate>' option to set the same baud rate on host side.
 
 to avoid packet loss, the baud rate should be higher than 250kbps, which is the maximum bitrate of the 802.15.4 2.4GHz PHY
