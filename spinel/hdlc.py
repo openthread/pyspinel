@@ -18,7 +18,6 @@
 
 import binascii
 import logging
-import sys
 
 from struct import pack
 

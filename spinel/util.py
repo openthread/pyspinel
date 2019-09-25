@@ -23,7 +23,6 @@ def hexify_str(s,delim=':'):
     hex_str = binascii.hexlify(s.encode('utf-8')).decode('utf-8')
     return delim.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)])
 
-def pack_bytes(packet): return pack("%dB" % len(packet), *packet)
 def packed_to_array(packet): return list(map(ord, packet))
 
 def asciify_int(i): return "%c" % (i)

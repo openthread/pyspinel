@@ -37,7 +37,6 @@ from ipaddress import ip_address
 import abc
 import io
 import struct
-import sys
 
 
 # Next headers for IPv6 protocols

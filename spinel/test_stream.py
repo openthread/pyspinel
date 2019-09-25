@@ -22,7 +22,7 @@ Tests for spinel.stream and implementation of MockStream class.
 import binascii
 import logging
 
-import Queue
+import queue
 
 import spinel.util as util
 import spinel.config as CONFIG
@@ -37,7 +37,7 @@ class MockStream(IStream):
         Pass a test vector as dictionary of hexstream outputs keyed on inputs.
         """
         self.vector = vector
-        self.rx_queue = Queue.Queue()
+        self.rx_queue = queue.Queue()
         self.response = None
 
     def write(self, out_binary):

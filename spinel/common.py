@@ -31,7 +31,6 @@ from binascii import hexlify
 
 import ipaddress
 import struct
-import sys
 
 
 def enum(*sequential, **named):

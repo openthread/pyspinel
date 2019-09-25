@@ -19,18 +19,11 @@ Module providing a Spienl coder / decoder class.
 """
 
 import binascii
-import os
-import sys
 import time
 import logging
 import threading
 import traceback
-
-is_py2 = sys.version[0] == '2'
-if is_py2:
-    import Queue as Queue
-else:
-    import queue as Queue
+import queue
 
 from struct import pack
 from struct import unpack
@@ -515,7 +508,7 @@ class SpinelPropertyHandler(SpinelCodec):
         self.autoAddresses = set()
 
         self.wpan_api = None
-        self.__queue_prefix = Queue.Queue()
+        self.__queue_prefix = queue.Queue()
         self.prefix_thread = threading.Thread(target=self.__run_prefix_handler)
         self.prefix_thread.setDaemon(True)
         self.prefix_thread.start()
@@ -840,7 +833,7 @@ class WpanApi(SpinelCodec):
         # Fire up threads
         self._reader_alive = True
         self.tid_filter = set()
-        self.__queue_prop = defaultdict(Queue.Queue)  # Map tid to Queue.
+        self.__queue_prop = defaultdict(queue.Queue)  # Map tid to Queue.
         self.queue_register()
         self.__start_reader()
 
@@ -959,7 +952,7 @@ class WpanApi(SpinelCodec):
                 item = self.__queue_prop[tid].get(True, timeout)
             else:
                 item = self.__queue_prop[tid].get_nowait()
-        except Queue.Empty:
+        except queue.Empty:
             item = None
         return item
 
@@ -967,7 +960,7 @@ class WpanApi(SpinelCodec):
         if _prop is None:
             return None
 
-        processed_queue = Queue.Queue()
+        processed_queue = queue.Queue()
         timeout_time = time.time() + timeout
 
         while time.time() < timeout_time:
