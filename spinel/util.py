@@ -17,7 +17,6 @@
 #
 
 import binascii
-import sys
 
 def hexify_str(s,delim=':'):
     hex_str = binascii.hexlify(s.encode('utf-8')).decode('utf-8')
