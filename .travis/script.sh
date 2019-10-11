@@ -36,4 +36,4 @@ pip install --upgrade .
     cd openthread &&
     pip install -r tests/scripts/thread-cert/requirements.txt &&
     ./bootstrap &&
-    VIRTUAL_TIME=1 VERBOSE=1 NODE_TYPE=ncp-sim make -f examples/Makefile-posix check)
+    VIRTUAL_TIME=1 VERBOSE=1 NODE_TYPE=ncp-sim make -f examples/Makefile-simulation check)

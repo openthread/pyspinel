@@ -352,7 +352,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 value = util.hex_to_bytes(line)
             else:
                 # Most everything else is some type of integer
-                value = int(line)
+                value = int(line, 0)
         return value
 
     @classmethod
@@ -411,9 +411,12 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             if mixed_format == '6':
                 print(str(ipaddress.IPv6Address(value)))
             elif (mixed_format == 'D') or (mixed_format == 'E'):
-                print(binascii.hexlify(value))
+                print(binascii.hexlify(value).decode('utf8'))
             elif mixed_format == 'H':
-                print("%04x" % value)
+                if prop_id == SPINEL.PROP_MAC_15_4_PANID:
+                    print("0x%04x" % value)
+                else:
+                    print("%04x" % value)
             else:
                 print(str(value))
 
