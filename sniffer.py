@@ -223,7 +223,7 @@ def main():
                     if options.rssi:
                         sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
 
-                pkt = pcap.encode_frame(pkt, timestamp_sec, timestamp_usec, options.rssi, options.crc, metadata)
+                pkt = pcap.encode_frame(pkt, int(timestamp_sec), timestamp_usec, options.rssi, options.crc, metadata)
 
                 if options.hex:
                     pkt = util.hexify_str(pkt)+"\n"

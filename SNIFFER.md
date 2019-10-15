@@ -15,7 +15,7 @@ The tool has been tested on the following platforms:
 
 | Language  | Version          |
 |-----------|------------------|
-| Python    | 2.7.10           |
+| Python    | 3.6.8            |
 
 ### Package Installation
 

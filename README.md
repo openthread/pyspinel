@@ -25,13 +25,12 @@ The power of this tool is three fold:
 
 | Language | Minimum Version  |
 |----------|------------------|
-| Python   | 2.7.10           |
+| Python   | 3.6.8            |
 
 ### Package Installation
 
 ```
-# From openthread root
-cd tools/spinel-cli
+# From pyspinel root
 sudo python setup.py install
 ```
 

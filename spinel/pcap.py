@@ -18,7 +18,7 @@
 
 import struct
 
-PCAP_MAGIC_NUMBER = 0xa1b2c3d4
+PCAP_MAGIC_NUMBER = 0xA1B2C3D4
 PCAP_VERSION_MAJOR = 2
 PCAP_VERSION_MINOR = 4
 
@@ -46,22 +46,23 @@ LQI_TYPE = 10
 LQI_LEN = 1
 
 
-
-def crc( s ):
+def crc(s):
     # Some chips do not transmit the CRC, here we recalculate the CRC.
 
     crc = 0
     # remove the last 2 bytes
     for c in s[:-2]:
-        c = ord(c)
-        q = (crc ^ c) & 0x0f
+        q = (crc ^ c) & 0x0F
         crc = (crc >> 4) ^ (q * 0x1081)
-        q = (crc ^ (c >> 4)) & 0x0f
+        q = (crc ^ (c >> 4)) & 0x0F
         crc = (crc >> 4) ^ (q * 0x1081)
-    msb = chr( 0x0ff & (crc >> 8) )
-    lsb = chr( 0x0ff & (crc >> 0) )
-    s = s[:-2] + lsb + msb
+
+    # lsb
+    s[-2] = 0xFF & (crc >> 0)
+    # msb
+    s[-1] = 0xFF & (crc >> 8)
     return s
+
 
 class PcapCodec(object):
     """ Utility class for .pcap formatters. """
@@ -70,38 +71,37 @@ class PcapCodec(object):
     def encode_header(cls, dlt):
         """ Returns a pcap file header. """
         cls._dlt = dlt
-        return struct.pack("<LHHLLLL",
-                           PCAP_MAGIC_NUMBER,
-                           PCAP_VERSION_MAJOR,
-                           PCAP_VERSION_MINOR,
-                           0, 0, 256,
-                           cls._dlt)
+        return struct.pack("<LHHLLLL", PCAP_MAGIC_NUMBER, PCAP_VERSION_MAJOR, PCAP_VERSION_MINOR, 0, 0, 256, cls._dlt)
 
     @classmethod
     def encode_frame(cls, frame, sec, usec, options_rssi, options_crc, metadata=None):
         """ Returns a pcap encapsulation of the given frame. """
         # write frame pcap header
         TLVs_length = TLVS_LENGTH_DEFAULT
-        
+
+        frame = bytearray(frame)
+
         if options_crc:
             frame = crc(frame)
             TLVs_length += 8
-            
+
         if options_rssi:
-            if (cls._dlt == DLT_IEEE802_15_4_TAP):
+            if cls._dlt == DLT_IEEE802_15_4_TAP:
                 TLVs_length += 16
             else:
-                # TI style FCS format: replace the last two bytes with RSSI and LQI
-                frame = frame[:-2] + chr(metadata[0] & 0xff) + chr(metadata[3][1] & 0xff)
-            
-        if (cls._dlt == DLT_IEEE802_15_4_TAP):
+                # TI style FCS format: replace the last two bytes (should be FCS) with RSSI and LQI and always
+                # assume FCS right
+                frame[-1] = metadata[0] & 0xFF
+                frame[-2] = metadata[3][1] & 0xFF
+
+        if cls._dlt == DLT_IEEE802_15_4_TAP:
             length = len(frame) + TLVs_length
         else:
             length = len(frame)
 
         pcap_frame = struct.pack("<LLLL", sec, usec, length, length)
 
-        if (cls._dlt == DLT_IEEE802_15_4_TAP):
+        if cls._dlt == DLT_IEEE802_15_4_TAP:
             # Append TLVs according to 802.15.4 TAP specification:
             # https://github.com/jkcko/ieee802.15.4-tap
             pcap_frame += struct.pack('<HH', 0, TLVs_length)
