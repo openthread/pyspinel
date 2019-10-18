@@ -110,13 +110,25 @@ class SPINEL(object):
 
     # Format: `A(T(E))`
     # * `E`: EUI64 address of node
-    PROP_MAC_BLACKLIST= PROP_MAC_EXT__BEGIN + 6   # <[A(T(E))]
+    PROP_MAC_BLACKLIST = PROP_MAC_EXT__BEGIN + 6   # <[A(T(E))]
     PROP_MAC_BLACKLIST_ENABLED = PROP_MAC_EXT__BEGIN + 7  # < [b]
 
     # Format: `A(T(Ec))`
     # * `E`: Optional EUI64 address of node. Set default RSS if not included.
     # * `c`: Fixed RSS. OT_MAC_FILTER_FIXED_RSS_OVERRIDE_DISABLED(127) means not set.
     PROP_MAC_FIXED_RSS = PROP_MAC_EXT__BEGIN + 8   # < [A(T(Ec))]
+
+    # Format: `S`
+    # * `S`: Current CCA (Clear Channel Assessment) failure rate.
+    PROP_MAC_CCA_FAILURE_RATE = PROP_MAC_EXT__BEGIN + 9
+
+    # Format: `C`
+    # * `C`: The maximum (user-specified) number of direct frame transmission retries.
+    PROP_MAC_MAX_RETRY_NUMBER_DIRECT = PROP_MAC_EXT__BEGIN + 10
+
+    # Format: `C`
+    # * `C`: The maximum (user-specified) number of indirect frame transmission retries.
+    PROP_MAC_MAX_RETRY_NUMBER_INDIRECT = PROP_MAC_EXT__BEGIN + 11
 
     PROP_MAC_EXT__END = 0x1400
 

@@ -1821,6 +1821,56 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         map_sub_commands = ('addr', 'rss')
         return [i for i in map_sub_commands if i.startswith(text)]
 
+    def do_mac(self, line):
+        """
+        mac
+
+            Mac related commands.
+
+        mac retries direct
+
+            Get the number of transmit retries on the MAC layer.
+
+            > mac retries direct
+            3
+            Done
+
+        mac retries direct <number>
+
+            Set the number of direct transmit retries on the MAC layer.
+
+            > mac retries direct 10
+            Done
+
+        mac retries indirect
+
+            Get the number of indirect transmit retries on the MAC layer.
+
+            > mac retries indirect
+            0
+            Done
+
+        mac retries indirect <number>
+
+            Set the number of indirect transmit retries on the MAC layer.
+
+            > mac retries indirect 5
+            Done
+
+        """
+        params = line.split(" ")
+        prop = None
+
+        if params[0] == "retries" and len(params) > 1:
+            if params[1] == "direct":
+                prop = SPINEL.PROP_MAC_MAX_RETRY_NUMBER_DIRECT
+            elif params[1] == "indirect":
+                prop = SPINEL.PROP_MAC_MAX_RETRY_NUMBER_INDIRECT
+
+        value = params[2] if len(params) == 3 else None
+
+        self.handle_property(value, prop)
+
     def do_macfilter(self, line):
         """
         macfilter
