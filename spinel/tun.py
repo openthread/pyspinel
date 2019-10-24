@@ -60,7 +60,7 @@ class TunInterface(object):
         self.__start_tun_thread()
 
     def __init_osx(self):
-        logging.info("TUN: Starting osx " + self.ifname)
+        CONFIG.LOGGER.info("TUN: Starting osx " + self.ifname)
         filename = "/dev/" + self.ifname
         self.tun = os.open(filename, os.O_RDWR)
         self.fd = self.tun
@@ -69,7 +69,7 @@ class TunInterface(object):
         self.addr_del("fe80::1")
 
     def __init_linux(self):
-        logging.info("TUN: Starting linux " + self.ifname)
+        CONFIG.LOGGER.info("TUN: Starting linux " + self.ifname)
         self.tun = open("/dev/net/tun", "r+b")
         self.fd = self.tun.fileno()
 
@@ -116,8 +116,8 @@ class TunInterface(object):
         #gWpanApi.ip_send(packet)
         # os.write(self.fd, packet)    # Loop back
         if CONFIG.DEBUG_TUN:
-            logging.debug("\nTUN: TX (" + str(len(packet)) +
-                          ") " + util.hexify_str(packet))
+            CONFIG.LOGGER.debug("\nTUN: TX (" + str(len(packet)) +
+                                ") " + util.hexify_str(packet))
 
     def __run_tun_thread(self):
         while self.fd:
@@ -126,14 +126,14 @@ class TunInterface(object):
                 if ready_fd == self.fd:
                     packet = os.read(self.fd, 4000)
                     if CONFIG.DEBUG_TUN:
-                        logging.debug("\nTUN: RX (" + str(len(packet)) + ") " +
-                                      util.hexify_str(packet))
+                        CONFIG.LOGGER.debug("\nTUN: RX (" + str(len(packet)) + ") " +
+                                            util.hexify_str(packet))
                     self.write(packet)
             except:
                 traceback.print_exc()
                 break
 
-        logging.info("TUN: exiting")
+        CONFIG.LOGGER.info("TUN: exiting")
         if self.fd:
             os.close(self.fd)
             self.fd = None

@@ -68,7 +68,6 @@ logging.config.dictConfig({
     }
 })
 
-
 def debug_set_level(level):
     """ Set logging level for spinel module. """
     global DEBUG_ENABLE, DEBUG_LOG_PROP

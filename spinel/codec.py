@@ -660,25 +660,25 @@ class SpinelCommandHandler(SpinelCodec):
                 # Generic output
                 if isinstance(prop_value, str):
                     prop_value_str = util.hexify_str(prop_value)
-                    logging.debug("PROP_VALUE_%s [tid=%d]: %s = %s",
-                                  name, (tid & 0xF), prop_name, prop_value_str)
+                    CONFIG.LOGGER.debug("PROP_VALUE_%s [tid=%d]: %s = %s",
+                                        name, (tid & 0xF), prop_name, prop_value_str)
                 else:
                     prop_value_str = str(prop_value)
 
-                    logging.debug("PROP_VALUE_%s [tid=%d]: %s = %s",
-                                  name, (tid & 0xF), prop_name, prop_value_str)
+                    CONFIG.LOGGER.debug("PROP_VALUE_%s [tid=%d]: %s = %s",
+                                        name, (tid & 0xF), prop_name, prop_value_str)
 
                 # Extend output for certain properties.
                 if prop_id == SPINEL.PROP_LAST_STATUS:
-                    logging.debug(SPINEL_LAST_STATUS_MAP[prop_value])
+                    CONFIG.LOGGER.debug(SPINEL_LAST_STATUS_MAP[prop_value])
 
             if CONFIG.DEBUG_LOG_PKT:
                 if ((prop_id == SPINEL.PROP_STREAM_NET) or
                         (prop_id == SPINEL.PROP_STREAM_NET_INSECURE)):
-                    logging.debug("PROP_VALUE_" + name + ": " + prop_name)
+                    CONFIG.LOGGER.debug("PROP_VALUE_" + name + ": " + prop_name)
 
                 elif prop_id == SPINEL.PROP_STREAM_DEBUG:
-                    logging.debug("DEBUG: " + prop_value)
+                    CONFIG.LOGGER.debug("DEBUG: " + prop_value)
 
             if wpan_api:
                 wpan_api.queue_add(prop_id, prop_value, tid)
@@ -686,7 +686,7 @@ class SpinelCommandHandler(SpinelCodec):
                 print("no wpan_api")
         else:
             prop_name = "Property Unknown"
-            logging.info("\n%s (%i): ", prop_name, prop_id)
+            CONFIG.LOGGER.info("\n%s (%i): ", prop_name, prop_id)
 
     def PROP_VALUE_IS(self, wpan_api, payload, tid):
         self.handle_prop(wpan_api, "IS", payload, tid)
@@ -851,8 +851,8 @@ class WpanApi(SpinelCodec):
     def transact(self, command_id, payload=bytes(), tid=SPINEL.HEADER_DEFAULT):
         pkt = self.encode_packet(command_id, payload, tid)
         if CONFIG.DEBUG_LOG_SERIAL:
-            msg = "TX Pay: (%i) %s " % (len(pkt), binascii.hexlify(pkt))
-            logging.debug(msg)
+            msg = "TX Pay: (%i) %s " % (len(pkt), binascii.hexlify(pkt).decode('utf-8'))
+            CONFIG.LOGGER.debug(msg)
 
         if self.use_hdlc:
             pkt = self.hdlc.encode(pkt)
@@ -864,8 +864,8 @@ class WpanApi(SpinelCodec):
 
         if CONFIG.DEBUG_LOG_SERIAL:
             msg = "RX Pay: (%i) %s " % (
-                len(pkt), binascii.hexlify(pkt))
-            logging.debug(msg)
+                len(pkt), binascii.hexlify(pkt).decode('utf-8'))
+            CONFIG.LOGGER.debug(msg)
 
         length = len(pkt) - 2
         if length < 0:
@@ -889,11 +889,11 @@ class WpanApi(SpinelCodec):
         except Exception as _ex:
             print(traceback.format_exc())
             cmd_name = "CB_Unknown"
-            logging.info("\n%s (%i): ", cmd_name, cmd_id)
+            CONFIG.LOGGER.info("\n%s (%i): ", cmd_name, cmd_id)
 
         if CONFIG.DEBUG_CMD_RESPONSE:
-            logging.info("\n%s (%i): ", cmd_name, cmd_id)
-            logging.info("===> %s", util.hexify_str(payload))
+            CONFIG.LOGGER.info("\n%s (%i): ", cmd_name, cmd_id)
+            CONFIG.LOGGER.info("===> %s", binascii.hexlify(payload).decode('utf-8'))
 
     def stream_tx(self, pkt):
         # Encapsulate lagging and Framer support in self.stream class.

@@ -56,18 +56,18 @@ class StreamSerial(IStream):
         try:
             self.serial = serial.Serial(dev, baudrate)
         except:
-            logging.error("Couldn't open " + dev)
+            CONFIG.LOGGER.error("Couldn't open " + dev)
             traceback.print_exc()
 
     def write(self, data):
         self.serial.write(data)
         if CONFIG.DEBUG_STREAM_TX:
-            logging.debug("TX Raw: " + binascii.hexlify(data))
+            CONFIG.LOGGER.debug("TX Raw: " + binascii.hexlify(data).decode('utf-8'))
 
     def read(self, size=1):
         pkt = self.serial.read(size)
         if CONFIG.DEBUG_STREAM_RX:
-            logging.debug("RX Raw: " + binascii.hexlify(pkt))
+            CONFIG.LOGGER.debug("RX Raw: " + binascii.hexlify(pkt).decode('utf-8'))
 
         return pkt[0]
 
@@ -83,12 +83,12 @@ class StreamSocket(IStream):
     def write(self, data):
         self.sock.send(data)
         if CONFIG.DEBUG_STREAM_TX:
-            logging.debug("TX Raw: " + binascii.hexlify(data))
+            CONFIG.LOGGER.debug("TX Raw: " + binascii.hexlify(data).decode('utf-8'))
 
     def read(self, size=1):
         pkt = self.sock.recv(size)
         if CONFIG.DEBUG_STREAM_RX:
-            logging.debug("RX Raw: " + binascii.hexlify(pkt))
+            CONFIG.LOGGER.debug("RX Raw: " + binascii.hexlify(pkt).decode('utf-8'))
 
         return pkt[0]
 
@@ -105,7 +105,7 @@ class StreamPipe(IStream):
                                          stdout=subprocess.PIPE,
                                          stderr=sys.stderr)
         except:
-            logging.error("Couldn't open " + filename)
+            CONFIG.LOGGER.error("Couldn't open " + filename)
             traceback.print_exc()
 
     def __del__(self):
@@ -113,8 +113,8 @@ class StreamPipe(IStream):
 
     def write(self, data):
         if CONFIG.DEBUG_STREAM_TX:
-            logging.debug("TX Raw: (%d) %s",
-                          len(data), binascii.hexlify(data))
+            CONFIG.LOGGER.debug("TX Raw: (%d) %s",
+                          len(data), binascii.hexlify(data).decode('utf-8'))
         self.pipe.stdin.write(data)
         self.pipe.stdin.flush()
         # let the NCP process UART events first
@@ -124,7 +124,7 @@ class StreamPipe(IStream):
         """ Blocking read on stream object """
         pkt = self.pipe.stdout.read(size)
         if CONFIG.DEBUG_STREAM_RX:
-            logging.debug("RX Raw: " + binascii.hexlify(pkt))
+            CONFIG.LOGGER.debug("RX Raw: " + binascii.hexlify(pkt).decode('utf-8'))
         if not pkt:
             sys.exit(0)
 
