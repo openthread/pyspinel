@@ -284,7 +284,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 pkt = cls.icmp_factory.from_bytes(value)
 
                 if CONFIG.DEBUG_LOG_PKT:
-                    logging.debug(pkt)
+                    CONFIG.LOGGER.debug(pkt)
 
                 timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
                 timestamp = (pkt.upper_layer_protocol.body.identifier << 16 | pkt.upper_layer_protocol.body.sequence_number)
@@ -301,7 +301,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
     @classmethod
     def log(cls, text):
         """ Common log handler. """
-        logging.info(text)
+        CONFIG.LOGGER.info(text)
 
     def parseline(self, line):
         cmd, arg, line = Cmd.parseline(self, line)
@@ -506,9 +506,9 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
     def default(self, line):
         if line[0] == "#":
-            logging.debug(line)
+            CONFIG.LOGGER.debug(line)
         else:
-            logging.info(line + ": command not found")
+            CONFIG.LOGGER.info(line + ": command not found")
             # exec(line)
 
     def do_debug(self, line):
@@ -2210,7 +2210,7 @@ def main():
     try:
         shell.cmdloop()
     except KeyboardInterrupt:
-        logging.info('\nCTRL+C Pressed')
+        CONFIG.LOGGER.info('\nCTRL+C Pressed')
 
     if shell.wpan_api:
         shell.wpan_api.stream.close()
