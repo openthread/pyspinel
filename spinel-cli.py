@@ -554,8 +554,6 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         result = self.prop_get_value(SPINEL.PROP_MSG_BUFFER_COUNTERS)
         if result != None:
-            result = result[0]
-
             print("total: %d" % result[0])
             print("free: %d" % result[1])
             print("6lo send: %d %d" % result[2:4])
