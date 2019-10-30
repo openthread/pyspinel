@@ -791,6 +791,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 TxOther: 0
                 TxRetry: 0
                 TxErrCca: 0
+                TxAbort: 0
                 TxErrBusyChannel: 0
             RxTotal: 2
                 RxUnicast: 1
@@ -841,7 +842,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 print("    TxOther: %d" % counters_tx[10])
                 print("    TxRetry: %d" % counters_tx[11])
                 print("    TxErrCca: %d" % counters_tx[12])
-                print("    TxErrBusyChannel: %d" % counters_tx[13])
+                print("    TxAbort: %d" % counters_tx[13])
+                print("    TxErrBusyChannel: %d" % counters_tx[14])
                 print("RxTotal: %d" % counters_rx[0])
                 print("    RxUnicast: %d" % counters_rx[1])
                 print("    RxBroadcast: %d" % counters_rx[2])
