@@ -369,20 +369,22 @@ Return the Link Local 64-bit IPv6 address for the node.
 
 ## Vendor package
 
-Extension of spinel-cli by specific vendor properties and commands.
-Idea of creating vendor package is to create specific commands without interrupting in spinel core.
-Vendor module contain:
+Extension of the Spinel CLI with custom properties and commands.
+This plugin-like extension adds vendor-specific commands and properties to pyspinel in a way that does not impact the 
+implementation of core pyspinel functionalities.
+
+The vendor package contains the following modules:
 
 | MODULE        |    DESCRIPTION                                     |
 |---------------|----------------------------------------------------|
-| vendor        | Module providing a specific vendor commands        |
-| const         | Module with constants for vendor spinel extension  |
-| codec         | Module providing a Vendor property handlers        |
-In each module is provided example how to add specific vendor codec and constant. 
+| vendor        | Module that provides a specific vendor commands.   |
+| const         | Module with constants for vendor spinel extension. |
+| codec         | Module that provides a vendor property handlers.   |
+Each module comes with an example that shows how to add specific vendor codecs and constants.
 
 ### Vendor commands
 
-#### help
+The vendor package adds several vendor-specific pyspinel commands. Use the help command to list them all.
 ```bash
 spinel-cli > vendor help
 Available vendor commands:
