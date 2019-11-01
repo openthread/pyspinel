@@ -28,7 +28,7 @@ childtimeout       history       ncp-tun           routerdowngradethreshold
 clear              ifconfig      netdataregister   routerselectionjitter
 commissioner       ipaddr        networkidtimeout  routerupgradethreshold
 contextreusedelay  joiner        networkname       scan
-counter            keysequence   panid             state
+counters           keysequence   panid             state
 debug              leaderdata    parent            thread
 debug-mem          leaderweight  ping              v
 diag               macfilter     prefix            version
@@ -228,7 +228,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'childtimeout',
         'commissioner',
         'contextreusedelay',
-        'counter',
+        'counters',
         'diag',
         'discover',
         'eidcache',
@@ -760,48 +760,131 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         self.handle_property(line, SPINEL.PROP_THREAD_CONTEXT_REUSE_DELAY, 'L')
 
-    def do_counter(self, line):
+    def do_counters(self, line):
         """
-        counter
+        counters
 
             Get the supported counter names.
 
-            >counter
+            >counters
             mac
+            mle
             Done
 
-        counter <countername>
+        counters <countername>
 
             Get the counter value.
 
-            >counter mac
+            > counters mac
             TxTotal: 10
-            TxAckRequested: 4
-            TxAcked: 4
-            TxNoAckRequested: 6
-            TxData: 10
-            TxDataPoll: 0
-            TxBeacon: 0
-            TxBeaconRequest: 0
-            TxOther: 0
-            TxRetry: 0
-            TxErrCca: 0
-            RxTotal: 11
-            RxData: 11
-            RxDataPoll: 0
-            RxBeacon: 0
-            RxBeaconRequest: 0
-            RxOther: 0
-            RxWhitelistFiltered: 0
-            RxDestAddrFiltered: 0
-            RxErrNoFrame: 0
-            RxErrNoUnknownNeighbor: 0
-            RxErrInvalidSrcAddr: 0
-            RxErrSec: 0
-            RxErrFcs: 0
-            RxErrOther: 0
+                TxUnicast: 3
+                TxBroadcast: 7
+                TxAckRequested: 3
+                TxAcked: 3
+                TxNoAckRequested: 7
+                TxData: 10
+                TxDataPoll: 0
+                TxBeacon: 0
+                TxBeaconRequest: 0
+                TxOther: 0
+                TxRetry: 0
+                TxErrCca: 0
+                TxAbort: 0
+                TxErrBusyChannel: 0
+            RxTotal: 2
+                RxUnicast: 1
+                RxBroadcast: 1
+                RxData: 2
+                RxDataPoll: 0
+                RxBeacon: 0
+                RxBeaconRequest: 0
+                RxOther: 0
+                RxAddressFiltered: 0
+                RxDestAddrFiltered: 0
+                RxDuplicated: 0
+                RxErrNoFrame: 0
+                RxErrNoUnknownNeighbor: 0
+                RxErrInvalidSrcAddr: 0
+                RxErrSec: 0
+                RxErrFcs: 0
+                RxErrOther: 0
+            Done
+            > counters mle
+            Role Disabled: 0
+            Role Detached: 1
+            Role Child: 0
+            Role Router: 0
+            Role Leader: 1
+            Attach Attempts: 1
+            Partition Id Changes: 1
+            Better Partition Attach Attempts: 0
+            Parent Changes: 0
+            Done
         """
-        pass
+        if line == "mac":
+            result = self.prop_get_value(SPINEL.PROP_CNTR_ALL_MAC_COUNTERS)
+            if result != None:
+                counters_tx = result[0][0]
+                counters_rx = result[1][0]
+
+                print("TxTotal: %d" % counters_tx[0])
+                print("    TxUnicast: %d" % counters_tx[1])
+                print("    TxBroadcast: %d" % counters_tx[2])
+                print("    TxAckRequested: %d" % counters_tx[3])
+                print("    TxAcked: %d" % counters_tx[4])
+                print("    TxNoAckRequested: %d" % counters_tx[5])
+                print("    TxData: %d" % counters_tx[6])
+                print("    TxDataPoll: %d" % counters_tx[7])
+                print("    TxBeacon: %d" % counters_tx[8])
+                print("    TxBeaconRequest: %d" % counters_tx[9])
+                print("    TxOther: %d" % counters_tx[10])
+                print("    TxRetry: %d" % counters_tx[11])
+                print("    TxErrCca: %d" % counters_tx[12])
+                print("    TxAbort: %d" % counters_tx[13])
+                print("    TxErrBusyChannel: %d" % counters_tx[14])
+                print("RxTotal: %d" % counters_rx[0])
+                print("    RxUnicast: %d" % counters_rx[1])
+                print("    RxBroadcast: %d" % counters_rx[2])
+                print("    RxData: %d" % counters_rx[3])
+                print("    RxDataPoll: %d" % counters_rx[4])
+                print("    RxBeacon: %d" % counters_rx[5])
+                print("    RxBeaconRequest: %d" % counters_rx[6])
+                print("    RxOther: %d" % counters_rx[7])
+                print("    RxAddressFiltered: %d" % counters_rx[8])
+                print("    RxDestAddrFiltered: %d" % counters_rx[9])
+                print("    RxDuplicated: %d" % counters_rx[10])
+                print("    RxErrNoFrame: %d" % counters_rx[11])
+                print("    RxErrNoUnknownNeighbor: %d" % counters_rx[12])
+                print("    RxErrInvalidSrcAddr: %d" % counters_rx[13])
+                print("    RxErrSec: %d" % counters_rx[14])
+                print("    RxErrFcs: %d" % counters_rx[15])
+                print("    RxErrOther: %d" % counters_rx[16])
+                print("Done")
+            else:
+                print("Error")
+
+        elif line == "mle":
+            result = self.prop_get_value(SPINEL.PROP_CNTR_MLE_COUNTERS)
+            if result != None:
+                print("Role Disabled: %d" % result[0])
+                print("Role Detached: %d" % result[1])
+                print("Role Child: %d" % result[2])
+                print("Role Router: %d" % result[3])
+                print("Role Leader: %d" % result[4])
+                print("Attach Attempts: %d" % result[5])
+                print("Partition Id Changes: %d" % result[6])
+                print("Better Partition Attach Attempts: %d" % result[7])
+                print("Parent Changes: %d" % result[8])
+                print("Done")
+            else:
+                print("Error")
+
+        elif line is None or line == "":
+            print("mac")
+            print("mle")
+            print("Done")
+        else:
+            print("Error")
 
     def do_discover(self, line):
         """

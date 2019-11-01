@@ -345,6 +345,62 @@ class SPINEL(object):
     #     `S`, (CoapClientMessages)     The number of messages in the CoAP client send queue.
     #     `S`  (CoapClientBuffers)      The number of buffers in the CoAP client send queue.
     PROP_MSG_BUFFER_COUNTERS = PROP_CNTR__BEGIN + 400
+
+    # All MAC related counters.
+    # Format: t(A(L))t(A(L))  (Read-only)
+    #
+    # The transmit structure includes:
+    #
+    #     'L': TxTotal              (The total number of transmissions).
+    #     'L': TxUnicast            (The total number of unicast transmissions).
+    #     'L': TxBroadcast          (The total number of broadcast transmissions).
+    #     'L': TxAckRequested       (The number of transmissions with ack request).
+    #     'L': TxAcked              (The number of transmissions that were acked).
+    #     'L': TxNoAckRequested     (The number of transmissions without ack request).
+    #     'L': TxData               (The number of transmitted data).
+    #     'L': TxDataPoll           (The number of transmitted data poll).
+    #     'L': TxBeacon             (The number of transmitted beacon).
+    #     'L': TxBeaconRequest      (The number of transmitted beacon request).
+    #     'L': TxOther              (The number of transmitted other types of frames).
+    #     'L': TxRetry              (The number of retransmission times).
+    #     'L': TxErrCca             (The number of CCA failure times).
+    #     'L': TxErrAbort           (The number of frame transmission failures due to abort error).
+    #     'L': TxErrBusyChannel     (The number of frames that were dropped due to a busy channel).
+    #
+    # The receive structure includes:
+    #
+    #     'L': RxTotal              (The total number of received packets).
+    #     'L': RxUnicast            (The total number of unicast packets received).
+    #     'L': RxBroadcast          (The total number of broadcast packets received).
+    #     'L': RxData               (The number of received data).
+    #     'L': RxDataPoll           (The number of received data poll).
+    #     'L': RxBeacon             (The number of received beacon).
+    #     'L': RxBeaconRequest      (The number of received beacon request).
+    #     'L': RxOther              (The number of received other types of frames).
+    #     'L': RxAddressFiltered    (The number of received packets filtered by address filter (whitelist or blacklist)).
+    #     'L': RxDestAddrFiltered   (The number of received packets filtered by destination check).
+    #     'L': RxDuplicated         (The number of received duplicated packets).
+    #     'L': RxErrNoFrame         (The number of received packets with no or malformed content).
+    #     'L': RxErrUnknownNeighbor (The number of received packets from unknown neighbor).
+    #     'L': RxErrInvalidSrcAddr  (The number of received packets whose source address is invalid).
+    #     'L': RxErrSec             (The number of received packets with security error).
+    #     'L': RxErrFcs             (The number of received packets with FCS error).
+    #     'L': RxErrOther           (The number of received packets with other error).
+    PROP_CNTR_ALL_MAC_COUNTERS = PROP_CNTR__BEGIN + 401
+
+    # Thread MLE counters.
+    # Format: `SSSSSSSSS`  (Read-only)
+    #    'S': DisabledRole                  (The number of times device entered OT_DEVICE_ROLE_DISABLED role).
+    #    'S': DetachedRole                  (The number of times device entered OT_DEVICE_ROLE_DETACHED role).
+    #    'S': ChildRole                     (The number of times device entered OT_DEVICE_ROLE_CHILD role).
+    #    'S': RouterRole                    (The number of times device entered OT_DEVICE_ROLE_ROUTER role).
+    #    'S': LeaderRole                    (The number of times device entered OT_DEVICE_ROLE_LEADER role).
+    #    'S': AttachAttempts                (The number of attach attempts while device was detached).
+    #    'S': PartitionIdChanges            (The number of changes to partition ID).
+    #    'S': BetterPartitionAttachAttempts (The number of attempts to attach to a better partition).
+    #    'S': ParentChanges                 (The number of times device changed its parents).
+    PROP_CNTR_MLE_COUNTERS = PROP_CNTR__BEGIN + 402
+
     PROP_CNTR__END = 0x800
 
     PROP_NEST__BEGIN = 0x3BC0

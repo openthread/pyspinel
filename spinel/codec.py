@@ -637,6 +637,8 @@ class SpinelPropertyHandler(SpinelCodec):
     def PIB_MAC_SECURITY_ENABLED(self, _wpan_api, payload): pass
 
     def MSG_BUFFER_COUNTERS(self, _wpan_api, payload): return self.parse_fields(payload, "SSSSSSSSSSSSSSSS")
+    def ALL_MAC_COUNTERS(self, _wpan_api, payload): return self.parse_fields(payload, "t(A(L))t(A(L))")
+    def MLE_COUNTERS(self, _wpan_api, payload): return self.parse_fields(payload, "SSSSSSSSS")
 
     def NEST_STREAM_MFG(self, _wpan_api, payload): return self.parse_U(payload)
 
@@ -816,6 +818,9 @@ SPINEL_PROP_DISPATCH = {
     SPINEL.PROP_PIB_15_4_MAC_SECURITY_ENABLED: WPAN_PROP_HANDLER.PIB_MAC_SECURITY_ENABLED,
 
     SPINEL.PROP_MSG_BUFFER_COUNTERS: WPAN_PROP_HANDLER.MSG_BUFFER_COUNTERS,
+
+    SPINEL.PROP_CNTR_ALL_MAC_COUNTERS: WPAN_PROP_HANDLER.ALL_MAC_COUNTERS,
+    SPINEL.PROP_CNTR_MLE_COUNTERS: WPAN_PROP_HANDLER.MLE_COUNTERS,
 
     SPINEL.PROP_NEST_STREAM_MFG: WPAN_PROP_HANDLER.NEST_STREAM_MFG
 }
