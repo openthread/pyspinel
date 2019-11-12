@@ -26,7 +26,7 @@ class VendorSpinelPropertyHandler(SpinelCodec):
     """
     Class to extend Spinel property Handler with new methods.
     Methods define parsers for Vendor Hooks for exapmle:
-        `def VENDOR_HOOK_COMMAND(self, _wpan_api, payload): return self.parse_C(payload)`
+        `def VENDOR_HOOK_PROPERTY(self, _wpan_api, payload): return self.parse_C(payload)`
     """
     pass
 
@@ -34,6 +34,6 @@ class VendorSpinelPropertyHandler(SpinelCodec):
 WPAN_PROP_HANDLER = VendorSpinelPropertyHandler()
 
 # Parameter to extend SPINEL_PREP_DISPATCH with Vendor properties for example:
-#   `VENDOR_SPINEL_PROP_DISPATCH = {VENDOR_SPINEL.PROP_VENDOR_HOOK: WPAN_PROP_HANDLER.VENDOR_HOOK_COMMAND}`
+#   `VENDOR_SPINEL_PROP_DISPATCH = {VENDOR_SPINEL.PROP_VENDOR_HOOK: WPAN_PROP_HANDLER.VENDOR_HOOK_PROPERTY}`
 VENDOR_SPINEL_PROP_DISPATCH = {}
 
