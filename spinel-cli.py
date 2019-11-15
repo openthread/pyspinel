@@ -820,66 +820,97 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             Better Partition Attach Attempts: 0
             Parent Changes: 0
             Done
+
+        counters <countername> reset
+
+            Reset the counter value.
+
+            >counters mac reset
+            Done
+            >counters mle reset
+            Done
+
         """
-        if line == "mac":
-            result = self.prop_get_value(SPINEL.PROP_CNTR_ALL_MAC_COUNTERS)
-            if result != None:
-                counters_tx = result[0][0]
-                counters_rx = result[1][0]
 
-                print("TxTotal: %d" % counters_tx[0])
-                print("    TxUnicast: %d" % counters_tx[1])
-                print("    TxBroadcast: %d" % counters_tx[2])
-                print("    TxAckRequested: %d" % counters_tx[3])
-                print("    TxAcked: %d" % counters_tx[4])
-                print("    TxNoAckRequested: %d" % counters_tx[5])
-                print("    TxData: %d" % counters_tx[6])
-                print("    TxDataPoll: %d" % counters_tx[7])
-                print("    TxBeacon: %d" % counters_tx[8])
-                print("    TxBeaconRequest: %d" % counters_tx[9])
-                print("    TxOther: %d" % counters_tx[10])
-                print("    TxRetry: %d" % counters_tx[11])
-                print("    TxErrCca: %d" % counters_tx[12])
-                print("    TxAbort: %d" % counters_tx[13])
-                print("    TxErrBusyChannel: %d" % counters_tx[14])
-                print("RxTotal: %d" % counters_rx[0])
-                print("    RxUnicast: %d" % counters_rx[1])
-                print("    RxBroadcast: %d" % counters_rx[2])
-                print("    RxData: %d" % counters_rx[3])
-                print("    RxDataPoll: %d" % counters_rx[4])
-                print("    RxBeacon: %d" % counters_rx[5])
-                print("    RxBeaconRequest: %d" % counters_rx[6])
-                print("    RxOther: %d" % counters_rx[7])
-                print("    RxAddressFiltered: %d" % counters_rx[8])
-                print("    RxDestAddrFiltered: %d" % counters_rx[9])
-                print("    RxDuplicated: %d" % counters_rx[10])
-                print("    RxErrNoFrame: %d" % counters_rx[11])
-                print("    RxErrNoUnknownNeighbor: %d" % counters_rx[12])
-                print("    RxErrInvalidSrcAddr: %d" % counters_rx[13])
-                print("    RxErrSec: %d" % counters_rx[14])
-                print("    RxErrFcs: %d" % counters_rx[15])
-                print("    RxErrOther: %d" % counters_rx[16])
-                print("Done")
+        params = line.split(" ")
+
+        if params[0] == "mac":
+
+            if len(params) == 1:
+                result = self.prop_get_value(SPINEL.PROP_CNTR_ALL_MAC_COUNTERS)
+                if result != None:
+                    counters_tx = result[0][0]
+                    counters_rx = result[1][0]
+
+                    print("TxTotal: %d" % counters_tx[0])
+                    print("    TxUnicast: %d" % counters_tx[1])
+                    print("    TxBroadcast: %d" % counters_tx[2])
+                    print("    TxAckRequested: %d" % counters_tx[3])
+                    print("    TxAcked: %d" % counters_tx[4])
+                    print("    TxNoAckRequested: %d" % counters_tx[5])
+                    print("    TxData: %d" % counters_tx[6])
+                    print("    TxDataPoll: %d" % counters_tx[7])
+                    print("    TxBeacon: %d" % counters_tx[8])
+                    print("    TxBeaconRequest: %d" % counters_tx[9])
+                    print("    TxOther: %d" % counters_tx[10])
+                    print("    TxRetry: %d" % counters_tx[11])
+                    print("    TxErrCca: %d" % counters_tx[12])
+                    print("    TxAbort: %d" % counters_tx[13])
+                    print("    TxErrBusyChannel: %d" % counters_tx[14])
+                    print("RxTotal: %d" % counters_rx[0])
+                    print("    RxUnicast: %d" % counters_rx[1])
+                    print("    RxBroadcast: %d" % counters_rx[2])
+                    print("    RxData: %d" % counters_rx[3])
+                    print("    RxDataPoll: %d" % counters_rx[4])
+                    print("    RxBeacon: %d" % counters_rx[5])
+                    print("    RxBeaconRequest: %d" % counters_rx[6])
+                    print("    RxOther: %d" % counters_rx[7])
+                    print("    RxAddressFiltered: %d" % counters_rx[8])
+                    print("    RxDestAddrFiltered: %d" % counters_rx[9])
+                    print("    RxDuplicated: %d" % counters_rx[10])
+                    print("    RxErrNoFrame: %d" % counters_rx[11])
+                    print("    RxErrNoUnknownNeighbor: %d" % counters_rx[12])
+                    print("    RxErrInvalidSrcAddr: %d" % counters_rx[13])
+                    print("    RxErrSec: %d" % counters_rx[14])
+                    print("    RxErrFcs: %d" % counters_rx[15])
+                    print("    RxErrOther: %d" % counters_rx[16])
+                    print("Done")
+                else:
+                    print("Error")
+
+            elif len(params) == 2:
+                if params[1] == "reset":
+                    self.prop_set_value(SPINEL.PROP_CNTR_ALL_MAC_COUNTERS, 1)
+                    print("Done") 
             else:
                 print("Error")
 
-        elif line == "mle":
-            result = self.prop_get_value(SPINEL.PROP_CNTR_MLE_COUNTERS)
-            if result != None:
-                print("Role Disabled: %d" % result[0])
-                print("Role Detached: %d" % result[1])
-                print("Role Child: %d" % result[2])
-                print("Role Router: %d" % result[3])
-                print("Role Leader: %d" % result[4])
-                print("Attach Attempts: %d" % result[5])
-                print("Partition Id Changes: %d" % result[6])
-                print("Better Partition Attach Attempts: %d" % result[7])
-                print("Parent Changes: %d" % result[8])
-                print("Done")
+        elif params[0] == "mle":
+
+            if len(params) == 1:
+                result = self.prop_get_value(SPINEL.PROP_CNTR_MLE_COUNTERS)
+                if result != None:
+                    print("Role Disabled: %d" % result[0])
+                    print("Role Detached: %d" % result[1])
+                    print("Role Child: %d" % result[2])
+                    print("Role Router: %d" % result[3])
+                    print("Role Leader: %d" % result[4])
+                    print("Attach Attempts: %d" % result[5])
+                    print("Partition Id Changes: %d" % result[6])
+                    print("Better Partition Attach Attempts: %d" % result[7])
+                    print("Parent Changes: %d" % result[8])
+                    print("Done")
+                else:
+                    print("Error")
+
+            elif len(params) == 2:
+                if params[1] == "reset":
+                    self.prop_set_value(SPINEL.PROP_CNTR_MLE_COUNTERS, 1)
+                    print("Done")
             else:
                 print("Error")
 
-        elif line is None or line == "":
+        elif params[0] is None or params[0] == "":
             print("mac")
             print("mle")
             print("Done")
