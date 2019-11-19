@@ -24,6 +24,7 @@ import logging
 import threading
 import traceback
 import queue
+import importlib
 
 from struct import pack
 from struct import unpack
@@ -712,7 +713,14 @@ SPINEL_COMMAND_DISPATCH = {
     SPINEL.RSP_PROP_VALUE_REMOVED: WPAN_CMD_HANDLER.PROP_VALUE_REMOVED,
 }
 
-WPAN_PROP_HANDLER = SpinelPropertyHandler()
+try:
+    codec = importlib.import_module('vendor.codec')
+    cls = type(codec.VendorSpinelPropertyHandler.__name__, (SpinelPropertyHandler, codec.VendorSpinelPropertyHandler),
+               {'__name__': codec.VendorSpinelPropertyHandler.__name__})
+    WPAN_PROP_HANDLER = cls()
+except ImportError:
+    codec = None
+    WPAN_PROP_HANDLER = SpinelPropertyHandler()
 
 SPINEL_PROP_DISPATCH = {
     SPINEL.PROP_LAST_STATUS:           WPAN_PROP_HANDLER.LAST_STATUS,
@@ -825,6 +833,8 @@ SPINEL_PROP_DISPATCH = {
     SPINEL.PROP_NEST_STREAM_MFG: WPAN_PROP_HANDLER.NEST_STREAM_MFG
 }
 
+if codec is not None:
+    SPINEL_PROP_DISPATCH.update(codec.VENDOR_SPINEL_PROP_DISPATCH)
 
 class WpanApi(SpinelCodec):
     """ Helper class to format wpan command packets """

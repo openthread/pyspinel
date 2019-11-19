@@ -42,6 +42,7 @@ import sys
 import time
 import traceback
 import random
+import importlib
 
 import optparse
 
@@ -263,6 +264,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'state',
         'thread',
         'version',
+        'vendor',
 
         # OpenThread Spinel-specific commands
         'ncp-ml64',
@@ -2336,7 +2338,12 @@ def main():
             stream_descriptor = " ".join(remaining_args)
 
     stream = StreamOpen(stream_type, stream_descriptor, options.verbose, options.baudrate)
-    shell = SpinelCliCmd(stream, nodeid=options.nodeid)
+    try:
+        vendor_ext = importlib.import_module('vendor.vendor')
+        cls = type(vendor_ext.VendorSpinelCliCmd.__name__, (SpinelCliCmd, vendor_ext.VendorSpinelCliCmd), {})
+        shell = cls(stream, nodeid=options.nodeid)
+    except ImportError:
+        shell = SpinelCliCmd(stream, nodeid=options.nodeid)
 
     try:
         shell.cmdloop()

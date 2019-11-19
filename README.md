@@ -365,3 +365,29 @@ Done
 #### ncp-ll64
 
 Return the Link Local 64-bit IPv6 address for the node.
+
+
+## Vendor package
+
+Extension of the Spinel CLI with custom properties and commands.
+This plugin-like extension adds vendor-specific commands and properties to pyspinel in a way that does not impact the 
+implementation of core pyspinel functionalities.
+
+The vendor package contains the following modules:
+
+| MODULE        |    DESCRIPTION                                     |
+|---------------|----------------------------------------------------|
+| vendor        | Module that provides a specific vendor commands.   |
+| const         | Module with constants for vendor spinel extension. |
+| codec         | Module that provides a vendor property handlers.   |
+Each module comes with an example that shows how to add specific vendor codecs and constants.
+
+### Vendor commands
+
+The vendor package adds several vendor-specific pyspinel commands. Use the help command to list them all.
+```bash
+spinel-cli > vendor help
+Available vendor commands:
+==============================================
+help
+```
