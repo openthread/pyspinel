@@ -766,7 +766,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
             Get the supported counter names.
 
-            >counters
+            > counters
             mac
             mle
             Done
@@ -825,9 +825,9 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
             Reset the counter value.
 
-            >counters mac reset
+            > counters mac reset
             Done
-            >counters mle reset
+            > counters mle reset
             Done
 
         """
