@@ -631,6 +631,8 @@ class SpinelPropertyHandler(SpinelCodec):
 
     def STREAM_NET_INSECURE(self, _, payload): return self.parse_d(payload)
 
+    def STREAM_LOG(self, _, payload): return self.parse_fields(payload, "UD")
+
     def PIB_PHY_CHANNELS_SUPPORTED(self, _wpan_api, payload): pass
 
     def PIB_MAC_PROMISCUOUS_MODE(self, _wpan_api, payload): pass
@@ -691,9 +693,9 @@ class SpinelCommandHandler(SpinelCodec):
                 wpan_api.queue_add(prop_id, prop_value, tid)
             else:
                 print("no wpan_api")
-        else:
-            prop_name = "Property Unknown"
-            CONFIG.LOGGER.info("\n%s (%i): ", prop_name, prop_id)
+        elif CONFIG.DEBUG_LOG_PROP:
+                prop_name = "Property Unknown"
+                CONFIG.LOGGER.info("\n%s (%i): ", prop_name, prop_id)
 
     def PROP_VALUE_IS(self, wpan_api, payload, tid):
         self.handle_prop(wpan_api, "IS", payload, tid)
@@ -820,6 +822,7 @@ SPINEL_PROP_DISPATCH = {
     SPINEL.PROP_STREAM_RAW:             WPAN_PROP_HANDLER.STREAM_RAW,
     SPINEL.PROP_STREAM_NET:             WPAN_PROP_HANDLER.STREAM_NET,
     SPINEL.PROP_STREAM_NET_INSECURE:    WPAN_PROP_HANDLER.STREAM_NET_INSECURE,
+    SPINEL.PROP_STREAM_LOG:             WPAN_PROP_HANDLER.STREAM_LOG,
 
     SPINEL.PROP_PIB_15_4_PHY_CHANNELS_SUPPORTED: WPAN_PROP_HANDLER.PIB_PHY_CHANNELS_SUPPORTED,
     SPINEL.PROP_PIB_15_4_MAC_PROMISCUOUS_MODE: WPAN_PROP_HANDLER.PIB_MAC_PROMISCUOUS_MODE,
