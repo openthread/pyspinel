@@ -1971,6 +1971,20 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             > mac retries indirect 5
             Done
 
+        mac ccathreshold
+
+            Get the CCA ED Threshold in dBm.
+
+            > mac ccathreshold
+            -10
+            Done
+
+        mac ccathreshold -70
+
+            Set the CCA ED Threshold in dBm.
+
+            > mac ccathreshold -70
+            Done
         """
         params = line.split(" ")
         prop = None
@@ -1980,8 +1994,15 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 prop = SPINEL.PROP_MAC_MAX_RETRY_NUMBER_DIRECT
             elif params[1] == "indirect":
                 prop = SPINEL.PROP_MAC_MAX_RETRY_NUMBER_INDIRECT
+            value = params[2] if len(params) == 3 else None
 
-        value = params[2] if len(params) == 3 else None
+        elif params[0] == "ccathreshold" and len(params) > 0:
+            prop = SPINEL.PROP_PHY_CCA_THRESHOLD
+            value = None
+            if len(params) == 2:
+                value = int(params[1])
+                self.prop_set(prop, value, mixed_format='b')
+                return
 
         self.handle_property(value, prop)
 
