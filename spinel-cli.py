@@ -790,6 +790,12 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 TxBeaconRequest: 0
                 TxOther: 0
                 TxRetry: 0
+                    TxDirectPacket after 1 retry: 0
+                    TxDirectPacket after 2 retry: 0
+                    TxDirectPacket after 3 retry: 0
+                    TxDirectMaxRetryExpiry: 0
+                    TxIndirectPacket after 1 retry: 0
+                    TxInDirectMaxRetryExpiry: 0
                 TxErrCca: 0
                 TxAbort: 0
                 TxErrBusyChannel: 0
@@ -856,9 +862,19 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                     print("    TxBeaconRequest: %d" % counters_tx[9])
                     print("    TxOther: %d" % counters_tx[10])
                     print("    TxRetry: %d" % counters_tx[11])
-                    print("    TxErrCca: %d" % counters_tx[12])
-                    print("    TxAbort: %d" % counters_tx[13])
-                    print("    TxErrBusyChannel: %d" % counters_tx[14])
+                    tx_retry_direct_number = counters_tx[12][0]
+                    for retry in range(tx_retry_direct_number):
+                        print("        TxDirectPacket after %d retry: %s" % (retry + 1, counters_tx[13 + retry][0]))
+                    if tx_retry_direct_number != 0:
+                        print("        TxDirectPacketMaxRetryExpiry: %s" % (counters_tx[13 + tx_retry_direct_number][0]))
+                    tx_retry_indirect_number = counters_tx[14 + tx_retry_direct_number][0]
+                    for retry in range(tx_retry_indirect_number):
+                        print("        TxIndirectPacket after %d retry: %s" % (retry + 1, counters_tx[15 + tx_retry_direct_number+retry][0]))
+                    if tx_retry_indirect_number != 0:
+                        print("        TxIndirectPacketMaxRetryExpiry: %s" % (counters_tx[15 + tx_retry_direct_number+tx_retry_indirect_number][0]))
+                    print("    TxErrCca: %d" % counters_tx[16 + tx_retry_direct_number+tx_retry_indirect_number])
+                    print("    TxAbort: %d" % counters_tx[17 + tx_retry_direct_number+tx_retry_indirect_number])
+                    print("    TxErrBusyChannel: %d" % counters_tx[18 + tx_retry_direct_number+tx_retry_indirect_number])
                     print("RxTotal: %d" % counters_rx[0])
                     print("    RxUnicast: %d" % counters_rx[1])
                     print("    RxBroadcast: %d" % counters_rx[2])
