@@ -52,6 +52,9 @@ sudo python setup.py install
        	Open a serial connection to the OpenThread NCP device
 	where <UART> is a device path such as "/dev/ttyUSB0".
 
+    -b <BAUDRATE>, --baudrate=<BAUDRATE>
+        Specify a serial connection baudrate. By default set to 115200.
+
     -p <PIPE>, --pipe=<PIPE>
         Open a piped process connection to the OpenThread NCP device
         where <PIPE> is the command to start an emulator, such as
@@ -73,6 +76,9 @@ sudo python setup.py install
 
     -v, --verbose
         Maximize debug and log output.
+
+    -d <DEBUG_LEVEL>, --debug=<DEBUG_LEVEL>
+        Specify the debug level.
 ```
 
 ## Quick Start
@@ -87,28 +93,12 @@ documented in the command reference section.
 openthread$ cd tools/spinel-cli/
 spinel-cli$ ./spinel-cli.py
 Opening pipe to ../../examples/apps/ncp/ot-ncp-ftd 1
-spinel-cli > help
-
-Available commands (type help <name> for more information):
-============================================================
-channel            diag-sleep  leaderdata       quit
-child              diag-start  leaderweight     releaserouterid
-childmax           diag-stats  macfilter        rloc16
-childtimeout       diag-stop   masterkey        route
-clear              discover    mode             router
-commissioner       eidcache    ncp-ll64         routerupgradethreshold
-contextreusedelay  exit        ncp-ml64         scan
-counter            extaddr     ncp-tun          state
-debug              extpanid    netdataregister  thread
-debug-mem          h           networkidtimeout tun
-diag               help        networkname      v
-diag-channel       history     panid            version
-diag-power         ifconfig    ping
-diag-repeat        ipaddr      prefix
-diag-send          keysequence q
-
 spinel-cli > version
 OPENTHREAD/gd4d4e9d-dirty; Aug 11 2016 14:40:44
+Done
+spinel-cli > panid 0
+Done
+spinel-cli > ifconfig up
 Done
 spinel-cli > thread start
 Done
@@ -202,21 +192,21 @@ spinel-cli > help
 
 Available commands (type help <name> for more information):
 ============================================================
-channel            diag-sleep  leaderdata       quit
-child              diag-start  leaderweight     releaserouterid
-childmax           diag-stats  macfilter        rloc16
-childtimeout       diag-stop   masterkey        route
-clear              discover    mode             router
-commissioner       eidcache    ncp-ll64         routerupgradethreshold
-contextreusedelay  exit        ncp-ml64         scan
-counter            extaddr     ncp-tun          state
-debug              extpanid    netdataregister  thread
-debug-mem          h           networkidtimeout tun
-diag               help        networkname      v
-diag-channel       history     panid            version
-diag-power         ifconfig    ping
-diag-repeat        ipaddr      prefix
-diag-send          keysequence q
+bufferinfo         extaddr       ncp-filter        reset
+channel            extpanid      ncp-ll64          rloc16
+child              h             ncp-ml64          route
+childmax           help          ncp-raw           router
+childtimeout       history       ncp-tun           routerdowngradethreshold
+clear              ifconfig      netdataregister   routerselectionjitter
+commissioner       ipaddr        networkidtimeout  routerupgradethreshold
+contextreusedelay  joiner        networkname       scan
+counters           keysequence   panid             state
+debug              leaderdata    parent            thread
+debug-mem          leaderweight  ping              v
+diag               macfilter     prefix            vendor
+discover           masterkey     q                 version
+eidcache           mfg           quit
+exit               mode          releaserouterid
 ```
 
 #### help \<command\>
