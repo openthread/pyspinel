@@ -18,7 +18,6 @@
 Module providing a specific vendor commands.
 """
 
-
 from vendor.const import VENDOR_SPINEL
 
 class VendorSpinelCliCmd():
