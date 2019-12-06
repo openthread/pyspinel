@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 #
-#  Copyright (c) 2016-2017, The OpenThread Authors.
+#  Copyright (c) 2016-2019, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,25 +16,7 @@
 #  limitations under the License.
 #
 """
-spinel-cli.py
-
-available commands (type help <name> for more information):
-============================================================
-bufferinfo         extaddr       ncp-filter        reset
-channel            extpanid      ncp-ll64          rloc16
-child              h             ncp-ml64          route
-childmax           help          ncp-raw           router
-childtimeout       history       ncp-tun           routerdowngradethreshold
-clear              ifconfig      netdataregister   routerselectionjitter
-commissioner       ipaddr        networkidtimeout  routerupgradethreshold
-contextreusedelay  joiner        networkname       scan
-counters           keysequence   panid             state
-debug              leaderdata    parent            thread
-debug-mem          leaderweight  ping              v
-diag               macfilter     prefix            version
-discover           masterkey     q
-eidcache           mfg           quit
-exit               mode          releaserouterid
+Shell tool for controlling OpenThread NCP instances.
 """
 
 import os
@@ -274,7 +256,6 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'ncp-tun',
         'ncp-raw',
         'ncp-filter',
-
     ]
 
     @classmethod
