@@ -105,10 +105,13 @@ def extcap_interfaces():
     DirtylogFile = open(os.path.join(tempfile.gettempdir(), 'dirtylog'), 'w')
     print('extcap {version=1.0.0}{display=OpenThread Sniffer}{help=https://github.com/openthread/pyspinel}')
 
+    threads = []
     for interface in comports():
         th = threading.Thread(target=serialopen, args=(interface, __console__, DirtylogFile))
-        th.setDaemon(True)
         th.start()
+        threads.append(th)
+    for th in threads:
+        th.join()
 
 def extcap_capture(interface, fifo, control_in, control_out, channel, tap):
     """Start the sniffer to capture packets"""
