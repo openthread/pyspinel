@@ -241,6 +241,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'keysequence',
         'leaderdata',
         'leaderweight',
+        'mac',
         'macfilter',
         'masterkey',
         'mfg',
@@ -263,6 +264,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'scan',
         'state',
         'thread',
+        'txpower',
         'version',
         'vendor',
 
@@ -1914,6 +1916,25 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             print("Done")
         else:
             print("Error")
+
+    def do_txpower(self, line):
+        """
+        txpower
+
+            Get the transmit power in dBm.
+
+            > txpower
+            0
+            Done
+
+        txpower <txpower>
+
+            Set the transmit power in dBm.
+
+            > txpower -10
+            Done
+        """
+        self.handle_property(line, SPINEL.PROP_PHY_TX_POWER, mixed_format='b')
 
     def do_version(self, line):
         """
