@@ -23,6 +23,7 @@ import subprocess
 import threading
 import logging
 import time
+import re
 
 from spinel.stream import StreamOpen
 from spinel.const import SPINEL
@@ -40,12 +41,15 @@ class Config(Enum):
     BAUDRATE = 1
     TAP = 2
 
-def extcap_config(interface, option):
+def extcap_config(interface, option, extcap_version):
     """List Configuration for the given interface"""
     args = []
     values = []
     args.append((Config.CHANNEL.value, '--channel', 'Channel', 'IEEE 802.15.4 channel', 'selector', '{required=true}{default=11}'))
-    args.append((Config.TAP.value, '--tap', 'IEEE 802.15.4 TAP (only for Wireshark3.0 and later)', 'IEEE 802.15.4 TAP', 'boolflag', '{default=yes}'))
+
+    match = re.match(r'^(\d+)\.(\d+)$', extcap_version)
+    if match and int(match.group(1)) >= 3:
+        args.append((Config.TAP.value, '--tap', 'IEEE 802.15.4 TAP (only for Wireshark3.0 and later)', 'IEEE 802.15.4 TAP', 'boolflag', '{default=yes}'))
 
     for arg in args:
         print('arg {number=%d}{call=%s}{display=%s}{tooltip=%s}{type=%s}%s' % arg)
@@ -162,6 +166,19 @@ if __name__ == '__main__':
     except argparse.ArgumentError as e:
         parser.exit('ERROR_ARG: %s' % str(e))
 
+    extcap_version = ''
+    version_path = os.path.join(tempfile.gettempdir(), 'extcap_ot_version')
+    if args.extcap_version:
+        extcap_version = args.extcap_version
+        with open(version_path, mode='w') as f:
+            f.write(extcap_version)
+    else:
+        try:
+            with open(version_path, mode='r') as f:
+                extcap_version = f.read()
+        except Exception as e:
+            logging.exception(e)
+
     if len(unknown) > 0:
         parser.exit('Sniffer %d unknown arguments given: %s' % (len(unknown), unknown))
 
@@ -177,7 +194,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     if args.extcap_config:
-        extcap_config(args.extcap_interface, '')
+        extcap_config(args.extcap_interface, '', extcap_version)
     elif args.extcap_dlts:
         extcap_dlts(args.extcap_interface)
     elif args.capture:
