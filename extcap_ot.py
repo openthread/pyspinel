@@ -107,11 +107,15 @@ def extcap_interfaces():
     log_file = open(os.path.join(tempfile.gettempdir(), 'extcap_ot_interfaces.log'), 'w')
     print('extcap {version=1.0.0}{display=OpenThread Sniffer}{help=https://github.com/openthread/pyspinel}')
 
+    threads = []
     for interface in comports():
         th = threading.Thread(target=serialopen, args=(interface, console, log_file))
         th.daemon = True
+        threads.append(th)
         th.start()
-    time.sleep(0.5)
+    deadline = time.time() + 0.5
+    for th in threads:
+        th.join(timeout=deadline - time.time())
 
 def extcap_capture(interface, fifo, control_in, control_out, channel, tap):
     """Start the sniffer to capture packets"""
