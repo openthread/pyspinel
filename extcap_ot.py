@@ -64,7 +64,7 @@ def extcap_dlts(interface):
     print('dlt {number=195}{name=IEEE802_15_4_WITHFCS}{display=IEEE 802.15.4 with FCS}')
     print('dlt {number=283}{name=IEEE802_15_4_TAP}{display=IEEE 802.15.4 TAP}')
 
-def serialopen(interface, console, log_file):
+def serialopen(interface, log_file):
     """
     Open serial to indentify OpenThread sniffer
     :param interface: string, eg: '/dev/ttyUSB0 - Zolertia Firefly platform', '/dev/ttyACM1 - nRF52840 OpenThread Device'
@@ -77,45 +77,50 @@ def serialopen(interface, console, log_file):
     for speed in COMMON_BAUDRATE:
         stream = StreamOpen('u', interface, False, baudrate=speed)
 
-        wpan_api = WpanApi(stream, nodeid=DEFAULT_NODEID)
-        # result is None for NCP, not None for RCP
-        wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1) # detect baudrate
+        class Closer:
+            def __enter__(self):
+                return self
 
-        # result should not be None for both NCP and RCP
-        result = wpan_api.prop_get_value(SPINEL.PROP_CAPS) # confirm OpenThread Sniffer
+            def __exit__(self, exc_type, exc_val, exc_tb):
+                stream.close()
 
-        # check whether or not is OpenThread Sniffer
-        stream.close()
-        if result is not None:
-            baudrate = speed
-            break
+        with Closer():
+            wpan_api = WpanApi(stream, nodeid=DEFAULT_NODEID)
+            wpan_api.timeout = 0.1
+            # result is None for NCP, not None for RCP
+            wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1) # detect baudrate
+
+            # result should not be None for both NCP and RCP
+            result = wpan_api.prop_get_value(SPINEL.PROP_CAPS) # confirm OpenThread Sniffer
+
+            # check whether or not is OpenThread Sniffer
+            if result is not None:
+                baudrate = speed
+                break
 
     if baudrate is not None:
         if sys.platform == 'win32':
             # Wireshark only shows the value of key `display`('OpenThread Sniffer').
             # Here intentionally appends interface in the end (e.g. 'OpenThread Sniffer: COM0').
-            print('interface {value=%s:%s}{display=OpenThread Sniffer %s}' % (interface, baudrate, interface), file=console, flush=True)
+            print('interface {value=%s:%s}{display=OpenThread Sniffer %s}' % (interface, baudrate, interface), file=sys.__stdout__, flush=True)
         else:
             # On Linux or MacOS, wireshark will show the concatenation of the content of `display`
             # and `interface` by default (e.g. 'OpenThread Sniffer: /dev/ttyACM0').
-            print('interface {value=%s:%s}{display=OpenThread Sniffer}' % (interface, baudrate), file=console, flush=True)
+            print('interface {value=%s:%s}{display=OpenThread Sniffer}' % (interface, baudrate), file=sys.__stdout__, flush=True)
 
 def extcap_interfaces():
     """List available interfaces to capture from"""
-    console = sys.stdout
 
     log_file = open(os.path.join(tempfile.gettempdir(), 'extcap_ot_interfaces.log'), 'w')
     print('extcap {version=1.0.0}{display=OpenThread Sniffer}{help=https://github.com/openthread/pyspinel}')
 
     threads = []
     for interface in comports():
-        th = threading.Thread(target=serialopen, args=(interface, console, log_file))
-        th.daemon = True
+        th = threading.Thread(target=serialopen, args=(interface, log_file))
         threads.append(th)
         th.start()
-    deadline = time.time() + 0.5
     for th in threads:
-        th.join(timeout=deadline - time.time())
+        th.join()
 
 def extcap_capture(interface, fifo, control_in, control_out, channel, tap):
     """Start the sniffer to capture packets"""

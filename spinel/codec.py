@@ -843,6 +843,8 @@ class WpanApi(SpinelCodec):
         self.stream = stream
         self.nodeid = nodeid
 
+        self.timeout = TIMEOUT_PROP
+
         self.use_hdlc = use_hdlc
         if self.use_hdlc:
             self.hdlc = Hdlc(self.stream)
@@ -977,9 +979,12 @@ class WpanApi(SpinelCodec):
             item = None
         return item
 
-    def queue_wait_for_prop(self, _prop, tid=SPINEL.HEADER_DEFAULT, timeout=TIMEOUT_PROP):
+    def queue_wait_for_prop(self, _prop, tid=SPINEL.HEADER_DEFAULT, timeout=None):
         if _prop is None:
             return None
+
+        if timeout is None:
+            timeout = self.timeout
 
         processed_queue = queue.Queue()
         timeout_time = time.time() + timeout
