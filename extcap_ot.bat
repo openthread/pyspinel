@@ -14,4 +14,4 @@
 :rem  limitations under the License.
 :rem
 @echo off
-python "%~dp0extcap_ot.py"  %*
+py -3 "%~dp0extcap_ot.py"  %*

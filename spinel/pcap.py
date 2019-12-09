@@ -17,7 +17,6 @@
 """ Module to provide codec utilities for .pcap formatters. """
 
 import struct
-import binascii
 
 PCAP_MAGIC_NUMBER = 0xA1B2C3D4
 PCAP_VERSION_MAJOR = 2

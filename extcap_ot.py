@@ -47,7 +47,7 @@ def extcap_config(interface, option, extcap_version):
     values = []
     args.append((Config.CHANNEL.value, '--channel', 'Channel', 'IEEE 802.15.4 channel', 'selector', '{required=true}{default=11}'))
 
-    match = re.match(r'^(\d+)\.(\d+)$', extcap_version)
+    match = re.match(r'^(\d+)(\.\d+)*$', extcap_version)
     if match and int(match.group(1)) >= 3:
         args.append((Config.TAP.value, '--tap', 'IEEE 802.15.4 TAP (only for Wireshark3.0 and later)', 'IEEE 802.15.4 TAP', 'boolflag', '{default=yes}'))
 
