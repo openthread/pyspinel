@@ -844,6 +844,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
             if len(params) == 1:
                 result = self.prop_get_value(SPINEL.PROP_CNTR_ALL_MAC_COUNTERS)
+                histogram = self.prop_get_value(SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM)
                 if result != None:
                     counters_tx = result[0][0]
                     counters_rx = result[1][0]
@@ -860,18 +861,22 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                     print("    TxBeaconRequest: %d" % counters_tx[9])
                     print("    TxOther: %d" % counters_tx[10])
                     print("    TxRetry: %d" % counters_tx[11])
-                    tx_retry_direct_number = counters_tx[15][0]
-                    if tx_retry_direct_number != 0:
-                        print("        mTxDirectRetrySuccess: [", end='')
-                        for retry in range(tx_retry_direct_number):
-                            print(" %d:%s" % (retry + 1, counters_tx[16 + retry][0]), end=',' if retry != (tx_retry_direct_number-1) else " ]\n")
-                        print("        mTxDirectMaxRetryExpiry: %s" % (counters_tx[16 + tx_retry_direct_number][0]))
-                    tx_retry_indirect_number = counters_tx[17 + tx_retry_direct_number][0]
-                    if tx_retry_indirect_number != 0:
-                        print("        mTxDirectRetrySuccess: [", end='')
-                        for retry in range(tx_retry_indirect_number):
-                            print(" %d:%s" % (retry + 1, counters_tx[18 + retry][0]), end=',' if retry != (tx_retry_indirect_number-1) else " ]\n")
-                        print("        mTxIndirectMaxRetryExpiry: %s" % (counters_tx[18 + tx_retry_direct_number+tx_retry_indirect_number][0]))
+                    if histogram != None:
+                        histogram_direct = histogram[0][0]
+                        if len(histogram_direct) != 0:
+                            print("        mTxDirectRetrySuccess: [", end='')
+                            for retry in range(len(histogram_direct)):
+                                print(" %d:%s" % (retry + 1, histogram_direct[retry][0]),
+                                    end=',' if retry != (len(histogram_direct) - 1) else " ]\n")
+                    print("        mTxDirectMaxRetryExpiry: %s" % (counters_tx[15][0]))
+                    if histogram != None:
+                        histogram_indirect = histogram[1][0]
+                        if len(histogram_indirect) != 0:
+                            print("        mTxIndirectRetrySuccess: [", end='')
+                            for retry in range(len(histogram_indirect)):
+                                print(" %d:%s" % (retry + 1, histogram_indirect[retry][0]),
+                                    end=',' if retry != (len(histogram_indirect) - 1) else " ]\n")
+                    print("        mTxIndirectMaxRetryExpiry: %s" % (counters_tx[16][0]))
                     print("    TxErrCca: %d" % counters_tx[12])
                     print("    TxAbort: %d" % counters_tx[13])
                     print("    TxErrBusyChannel: %d" % counters_tx[14])
@@ -899,6 +904,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             elif len(params) == 2:
                 if params[1] == "reset":
                     self.prop_set_value(SPINEL.PROP_CNTR_ALL_MAC_COUNTERS, 1)
+                    self.prop_set_value(SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM, 1)
                     print("Done") 
             else:
                 print("Error")

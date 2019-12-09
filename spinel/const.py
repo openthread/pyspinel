@@ -401,6 +401,23 @@ class SPINEL(object):
     #    'S': ParentChanges                 (The number of times device changed its parents).
     PROP_CNTR_MLE_COUNTERS = PROP_CNTR__BEGIN + 402
 
+    # MAC retry histogram.
+    # Format: t(A(L))t(A(L)) (Read-only)
+    #
+    # The first structure is histogram which corresponds to retries of direct transmission:
+    #   'L': DirectRetry[0]                   (The number of packet afters 1 retry).
+    #   'L': DirectRetry[1]                   (The number of packet afters 2 retry).
+    #    ...
+    #   'L': DirectRetry[n-1]                 (The number of packet afters n retry).
+    #
+    # The second structure provides the histogram of retries for indirect transmission:
+    #   'L': IndirectRetry[0]                   (The number of packets after 1 retry).
+    #   'L': IndirectRetry[1]                   (The number of packets after 2 retry).
+    #    ...
+    #   'L': IndirectRetry[m-1]                 (The number of packets after m retry).
+    #
+    PROP_CNTR_MAC_RETRY_HISTOGRAM = PROP_CNTR__BEGIN + 404
+
     PROP_CNTR__END = 0x800
 
     PROP_NEST__BEGIN = 0x3BC0
