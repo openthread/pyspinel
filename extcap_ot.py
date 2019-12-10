@@ -129,7 +129,11 @@ def extcap_capture(interface, fifo, control_in, control_out, channel, tap):
     interface_baudrate = str(interface).split(':')[1]
 
     if sys.platform == 'win32':
-        python_path = subprocess.Popen('where python', stdout=subprocess.PIPE, shell=True).stdout.readline().decode().strip()
+        python_path = subprocess.Popen(
+            'py -3 -c "import sys; print(sys.executable)"',
+            stdout=subprocess.PIPE,
+            shell=True,
+        ).stdout.readline().decode().strip()
         sniffer_py = os.path.join(os.path.dirname(python_path), 'Scripts', 'sniffer.py')
         cmd = ['python', sniffer_py]
     else:
