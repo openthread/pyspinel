@@ -790,10 +790,10 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 TxBeaconRequest: 0
                 TxOther: 0
                 TxRetry: 0
-                    mTxDirectRetrySuccess: [ 1:2, 2:2, 3:1 ]
-                    mTxDirectMaxRetryExpiry: 1
-                    mTxIndirectRetrySuccess: [ 1:0 ]
-                    mTxIndirectMaxRetryExpiry: 1
+                    TxDirectRetrySuccess: [ 0:2, 1:2, 2:1 ]
+                    TxDirectMaxRetryExpiry: 1
+                    TxIndirectRetrySuccess: [ 0:0 ]
+                    TxIndirectMaxRetryExpiry: 1
                 TxErrCca: 0
                 TxAbort: 0
                 TxErrBusyChannel: 0
@@ -864,19 +864,19 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                     if histogram != None:
                         histogram_direct = histogram[0][0]
                         if len(histogram_direct) != 0:
-                            print("        mTxDirectRetrySuccess: [", end='')
+                            print("        TxDirectRetrySuccess: [", end='')
                             for retry in range(len(histogram_direct)):
-                                print(" %d:%s" % (retry + 1, histogram_direct[retry][0]),
+                                print(" %d:%s" % (retry, histogram_direct[retry][0]),
                                     end=',' if retry != (len(histogram_direct) - 1) else " ]\n")
-                    print("        mTxDirectMaxRetryExpiry: %s" % (counters_tx[15][0]))
+                    print("        TxDirectMaxRetryExpiry: %s" % (counters_tx[15][0]))
                     if histogram != None:
                         histogram_indirect = histogram[1][0]
                         if len(histogram_indirect) != 0:
-                            print("        mTxIndirectRetrySuccess: [", end='')
+                            print("        TxIndirectRetrySuccess: [", end='')
                             for retry in range(len(histogram_indirect)):
-                                print(" %d:%s" % (retry + 1, histogram_indirect[retry][0]),
+                                print(" %d:%s" % (retry, histogram_indirect[retry][0]),
                                     end=',' if retry != (len(histogram_indirect) - 1) else " ]\n")
-                    print("        mTxIndirectMaxRetryExpiry: %s" % (counters_tx[16][0]))
+                    print("        TxIndirectMaxRetryExpiry: %s" % (counters_tx[16][0]))
                     print("    TxErrCca: %d" % counters_tx[12])
                     print("    TxAbort: %d" % counters_tx[13])
                     print("    TxErrBusyChannel: %d" % counters_tx[14])
