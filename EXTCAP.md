@@ -24,21 +24,31 @@ The tool has been tested on the following platforms:
 
 ## Package installation
 
-### Automatic installation from source
+### 1. Find Wireshark extcap location
+
+To find the correct installation path of the extcap utility on any system, open Wireshark:
+```
+"Help" -> "About Wireshark" -> "Folders" -> "Extcap path"
+```
+Copy the path. It is refered to as `<extcap_path>` in the following sections.
+
+### 2. Installation
+
+#### Automatic installation from source
 
 ```
 git clone https://github.com/openthread/pyspinel
 cd pyspinel
-sudo python setup.py install 
+sudo python setup.py install --extcap-path=<extcap_path>
 ```
 
-### Automatic install from PYPI (pending for new release package)
+#### Automatic install from PYPI (pending for new release package)
 
 ```
-pip install pyspinel
+pip install pyspinel --install-option="--extcap-path=<extcap_path>"
 ```
 
-### Manual installation(for pyspinel 1.0.0a3 and before)
+#### Manual installation (for pyspinel 1.0.0a3 and before)
 
 **1. Install pyspinel package**
 ``` 
@@ -46,10 +56,6 @@ pip install pyspinel
 ```
 **2. Install extcap script on Wireshark**
 
-To find the correct installation path of the extcap utility on any system, open Wireshark:
-```
-"Help" -> "About Wireshark" -> "Folders" -> "Extcap path"
-```
 Copy the provided `extcap_ot.py`, `extcap_ot.bat` and `sniffer.py` to the extcap directory.
 
 For OS X and Linux, verify that the ```extcap_ot.py``` file has the execute (x) permission. If not, add it using:
