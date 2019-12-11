@@ -85,8 +85,7 @@ def serialopen(interface, log_file):
 
     for speed in COMMON_BAUDRATE:
         with _StreamCloser(StreamOpen('u', interface, False, baudrate=speed)) as stream:
-            wpan_api = WpanApi(stream, nodeid=DEFAULT_NODEID)
-            wpan_api.timeout = 0.1
+            wpan_api = WpanApi(stream, nodeid=DEFAULT_NODEID, timeout=0.1)
 
             # result should not be None for both NCP and RCP
             result = wpan_api.prop_get_value(SPINEL.PROP_CAPS)  # confirm OpenThread Sniffer

@@ -839,11 +839,11 @@ if codec is not None:
 class WpanApi(SpinelCodec):
     """ Helper class to format wpan command packets """
 
-    def __init__(self, stream, nodeid, use_hdlc=FEATURE_USE_HDLC):
+    def __init__(self, stream, nodeid, use_hdlc=FEATURE_USE_HDLC, timeout=TIMEOUT_PROP):
         self.stream = stream
         self.nodeid = nodeid
 
-        self.timeout = TIMEOUT_PROP
+        self.timeout = timeout
 
         self.use_hdlc = use_hdlc
         if self.use_hdlc:
