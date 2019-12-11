@@ -22,7 +22,6 @@ import argparse
 import subprocess
 import threading
 import logging
-import time
 import re
 
 from spinel.stream import StreamOpen
@@ -40,6 +39,16 @@ class Config(Enum):
     CHANNEL = 0
     BAUDRATE = 1
     TAP = 2
+
+class _StreamCloser:
+    def __init__(self, stream):
+        self._stream = stream
+
+    def __enter__(self):
+        return self._stream
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._stream.close()
 
 def extcap_config(interface, option, extcap_version):
     """List Configuration for the given interface"""
@@ -75,23 +84,12 @@ def serialopen(interface, log_file):
     baudrate = None
 
     for speed in COMMON_BAUDRATE:
-        stream = StreamOpen('u', interface, False, baudrate=speed)
-
-        class Closer:
-            def __enter__(self):
-                return self
-
-            def __exit__(self, exc_type, exc_val, exc_tb):
-                stream.close()
-
-        with Closer():
+        with _StreamCloser(StreamOpen('u', interface, False, baudrate=speed)) as stream:
             wpan_api = WpanApi(stream, nodeid=DEFAULT_NODEID)
             wpan_api.timeout = 0.1
-            # result is None for NCP, not None for RCP
-            wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1) # detect baudrate
 
             # result should not be None for both NCP and RCP
-            result = wpan_api.prop_get_value(SPINEL.PROP_CAPS) # confirm OpenThread Sniffer
+            result = wpan_api.prop_get_value(SPINEL.PROP_CAPS)  # confirm OpenThread Sniffer
 
             # check whether or not is OpenThread Sniffer
             if result is not None:
@@ -127,6 +125,10 @@ def extcap_capture(interface, fifo, control_in, control_out, channel, tap):
     # baudrate = detect_baudrate(interface)
     interface_port = str(interface).split(':')[0]
     interface_baudrate = str(interface).split(':')[1]
+
+    with _StreamCloser(StreamOpen('u', interface_port, False, baudrate=int(interface_baudrate))) as stream:
+        wpan_api = WpanApi(stream, nodeid=DEFAULT_NODEID)
+        wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
 
     if sys.platform == 'win32':
         python_path = subprocess.Popen(
