@@ -848,7 +848,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 caps_list = self.prop_get_value(SPINEL.PROP_CAPS)
 
                 for caps in caps_list[0]:
-                    if SPINEL.CAP_TX_RETRY_HISTOGRAM == caps[0][0]:
+                    if SPINEL.CAP_MAC_RETRY_HISTOGRAM == caps[0][0]:
                         histogram = self.prop_get_value(SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM)
 
                 if result != None:

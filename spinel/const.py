@@ -439,7 +439,7 @@ class SPINEL(object):
     # Describes the supported capabilities of NCP.
     CAP_OPENTHREAD__BEGIN = 512
 
-    CAP_TX_RETRY_HISTOGRAM = CAP_OPENTHREAD__BEGIN + 12
+    CAP_MAC_RETRY_HISTOGRAM = CAP_OPENTHREAD__BEGIN + 12
 
 class kThread(object):
     """ OpenThread constant class. """
