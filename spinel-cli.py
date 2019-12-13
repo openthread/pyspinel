@@ -843,8 +843,14 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         if params[0] == "mac":
 
             if len(params) == 1:
+                histogram = None
                 result = self.prop_get_value(SPINEL.PROP_CNTR_ALL_MAC_COUNTERS)
-                histogram = self.prop_get_value(SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM)
+                caps_list = self.prop_get_value(SPINEL.PROP_CAPS)
+
+                for caps in caps_list[0]:
+                    if SPINEL.CAP_TX_RETRY_HISTOGRAM == caps[0][0]:
+                        histogram = self.prop_get_value(SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM)
+
                 if result != None:
                     counters_tx = result[0][0]
                     counters_rx = result[1][0]
