@@ -139,7 +139,8 @@ def extcap_capture(interface, fifo, control_in, control_out, channel, tap):
         cmd = ['python', sniffer_py]
     else:
         cmd = ['sniffer.py']
-    cmd += ['-c', channel, '-u', interface_port, '--crc', '--rssi', '-b', interface_baudrate, '-o', str(fifo)]
+    cmd += ['-c', channel, '-u', interface_port, '--crc', '--rssi', '-b', interface_baudrate, '-o', str(fifo),
+            '--is-fifo']
     if tap:
         cmd.append('--tap')
 
