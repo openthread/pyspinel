@@ -863,6 +863,12 @@ class WpanApi(SpinelCodec):
     def __del__(self):
         self._reader_alive = False
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        self._reader_alive = False
+
     def __start_reader(self):
         """Start reader thread"""
         self._reader_alive = True
@@ -924,15 +930,22 @@ class WpanApi(SpinelCodec):
 
     def stream_rx(self):
         """ Recieve thread and parser. """
-        while self._reader_alive:
-            if self.use_hdlc:
-                self.rx_pkt = self.hdlc.collect()
-            else:
-                # size=None: Assume stream will always deliver packets
-                pkt = self.stream.read(None)
-                self.rx_pkt = util.packed_to_array(pkt)
+        try:
+            while self._reader_alive:
+                if self.use_hdlc:
+                    self.rx_pkt = self.hdlc.collect()
+                else:
+                    # size=None: Assume stream will always deliver packets
+                    pkt = self.stream.read(None)
+                    self.rx_pkt = util.packed_to_array(pkt)
 
-            self.parse_rx(self.rx_pkt)
+                self.parse_rx(self.rx_pkt)
+        except:
+            if self._reader_alive:
+                raise
+            else:
+                # Ignore the error since we are exiting
+                pass
 
     class PropertyItem(object):
         """ Queue item for NCP response to property commands. """

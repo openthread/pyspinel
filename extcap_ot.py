@@ -84,8 +84,8 @@ def serialopen(interface, log_file):
     baudrate = None
 
     for speed in COMMON_BAUDRATE:
-        with _StreamCloser(StreamOpen('u', interface, False, baudrate=speed)) as stream:
-            wpan_api = WpanApi(stream, nodeid=DEFAULT_NODEID, timeout=0.1)
+        with _StreamCloser(StreamOpen('u', interface, False, baudrate=speed)) as stream, \
+                WpanApi(stream, nodeid=DEFAULT_NODEID, timeout=0.1) as wpan_api:
 
             # result should not be None for both NCP and RCP
             result = wpan_api.prop_get_value(SPINEL.PROP_CAPS)  # confirm OpenThread Sniffer
@@ -125,8 +125,8 @@ def extcap_capture(interface, fifo, control_in, control_out, channel, tap):
     interface_port = str(interface).split(':')[0]
     interface_baudrate = str(interface).split(':')[1]
 
-    with _StreamCloser(StreamOpen('u', interface_port, False, baudrate=int(interface_baudrate))) as stream:
-        wpan_api = WpanApi(stream, nodeid=DEFAULT_NODEID)
+    with _StreamCloser(StreamOpen('u', interface_port, False, baudrate=int(interface_baudrate))) as stream, \
+            WpanApi(stream, nodeid=DEFAULT_NODEID) as wpan_api:
         wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
 
     if sys.platform == 'win32':
