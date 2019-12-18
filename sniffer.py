@@ -93,6 +93,9 @@ def parse_args():
     opt_parser.add_option('--is-fifo', action='store_true',
                           dest='is_fifo', default=False)
 
+    opt_parser.add_option('--use-host-timestamp', action='store_true',
+                          dest='use_host_timestamp', default=False)
+
     return opt_parser.parse_args(args)
 
 def sniffer_init(wpan_api, options):
@@ -157,6 +160,9 @@ def main():
 
     if options.debug:
         CONFIG.debug_set_level(options.debug)
+
+    if options.use_host_timestamp:
+        print('WARNING: Using host timestamp, may be inaccurate', file=sys.stderr)
 
     # Set default stream to pipe
     stream_type = 'p'
@@ -264,6 +270,11 @@ def main():
 
                     if options.rssi:
                         sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
+
+                if options.use_host_timestamp:
+                    timestamp = round(time.time() * 1000000)
+                    timestamp_sec = timestamp // 1000000
+                    timestamp_usec = timestamp % 1000000
 
                 pkt = pcap.encode_frame(pkt, int(timestamp_sec), timestamp_usec, options.rssi, options.crc, metadata)
 
