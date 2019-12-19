@@ -16,11 +16,11 @@ The tool has been tested on the following platforms:
 
 | Language  | Version          |
 |-----------|------------------|
-| Python    | 2.7.10           |
+| Python    | 3.6.8            |
 
 | Software  | Version          |
 |-----------|------------------|
-| Wireshark | 3.0.3            |
+| Wireshark | 3.0.6            |
 
 ## Package installation
 
@@ -42,13 +42,13 @@ cd pyspinel
 sudo python setup.py install --extcap-path=<extcap_path>
 ```
 
-#### Automatic install from PYPI (pending for new release package)
+#### Automatic install from PYPI
 
 ```
 pip install pyspinel --install-option="--extcap-path=<extcap_path>"
 ```
 
-#### Manual installation (for pyspinel 1.0.0a3 and before)
+#### Manual installation
 
 **1. Install pyspinel package**
 ``` 
@@ -56,7 +56,7 @@ pip install pyspinel
 ```
 **2. Install extcap script on Wireshark**
 
-Copy the provided `extcap_ot.py`, `extcap_ot.bat` and `sniffer.py` to the extcap directory.
+Copy the provided `extcap_ot.py` and `extcap_ot.bat` to the extcap directory.
 
 For OS X and Linux, verify that the ```extcap_ot.py``` file has the execute (x) permission. If not, add it using:
 
@@ -141,7 +141,9 @@ There are three ways to start sniffing:
  Select all hardware interfaces in the Wireshark welcome window and click 
  the Wireshark icon on the top left to start sniffing.
  
-**Interface name (frame.interface_name)**\
+ These fields are useful when capturing from multiple interfaces:
+ 
+**Interface name (frame.interface_name)**
 Interface Identifier used by Wireshark to identify the capture interfaces 
 
 **Channel (wpan-tap.ch_num)**
@@ -166,11 +168,11 @@ IEEE 802.15.4 capture channel [11-26]
        ```
        chmod +x extcap_ot.py
        ```
-    3. Run ```python extcap_ot.py --extcap-interfaces``` to list the interface
+    3. Run ```./extcap_ot.py --extcap-interfaces``` to list the interface
     
     For Windows:
     1. Run ```extcap_ot.bat --extcap-interfaces``` to list the interface.
-    2. If this exits with a python error, verify that python.exe can be run from the command line ```C:>python.exe --version```
+    2. If this exits with a python error, verify that python.exe can be run from the command line ```C:>py -3 --version```
 
 ### Wireshark only allows the root user to capture packets
 
@@ -197,6 +199,6 @@ Log out and log in again to apply the new user group settings.
 
 ### Wireshark format error when capturing on multiple USB interfaces on windows
 
-It's related to a [Wireshark bug](https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=13653), 
-and a patch has been provided. Please download the [patch](https://code.wireshark.org/review/#/c/34722/)
-and recompile Wireshark.
+[Known issue](https://bugs.wireshark.org/bugzilla/show_bug.cgi?id=13653) of some old versions
+of Wireshark. Please upgrade to
+[Wireshark 3.0.6](https://www.wireshark.org/docs/relnotes/wireshark-3.0.6.html) or later.
