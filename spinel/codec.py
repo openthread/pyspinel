@@ -642,6 +642,7 @@ class SpinelPropertyHandler(SpinelCodec):
     def MSG_BUFFER_COUNTERS(self, _wpan_api, payload): return self.parse_fields(payload, "SSSSSSSSSSSSSSSS")
     def ALL_MAC_COUNTERS(self, _wpan_api, payload): return self.parse_fields(payload, "t(A(L))t(A(L))")
     def MLE_COUNTERS(self, _wpan_api, payload): return self.parse_fields(payload, "SSSSSSSSS")
+    def MAC_RETRY_HISTOGRAM(self, _wpan_api, payload): return self.parse_fields(payload, "t(A(L))t(A(L))")
 
     def NEST_STREAM_MFG(self, _wpan_api, payload): return self.parse_U(payload)
 
@@ -832,6 +833,7 @@ SPINEL_PROP_DISPATCH = {
 
     SPINEL.PROP_CNTR_ALL_MAC_COUNTERS: WPAN_PROP_HANDLER.ALL_MAC_COUNTERS,
     SPINEL.PROP_CNTR_MLE_COUNTERS: WPAN_PROP_HANDLER.MLE_COUNTERS,
+    SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM: WPAN_PROP_HANDLER.MAC_RETRY_HISTOGRAM,
 
     SPINEL.PROP_NEST_STREAM_MFG: WPAN_PROP_HANDLER.NEST_STREAM_MFG
 }

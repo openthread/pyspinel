@@ -402,6 +402,23 @@ class SPINEL(object):
     #    'S': ParentChanges                 (The number of times device changed its parents).
     PROP_CNTR_MLE_COUNTERS = PROP_CNTR__BEGIN + 402
 
+    # MAC retry histogram.
+    # Format: t(A(L))t(A(L)) (Read-only)
+    #
+    # The first structure is histogram which corresponds to retries of direct transmission:
+    #   'L': DirectRetry[0]                   (The number of packets send with 0 retransmissions).
+    #   'L': DirectRetry[1]                   (The number of packets send with 1 retransmissions).
+    #    ...
+    #   'L': DirectRetry[n]                   (The number of packets send with n retransmissions).
+    #
+    # The second structure provides the histogram of retries for indirect transmission:
+    #   'L': IndirectRetry[0]                 (The number of packets send with 0 retransmissions).
+    #   'L': IndirectRetry[1]                 (The number of packets send with 1 retransmissions).
+    #    ...
+    #   'L': IndirectRetry[m]                 (The number of packets send with m retransmissions).
+    #
+    PROP_CNTR_MAC_RETRY_HISTOGRAM = PROP_CNTR__BEGIN + 404
+
     PROP_CNTR__END = 0x800
 
     PROP_NEST__BEGIN = 0x3BC0
@@ -420,6 +437,10 @@ class SPINEL(object):
 
     #=========================================
 
+    # Describes the supported capabilities of NCP.
+    CAP_OPENTHREAD__BEGIN = 512
+
+    CAP_MAC_RETRY_HISTOGRAM = CAP_OPENTHREAD__BEGIN + 12
 
 class kThread(object):
     """ OpenThread constant class. """
