@@ -56,15 +56,15 @@ pip install pyspinel
 ```
 **2. Install extcap script on Wireshark**
 
-Copy the provided `extcap_ot.py` and `extcap_ot.bat` to the extcap directory.
+Copy the provided `extcap_ot.py` to the extcap directory.
 
-For OS X and Linux, verify that the ```extcap_ot.py``` file has the execute (x) permission. If not, add it using:
+For Windows, also copy the provided `extcap_ot.bat` to the extcap directory.
+
+For OS X and Linux, verify that the `extcap_ot.py` file has the execute (x) permission. If not, add it using:
 
 ```
 chmod +x extcap_ot.py
 ```
-
-For Windows, verify that the ```extcap_ot.bat``` file is in the extcap folder.
 
 ## Usage
 
