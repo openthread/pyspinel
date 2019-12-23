@@ -191,8 +191,8 @@ if __name__ == '__main__':
         try:
             with open(version_path, mode='r') as f:
                 extcap_version = f.read()
-        except Exception as e:
-            logging.exception(e)
+        except FileNotFoundError:
+            pass
 
     if len(unknown) > 0:
         parser.exit('Sniffer %d unknown arguments given: %s' % (len(unknown), unknown))
