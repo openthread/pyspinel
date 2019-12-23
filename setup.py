@@ -34,7 +34,8 @@ class _InstallCommand(install.install):
     def run(self):
         if self.extcap_path:
             _copy_script('extcap_ot.py', self.extcap_path)
-            _copy_script('extcap_ot.bat', self.extcap_path)
+            if sys.platform == 'win32':
+                _copy_script('extcap_ot.bat', self.extcap_path)
         else:
             print('WARNING: Wireshark extcap is not installed. To install:', file=sys.stderr)
             print('1. Get Wireshark extcap path from Wireshark -> About -> Folders -> Extcap path', file=sys.stderr)
