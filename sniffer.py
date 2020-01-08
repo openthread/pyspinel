@@ -28,6 +28,8 @@
 import sys
 import optparse
 import time
+import os
+import threading
 from datetime import datetime
 
 import spinel.util as util
@@ -36,6 +38,10 @@ from spinel.const import SPINEL
 from spinel.codec import WpanApi
 from spinel.stream import StreamOpen
 from spinel.pcap import PcapCodec
+
+if sys.platform == 'win32':
+    import ctypes
+    import msvcrt
 
 # Nodeid is required to execute ot-ncp-ftd for its sim radio socket port.
 # This is maximum that works for MacOS.
@@ -73,16 +79,22 @@ def parse_args():
                           dest="channel", type="int", default=DEFAULT_CHANNEL)
 
     opt_parser.add_option('--crc', action='store_true',
-                          dest='crc', default=False )
+                          dest='crc', default=False)
 
     opt_parser.add_option('--rssi', action='store_true',
-                          dest='rssi', default=False )
+                          dest='rssi', default=False)
 
     opt_parser.add_option('--no-reset', action='store_true',
-                          dest='no_reset', default=False )
+                          dest='no_reset', default=False)
 
     opt_parser.add_option('--tap', action='store_true',
                           dest='tap', default=False)
+
+    opt_parser.add_option('--is-fifo', action='store_true',
+                          dest='is_fifo', default=False)
+
+    opt_parser.add_option('--use-host-timestamp', action='store_true',
+                          dest='use_host_timestamp', default=False)
 
     return opt_parser.parse_args(args)
 
@@ -97,7 +109,7 @@ def sniffer_init(wpan_api, options):
         wpan_api.cmd_send(SPINEL.CMD_RESET)
         time.sleep(1)
 
-    result = wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
+    wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
 
     result = wpan_api.prop_set_value(SPINEL.PROP_MAC_FILTER_MODE, SPINEL.MAC_FILTER_MODE_MONITOR)
     if result is None:
@@ -113,12 +125,44 @@ def sniffer_init(wpan_api, options):
 
     return True
 
+
+FIFO_CHECK_INTERVAL = 0.1
+
+def check_fifo(fifo):
+    if sys.platform == 'win32':
+        kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+        handle = msvcrt.get_osfhandle(fifo.fileno())
+        data = b''
+        p_data = ctypes.c_char_p(data)
+        written = ctypes.c_ulong(0)
+        while True:
+            time.sleep(FIFO_CHECK_INTERVAL)
+            if not kernel32.WriteFile(handle, p_data, 0, ctypes.byref(written), None):
+                error = ctypes.get_last_error()
+                if error in (
+                        0xe8,  # ERROR_NO_DATA
+                        0xe9,  # ERROR_PIPE_NOT_CONNECTED
+                ):
+                    os._exit(0)
+                else:
+                    raise ctypes.WinError(error)
+    else:
+        while True:
+            time.sleep(FIFO_CHECK_INTERVAL)
+            try:
+                os.stat(fifo.name)
+            except OSError:
+                os._exit(0)
+
 def main():
     """ Top-level main for sniffer host-side tool. """
     (options, remaining_args) = parse_args()
 
     if options.debug:
         CONFIG.debug_set_level(options.debug)
+
+    if options.use_host_timestamp:
+        print('WARNING: Using host timestamp, may be inaccurate', file=sys.stderr)
 
     # Set default stream to pipe
     stream_type = 'p'
@@ -140,7 +184,8 @@ def main():
             stream_descriptor = " ".join(remaining_args)
 
     stream = StreamOpen(stream_type, stream_descriptor, False, options.baudrate)
-    if stream is None: exit()
+    if stream is None:
+        exit()
     wpan_api = WpanApi(stream, options.nodeid)
     result = sniffer_init(wpan_api, options)
     if not result:
@@ -155,7 +200,7 @@ def main():
     if options.hex:
         hdr = util.hexify_str(hdr)+"\n"
 
-    if (options.output):
+    if options.output:
         output = open(options.output, 'wb')
     elif hasattr(sys.stdout, 'buffer'):
         output = sys.stdout.buffer
@@ -164,6 +209,9 @@ def main():
 
     output.write(hdr)
     output.flush()
+
+    if options.is_fifo:
+        threading.Thread(target=check_fifo, args=(output,)).start()
 
     epoch = datetime(1970, 1, 1)
     timebase = datetime.utcnow() - epoch
@@ -223,6 +271,11 @@ def main():
                     if options.rssi:
                         sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
 
+                if options.use_host_timestamp:
+                    timestamp = round(time.time() * 1000000)
+                    timestamp_sec = timestamp // 1000000
+                    timestamp_usec = timestamp % 1000000
+
                 pkt = pcap.encode_frame(pkt, int(timestamp_sec), timestamp_usec, options.rssi, options.crc, metadata)
 
                 if options.hex:
@@ -237,6 +290,7 @@ def main():
         wpan_api.stream.close()
 
     output.close()
+
 
 if __name__ == "__main__":
     main()

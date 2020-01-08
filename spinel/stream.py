@@ -21,7 +21,6 @@ Also includes adapter implementations for serial, socket, and pipes.
 
 import sys
 import binascii
-import logging
 import time
 import traceback
 
@@ -29,7 +28,6 @@ import subprocess
 import socket
 import serial
 
-import spinel.util
 import spinel.config as CONFIG
 
 
@@ -55,9 +53,9 @@ class StreamSerial(IStream):
     def __init__(self, dev, baudrate=115200):
         try:
             self.serial = serial.Serial(dev, baudrate)
-        except:
-            CONFIG.LOGGER.error("Couldn't open " + dev)
-            traceback.print_exc()
+        except Exception as e:
+            CONFIG.LOGGER.error(f"Couldn't open {dev} {str(e)}")
+            raise
 
     def write(self, data):
         self.serial.write(data)
@@ -70,6 +68,9 @@ class StreamSerial(IStream):
             CONFIG.LOGGER.debug("RX Raw: " + binascii.hexlify(pkt).decode('utf-8'))
 
         return pkt[0]
+
+    def close(self):
+        self.serial.close()
 
 
 class StreamSocket(IStream):

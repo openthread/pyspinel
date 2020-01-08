@@ -844,9 +844,11 @@ if codec is not None:
 class WpanApi(SpinelCodec):
     """ Helper class to format wpan command packets """
 
-    def __init__(self, stream, nodeid, use_hdlc=FEATURE_USE_HDLC):
+    def __init__(self, stream, nodeid, use_hdlc=FEATURE_USE_HDLC, timeout=TIMEOUT_PROP):
         self.stream = stream
         self.nodeid = nodeid
+
+        self.timeout = timeout
 
         self.use_hdlc = use_hdlc
         if self.use_hdlc:
@@ -864,6 +866,12 @@ class WpanApi(SpinelCodec):
         self.__start_reader()
 
     def __del__(self):
+        self._reader_alive = False
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
         self._reader_alive = False
 
     def __start_reader(self):
@@ -927,15 +935,22 @@ class WpanApi(SpinelCodec):
 
     def stream_rx(self):
         """ Recieve thread and parser. """
-        while self._reader_alive:
-            if self.use_hdlc:
-                self.rx_pkt = self.hdlc.collect()
-            else:
-                # size=None: Assume stream will always deliver packets
-                pkt = self.stream.read(None)
-                self.rx_pkt = util.packed_to_array(pkt)
+        try:
+            while self._reader_alive:
+                if self.use_hdlc:
+                    self.rx_pkt = self.hdlc.collect()
+                else:
+                    # size=None: Assume stream will always deliver packets
+                    pkt = self.stream.read(None)
+                    self.rx_pkt = util.packed_to_array(pkt)
 
-            self.parse_rx(self.rx_pkt)
+                self.parse_rx(self.rx_pkt)
+        except:
+            if self._reader_alive:
+                raise
+            else:
+                # Ignore the error since we are exiting
+                pass
 
     class PropertyItem(object):
         """ Queue item for NCP response to property commands. """
@@ -982,9 +997,12 @@ class WpanApi(SpinelCodec):
             item = None
         return item
 
-    def queue_wait_for_prop(self, _prop, tid=SPINEL.HEADER_DEFAULT, timeout=TIMEOUT_PROP):
+    def queue_wait_for_prop(self, _prop, tid=SPINEL.HEADER_DEFAULT, timeout=None):
         if _prop is None:
             return None
+
+        if timeout is None:
+            timeout = self.timeout
 
         processed_queue = queue.Queue()
         timeout_time = time.time() + timeout

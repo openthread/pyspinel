@@ -17,7 +17,6 @@
 """ High-Level Data Link Control (HDLC) module. """
 
 import binascii
-import logging
 
 from struct import pack
 

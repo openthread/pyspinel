@@ -16,8 +16,43 @@
 #  limitations under the License.
 #
 from setuptools import setup, find_packages
-
+from setuptools.command import install
+import shutil
+import os
 import sys
+
+
+class _InstallCommand(install.install):
+    user_options = install.install.user_options + [
+        ('extcap-path=', None, 'Path to Wireshark extcap directory'),
+    ]
+
+    def __init__(self, *args, **kwargs):
+        super(_InstallCommand, self).__init__(*args, **kwargs)
+        self.extcap_path = None
+
+    def run(self):
+        if self.extcap_path:
+            _copy_script('extcap_ot.py', self.extcap_path)
+            if sys.platform == 'win32':
+                _copy_script('extcap_ot.bat', self.extcap_path)
+        else:
+            print('WARNING: Wireshark extcap is not installed. To install:', file=sys.stderr)
+            print('1. Get Wireshark extcap path from Wireshark -> About -> Folders -> Extcap path', file=sys.stderr)
+            print('2. Run setup.py with --extcap-path=<extcap path> if you are installing by executing setup.py',
+                  file=sys.stderr)
+            print('   or', file=sys.stderr)
+            print('   Provide --install-option="--extcap-path=<extcap path>" if you are installing by pip',
+                  file=sys.stderr)
+        super(_InstallCommand, self).run()
+
+
+def _copy_script(src, dest):
+    cwd = os.path.abspath(os.path.dirname(__file__))
+    src = os.path.join(cwd, src)
+    print(f'copying {src} -> {dest}')
+    shutil.copy2(src, dest)
+
 
 setup(
     name='pyspinel',
@@ -49,5 +84,6 @@ setup(
         'pyserial',
         'ipaddress',
     ],
-    scripts=['spinel-cli.py', 'sniffer.py']
+    scripts=['spinel-cli.py', 'sniffer.py', 'extcap_ot.py', 'extcap_ot.bat'],
+    cmdclass={'install': _InstallCommand},
 )
