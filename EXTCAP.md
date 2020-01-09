@@ -11,7 +11,7 @@ The tool has been tested on the following platforms:
 | Platforms  | Version          |
 |------------|------------------|
 | Ubuntu     | 14.04 Trusty     |
-| Mac OS     | 10.11 El Capitan |
+| macOS      | 10.11 El Capitan |
 | Windows 10 | 1803             |
 
 | Language  | Version          |
@@ -60,7 +60,7 @@ Copy the provided `extcap_ot.py` to the extcap directory.
 
 For Windows, also copy the provided `extcap_ot.bat` to the extcap directory.
 
-For OS X and Linux, verify that the `extcap_ot.py` file has the execute (x) permission. If not, add it using:
+For Linux and macOS, verify that the `extcap_ot.py` file has the execute (x) permission. If not, add it using:
 
 ```
 chmod +x extcap_ot.py
@@ -98,7 +98,7 @@ chmod +x extcap_ot.py
         Use together with capture to provide the fifo to dump data to.
     
     --channel <CHANNEL>
-         IEEE 802.15.4 capture channel [11-26].
+        IEEE 802.15.4 capture channel [11-26].
 
     --baudrate <BAUDRATE>
         Set the serial port baud rate.
@@ -132,7 +132,7 @@ There are three ways to start sniffing:
   need to set it again the next time you use the interface (unless you need to
   change the channel).
 
-* Double click on the hardware interface
+* Double click on the hardware interface.
 
 * Select the hardware interface and then click **Start Capture** to start sniffing.
  
@@ -159,7 +159,7 @@ IEEE 802.15.4 capture channel [11-26]
 4. Reset the hardware by unplugging the hardware, waiting 5 seconds, and plugging it back in. 
 5. Restart Wireshark. If it still doesn’t appear, verify the python script located in the extcap folder is able to run. 
     
-    For OS X and Linux:
+    For Linux and macOS:
     1. Verify that the execute (x) permission is present for the extcap_ot.py file. 
         ```
        ls -l extcap_ot.py
