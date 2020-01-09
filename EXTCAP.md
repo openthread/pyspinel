@@ -80,14 +80,14 @@ chmod +x extcap_ot.py
 
 ```
     -h, --help            
-    	Show this help message and exit
+        Show this help message and exit
 
     --extcap-interfaces
-       	Provide a list of interfaces to capture from.
+        Provide a list of interfaces to capture from.
 
     --extcap-interface <EXTCAP_INTERFACE>
         Provide the interface to capture from.
-    
+
     --extcap-dlts
         Provide a list of dlts for the given interface
 
@@ -96,7 +96,7 @@ chmod +x extcap_ot.py
 
     --fifo <FIFO>
         Use together with capture to provide the fifo to dump data to.
-    
+
     --channel <CHANNEL>
         IEEE 802.15.4 capture channel [11-26].
 
