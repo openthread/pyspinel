@@ -50,9 +50,9 @@ class IStream(object):
 class StreamSerial(IStream):
     """ An IStream interface implementation for serial devices. """
 
-    def __init__(self, dev, baudrate=115200):
+    def __init__(self, dev, baudrate=115200, rtscts=False):
         try:
-            self.serial = serial.Serial(dev, baudrate)
+            self.serial = serial.Serial(port=dev, baudrate=baudrate, rtscts=rtscts)
         except Exception as e:
             CONFIG.LOGGER.error(f"Couldn't open {dev} {str(e)}")
             raise
@@ -138,7 +138,7 @@ class StreamPipe(IStream):
             self.pipe = None
 
 
-def StreamOpen(stream_type, descriptor, verbose=True, baudrate=115200):
+def StreamOpen(stream_type, descriptor, verbose=True, baudrate=115200, rtscts=False):
     """
     Factory function that creates and opens a stream connection.
 
@@ -168,8 +168,8 @@ def StreamOpen(stream_type, descriptor, verbose=True, baudrate=115200):
     elif stream_type == 'u':
         dev = str(descriptor)
         if verbose:
-            print("Opening serial to " + dev + " @ " + str(baudrate))
-        return StreamSerial(dev, baudrate)
+            print("Opening serial to " + dev + " @ " + str(baudrate) + " rtscts " + str(rtscts))
+        return StreamSerial(dev, baudrate, rtscts)
 
     else:
         return None
