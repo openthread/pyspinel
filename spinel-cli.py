@@ -2378,6 +2378,8 @@ def parse_args():
                           dest="uart", type="string")
     opt_parser.add_option("-b", "--baudrate", action="store",
                           dest="baudrate", type="int", default=DEFAULT_BAUDRATE)
+    opt_parser.add_option("--rtscts", action="store_true",
+                          dest="rtscts", default=False),
     opt_parser.add_option("-p", "--pipe", action="store",
                           dest="pipe", type="string")
     opt_parser.add_option("-s", "--socket", action="store",
@@ -2419,7 +2421,7 @@ def main():
         if len(remaining_args) > 0:
             stream_descriptor = " ".join(remaining_args)
 
-    stream = StreamOpen(stream_type, stream_descriptor, options.verbose, options.baudrate)
+    stream = StreamOpen(stream_type, stream_descriptor, options.verbose, options.baudrate, options.rtscts)
     try:
         vendor_ext = importlib.import_module('vendor.vendor')
         cls = type(vendor_ext.VendorSpinelCliCmd.__name__, (SpinelCliCmd, vendor_ext.VendorSpinelCliCmd), {})

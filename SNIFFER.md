@@ -46,6 +46,9 @@ sudo pip install --user ipaddress
     -b <baudrate>, --baudrate=<baudrate>
         Set the uart baud rate, default is 115200.
 
+    --rtscts
+        Enable the serial connection hardware flow control. By default disabled.
+
     -p <PIPE>, --pipe=<PIPE>
         Open a piped process connection to the OpenThread NCP device
         where <PIPE> is the command to start an emulator, such as

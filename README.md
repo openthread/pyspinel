@@ -55,6 +55,9 @@ sudo python setup.py install
     -b <BAUDRATE>, --baudrate=<BAUDRATE>
         Specify a serial connection baudrate. By default set to 115200.
 
+    --rtscts
+        Enable the serial connection hardware flow control. By default disabled.
+
     -p <PIPE>, --pipe=<PIPE>
         Open a piped process connection to the OpenThread NCP device
         where <PIPE> is the command to start an emulator, such as
