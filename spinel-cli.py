@@ -350,7 +350,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 value = line.encode('utf-8')
             elif mixed_format == 'D':     # Expect raw data to be hex string w/o delimeters
                 value = util.hex_to_bytes(line)
-            else:
+            elif isinstance(line, str):
                 # Most everything else is some type of integer
                 value = int(line, 0)
         return value
