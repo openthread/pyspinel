@@ -100,12 +100,13 @@ class Hdlc(IStream):
             fcs = self.fcs16(byte, fcs)
 
         if CONFIG.DEBUG_HDLC:
-            CONFIG.LOGGER.debug("RX Hdlc: " + binascii.hexlify(bytearray(raw)).decode('utf-8'))
+            CONFIG.LOGGER.debug(
+                "RX Hdlc: " + binascii.hexlify(bytearray(raw)).decode('utf-8'))
 
         if fcs != HDLC_FCS_GOOD:
             packet = None
         else:
-            packet = packet[:-2]        # remove FCS16 from end
+            packet = packet[:-2]  # remove FCS16 from end
             packet = pack("%dB" % len(packet), *packet)
 
         return packet
@@ -138,7 +139,9 @@ class Hdlc(IStream):
         packet = pack("%dB" % len(packet), *packet)
 
         if CONFIG.DEBUG_HDLC:
-            CONFIG.LOGGER.debug("TX Hdlc: " + binascii.hexlify(bytearray(packet)).decode('utf-8'))
+            CONFIG.LOGGER.debug(
+                "TX Hdlc: " +
+                binascii.hexlify(bytearray(packet)).decode('utf-8'))
         return packet
 
     def write(self, data):

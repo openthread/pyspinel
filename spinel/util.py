@@ -18,20 +18,26 @@
 
 import binascii
 
-def hexify_str(s,delim=':'):
+
+def hexify_str(s, delim=':'):
     hex_str = binascii.hexlify(s.encode('utf-8')).decode('utf-8')
-    return delim.join([hex_str[i:i+2] for i in range(0, len(hex_str), 2)])
+    return delim.join([hex_str[i:i + 2] for i in range(0, len(hex_str), 2)])
 
-def packed_to_array(packet): return list(map(ord, packet))
 
-def asciify_int(i): return "%c" % (i)
+def packed_to_array(packet):
+    return list(map(ord, packet))
+
+
+def asciify_int(i):
+    return "%c" % (i)
+
 
 def hex_to_bytes(s):
     result = bytes()
 
     for i in range(0, len(s), 2):
-        (b1, b2) = s[i:i+2]
-        hex = b1+b2
+        (b1, b2) = s[i:i + 2]
+        hex = b1 + b2
         v = int(hex, 16)
         result += bytearray([v])
 

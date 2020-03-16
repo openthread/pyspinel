@@ -38,7 +38,6 @@ LOGGER = logging.getLogger(__name__)
 logging.config.dictConfig({
     'version': 1,
     'disable_existing_loggers': False,
-
     'formatters': {
         'minimal': {
             'format': '%(message)s'
@@ -67,6 +66,7 @@ logging.config.dictConfig({
         }
     }
 })
+
 
 def debug_set_level(level):
     """ Set logging level for spinel module. """

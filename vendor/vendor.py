@@ -20,6 +20,7 @@ Module providing a specific vendor commands.
 
 from vendor.const import VENDOR_SPINEL
 
+
 class VendorSpinelCliCmd():
     """
     Extended Vendor Spinel Cli with vendor hooks commands.
@@ -35,6 +36,5 @@ class VendorSpinelCliCmd():
     def do_vendor(self, line):
         params = line.split(" ")
         if params[0] == 'help':
-            self.print_topics(
-            "\nAvailable vendor commands:",
-            VendorSpinelCliCmd.vendor_command_names, 15, 30)
+            self.print_topics("\nAvailable vendor commands:",
+                              VendorSpinelCliCmd.vendor_command_names, 15, 30)

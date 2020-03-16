@@ -24,13 +24,18 @@ import unittest
 import spinel.config as CONFIG
 from spinel.tests import *
 
+
 def main():
     """ Run all unit tests for spinel module. """
     args = sys.argv[1:]
 
     opt_parser = optparse.OptionParser()
-    opt_parser.add_option("-d", "--debug", action="store",
-                          dest="debug", type="int", default=CONFIG.DEBUG_ENABLE)
+    opt_parser.add_option("-d",
+                          "--debug",
+                          action="store",
+                          dest="debug",
+                          type="int",
+                          default=CONFIG.DEBUG_ENABLE)
 
     (options, remaining_args) = opt_parser.parse_args(args)
 
@@ -39,6 +44,7 @@ def main():
 
     sys.argv[1:] = remaining_args
     unittest.main()
+
 
 if __name__ == '__main__':
     main()

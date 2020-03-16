@@ -71,10 +71,17 @@ class PcapCodec(object):
     def encode_header(cls, dlt):
         """ Returns a pcap file header. """
         cls._dlt = dlt
-        return struct.pack("<LHHLLLL", PCAP_MAGIC_NUMBER, PCAP_VERSION_MAJOR, PCAP_VERSION_MINOR, 0, 0, 256, cls._dlt)
+        return struct.pack("<LHHLLLL", PCAP_MAGIC_NUMBER, PCAP_VERSION_MAJOR,
+                           PCAP_VERSION_MINOR, 0, 0, 256, cls._dlt)
 
     @classmethod
-    def encode_frame(cls, frame, sec, usec, options_rssi, options_crc, metadata=None):
+    def encode_frame(cls,
+                     frame,
+                     sec,
+                     usec,
+                     options_rssi,
+                     options_crc,
+                     metadata=None):
         """ Returns a pcap encapsulation of the given frame. """
         # write frame pcap header
         TLVs_length = TLVS_LENGTH_DEFAULT
@@ -105,12 +112,16 @@ class PcapCodec(object):
             # Append TLVs according to 802.15.4 TAP specification:
             # https://github.com/jkcko/ieee802.15.4-tap
             pcap_frame += struct.pack('<HH', 0, TLVs_length)
-            pcap_frame += struct.pack('<HHHH', CHANNEL_TYPE, CHANNEL_LEN, metadata[3][0], CHANNEL_PAGE)
+            pcap_frame += struct.pack('<HHHH', CHANNEL_TYPE, CHANNEL_LEN,
+                                      metadata[3][0], CHANNEL_PAGE)
             if options_rssi:
-                pcap_frame += struct.pack('<HHf', RSS_TYPE, RSS_LEN, metadata[0])
-                pcap_frame += struct.pack('<HHI', LQI_TYPE, LQI_LEN, metadata[3][1])
+                pcap_frame += struct.pack('<HHf', RSS_TYPE, RSS_LEN,
+                                          metadata[0])
+                pcap_frame += struct.pack('<HHI', LQI_TYPE, LQI_LEN,
+                                          metadata[3][1])
             if options_crc:
-                pcap_frame += struct.pack('<HHI', FCS_TYPE, FCS_LEN, FCS_16bitCRC)
+                pcap_frame += struct.pack('<HHI', FCS_TYPE, FCS_LEN,
+                                          FCS_16bitCRC)
 
         pcap_frame += frame
         return pcap_frame

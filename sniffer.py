@@ -45,12 +45,13 @@ if sys.platform == 'win32':
 
 # Nodeid is required to execute ot-ncp-ftd for its sim radio socket port.
 # This is maximum that works for MacOS.
-DEFAULT_NODEID = 34    # same as WELLKNOWN_NODE_ID
+DEFAULT_NODEID = 34  # same as WELLKNOWN_NODE_ID
 DEFAULT_CHANNEL = 11
 DEFAULT_BAUDRATE = 115200
 
 DLT_IEEE802_15_4_WITHFCS = 195
 DLT_IEEE802_15_4_TAP = 283
+
 
 def parse_args():
     """ Parse command line arguments for this applications. """
@@ -58,47 +59,90 @@ def parse_args():
     args = sys.argv[1:]
 
     opt_parser = optparse.OptionParser()
-    opt_parser.add_option("-u", "--uart", action="store",
-                          dest="uart", type="string")
-    opt_parser.add_option("-b", "--baudrate", action="store",
-                          dest="baudrate", type="int", default=DEFAULT_BAUDRATE)
-    opt_parser.add_option("--rtscts", action="store_true",
-                          dest="rtscts", default=False),
-    opt_parser.add_option("-p", "--pipe", action="store",
-                          dest="pipe", type="string")
-    opt_parser.add_option("-s", "--socket", action="store",
-                          dest="socket", type="string")
-    opt_parser.add_option("-n", "--nodeid", action="store",
-                          dest="nodeid", type="string", default=str(DEFAULT_NODEID))
+    opt_parser.add_option("-u",
+                          "--uart",
+                          action="store",
+                          dest="uart",
+                          type="string")
+    opt_parser.add_option("-b",
+                          "--baudrate",
+                          action="store",
+                          dest="baudrate",
+                          type="int",
+                          default=DEFAULT_BAUDRATE)
+    opt_parser.add_option("--rtscts",
+                          action="store_true",
+                          dest="rtscts",
+                          default=False),
+    opt_parser.add_option("-p",
+                          "--pipe",
+                          action="store",
+                          dest="pipe",
+                          type="string")
+    opt_parser.add_option("-s",
+                          "--socket",
+                          action="store",
+                          dest="socket",
+                          type="string")
+    opt_parser.add_option("-n",
+                          "--nodeid",
+                          action="store",
+                          dest="nodeid",
+                          type="string",
+                          default=str(DEFAULT_NODEID))
 
-    opt_parser.add_option("-d", "--debug", action="store",
-                          dest="debug", type="int", default=CONFIG.DEBUG_ENABLE)
+    opt_parser.add_option("-d",
+                          "--debug",
+                          action="store",
+                          dest="debug",
+                          type="int",
+                          default=CONFIG.DEBUG_ENABLE)
     opt_parser.add_option("-x", "--hex", action="store_true", dest="hex")
-    opt_parser.add_option("-o", "--output", action="store",
-                          dest="output", type="string")
+    opt_parser.add_option("-o",
+                          "--output",
+                          action="store",
+                          dest="output",
+                          type="string")
 
-    opt_parser.add_option("-c", "--channel", action="store",
-                          dest="channel", type="int", default=DEFAULT_CHANNEL)
+    opt_parser.add_option("-c",
+                          "--channel",
+                          action="store",
+                          dest="channel",
+                          type="int",
+                          default=DEFAULT_CHANNEL)
 
-    opt_parser.add_option('--crc', action='store_true',
-                          dest='crc', default=False)
+    opt_parser.add_option('--crc',
+                          action='store_true',
+                          dest='crc',
+                          default=False)
 
-    opt_parser.add_option('--rssi', action='store_true',
-                          dest='rssi', default=False)
+    opt_parser.add_option('--rssi',
+                          action='store_true',
+                          dest='rssi',
+                          default=False)
 
-    opt_parser.add_option('--no-reset', action='store_true',
-                          dest='no_reset', default=False)
+    opt_parser.add_option('--no-reset',
+                          action='store_true',
+                          dest='no_reset',
+                          default=False)
 
-    opt_parser.add_option('--tap', action='store_true',
-                          dest='tap', default=False)
+    opt_parser.add_option('--tap',
+                          action='store_true',
+                          dest='tap',
+                          default=False)
 
-    opt_parser.add_option('--is-fifo', action='store_true',
-                          dest='is_fifo', default=False)
+    opt_parser.add_option('--is-fifo',
+                          action='store_true',
+                          dest='is_fifo',
+                          default=False)
 
-    opt_parser.add_option('--use-host-timestamp', action='store_true',
-                          dest='use_host_timestamp', default=False)
+    opt_parser.add_option('--use-host-timestamp',
+                          action='store_true',
+                          dest='use_host_timestamp',
+                          default=False)
 
     return opt_parser.parse_args(args)
+
 
 def sniffer_init(wpan_api, options):
     """" Send spinel commands to initialize sniffer node. """
@@ -113,7 +157,8 @@ def sniffer_init(wpan_api, options):
 
     wpan_api.prop_set_value(SPINEL.PROP_PHY_ENABLED, 1)
 
-    result = wpan_api.prop_set_value(SPINEL.PROP_MAC_FILTER_MODE, SPINEL.MAC_FILTER_MODE_MONITOR)
+    result = wpan_api.prop_set_value(SPINEL.PROP_MAC_FILTER_MODE,
+                                     SPINEL.MAC_FILTER_MODE_MONITOR)
     if result is None:
         return False
 
@@ -130,6 +175,7 @@ def sniffer_init(wpan_api, options):
 
 FIFO_CHECK_INTERVAL = 0.1
 
+
 def check_fifo(fifo):
     if sys.platform == 'win32':
         kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
@@ -139,7 +185,8 @@ def check_fifo(fifo):
         written = ctypes.c_ulong(0)
         while True:
             time.sleep(FIFO_CHECK_INTERVAL)
-            if not kernel32.WriteFile(handle, p_data, 0, ctypes.byref(written), None):
+            if not kernel32.WriteFile(handle, p_data, 0, ctypes.byref(written),
+                                      None):
                 error = ctypes.get_last_error()
                 if error in (
                         0xe8,  # ERROR_NO_DATA
@@ -156,6 +203,7 @@ def check_fifo(fifo):
             except OSError:
                 os._exit(0)
 
+
 def main():
     """ Top-level main for sniffer host-side tool. """
     (options, remaining_args) = parse_args()
@@ -164,11 +212,12 @@ def main():
         CONFIG.debug_set_level(options.debug)
 
     if options.use_host_timestamp:
-        print('WARNING: Using host timestamp, may be inaccurate', file=sys.stderr)
+        print('WARNING: Using host timestamp, may be inaccurate',
+              file=sys.stderr)
 
     # Set default stream to pipe
     stream_type = 'p'
-    stream_descriptor = "../../examples/apps/ncp/ot-ncp-ftd "+options.nodeid
+    stream_descriptor = "../../examples/apps/ncp/ot-ncp-ftd " + options.nodeid
 
     if options.uart:
         stream_type = 'u'
@@ -180,12 +229,13 @@ def main():
         stream_type = 'p'
         stream_descriptor = options.pipe
         if options.nodeid:
-            stream_descriptor += " "+str(options.nodeid)
+            stream_descriptor += " " + str(options.nodeid)
     else:
         if len(remaining_args) > 0:
             stream_descriptor = " ".join(remaining_args)
 
-    stream = StreamOpen(stream_type, stream_descriptor, False, options.baudrate, options.rtscts)
+    stream = StreamOpen(stream_type, stream_descriptor, False, options.baudrate,
+                        options.rtscts)
     if stream is None:
         exit()
     wpan_api = WpanApi(stream, options.nodeid)
@@ -197,10 +247,11 @@ def main():
         sys.stderr.write("SUCCESS: sniffer initialized\nSniffing...\n")
 
     pcap = PcapCodec()
-    hdr = pcap.encode_header(DLT_IEEE802_15_4_TAP if options.tap else DLT_IEEE802_15_4_WITHFCS)
+    hdr = pcap.encode_header(
+        DLT_IEEE802_15_4_TAP if options.tap else DLT_IEEE802_15_4_WITHFCS)
 
     if options.hex:
-        hdr = util.hexify_str(hdr)+"\n"
+        hdr = util.hexify_str(hdr) + "\n"
 
     if options.output:
         output = open(options.output, 'wb')
@@ -227,7 +278,7 @@ def main():
             result = wpan_api.queue_wait_for_prop(prop_id, tid)
             if result and result.prop == prop_id:
                 length = wpan_api.parse_S(result.value)
-                pkt = result.value[2:2+length]
+                pkt = result.value[2:2 + length]
 
                 # metadata format (totally 19 bytes):
                 # 0. RSSI(int8)
@@ -239,8 +290,10 @@ def main():
                 #     3.2 Timestamp in microseconds(uint64)
                 # 4. Vendor data struct contains:
                 #     4.0 Receive error(uint8)
-                if len(result.value) == 2+length+19:
-                    metadata = wpan_api.parse_fields(result.value[2+length:2+length+19], "ccSt(CCX)t(i)")
+                if len(result.value) == 2 + length + 19:
+                    metadata = wpan_api.parse_fields(
+                        result.value[2 + length:2 + length + 19],
+                        "ccSt(CCX)t(i)")
 
                     timestamp = metadata[3][2]
                     timestamp_sec = timestamp / 1000000
@@ -257,10 +310,13 @@ def main():
                 #     3.3 Timestamp Usec(uint16)
                 # 4. Vendor data struct contains:
                 #     4.0 Receive error(uint8)
-                elif len(result.value) == 2+length+17:
-                    metadata = wpan_api.parse_fields(result.value[2+length:2+length+17], "ccSt(CCLS)t(i)")
+                elif len(result.value) == 2 + length + 17:
+                    metadata = wpan_api.parse_fields(
+                        result.value[2 + length:2 + length + 17],
+                        "ccSt(CCLS)t(i)")
 
-                    timestamp_usec = timebase_usec + metadata[3][2] * 1000 + metadata[3][3]
+                    timestamp_usec = timebase_usec + metadata[3][
+                        2] * 1000 + metadata[3][3]
                     timestamp_sec = timebase_sec + timestamp_usec / 1000000
                     timestamp_usec = timestamp_usec % 1000000
 
@@ -271,17 +327,20 @@ def main():
                     timestamp_usec = timestamp.microseconds
 
                     if options.rssi:
-                        sys.stderr.write("WARNING: failed to display RSSI, please update the NCP version\n")
+                        sys.stderr.write(
+                            "WARNING: failed to display RSSI, please update the NCP version\n"
+                        )
 
                 if options.use_host_timestamp:
                     timestamp = round(time.time() * 1000000)
                     timestamp_sec = timestamp // 1000000
                     timestamp_usec = timestamp % 1000000
 
-                pkt = pcap.encode_frame(pkt, int(timestamp_sec), timestamp_usec, options.rssi, options.crc, metadata)
+                pkt = pcap.encode_frame(pkt, int(timestamp_sec), timestamp_usec,
+                                        options.rssi, options.crc, metadata)
 
                 if options.hex:
-                    pkt = util.hexify_str(pkt)+"\n"
+                    pkt = util.hexify_str(pkt) + "\n"
                 output.write(pkt)
                 output.flush()
 

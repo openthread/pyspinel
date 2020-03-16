@@ -27,10 +27,11 @@
 #
 
 language: python
-
-dist: trusty
-compiler: clang
 python: "3.6"
+dist: bionic
+
+compiler: clang
+
 git:
   depth: 1
 

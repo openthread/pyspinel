@@ -37,13 +37,18 @@ class _InstallCommand(install.install):
             if sys.platform == 'win32':
                 _copy_script('extcap_ot.bat', self.extcap_path)
         else:
-            print('WARNING: Wireshark extcap is not installed. To install:', file=sys.stderr)
-            print('1. Get Wireshark extcap path from Wireshark -> About -> Folders -> Extcap path', file=sys.stderr)
-            print('2. Run setup.py with --extcap-path=<extcap path> if you are installing by executing setup.py',
+            print('WARNING: Wireshark extcap is not installed. To install:',
                   file=sys.stderr)
+            print(
+                '1. Get Wireshark extcap path from Wireshark -> About -> Folders -> Extcap path',
+                file=sys.stderr)
+            print(
+                '2. Run setup.py with --extcap-path=<extcap path> if you are installing by executing setup.py',
+                file=sys.stderr)
             print('   or', file=sys.stderr)
-            print('   Provide --install-option="--extcap-path=<extcap path>" if you are installing by pip',
-                  file=sys.stderr)
+            print(
+                '   Provide --install-option="--extcap-path=<extcap path>" if you are installing by pip',
+                file=sys.stderr)
         super(_InstallCommand, self).run()
 
 
@@ -57,7 +62,8 @@ def _copy_script(src, dest):
 setup(
     name='pyspinel',
     version='1.0.1',
-    description='A Python interface to the OpenThread Network Co-Processor (NCP)',
+    description=
+    'A Python interface to the OpenThread Network Co-Processor (NCP)',
     url='https://github.com/openthread/openthread',
     author='The OpenThread Authors',
     author_email='openthread-users@googlegroups.com',
@@ -65,16 +71,12 @@ setup(
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
-
         'Operating System :: MacOS',
         'Operating System :: POSIX :: Linux',
-
         'License :: OSI Approved :: BSD License',
-
         'Topic :: System :: Networking',
         'Topic :: System :: Hardware :: Hardware Drivers',
         'Topic :: Software Development :: Embedded Systems',
-
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.6',
     ],
