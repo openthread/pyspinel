@@ -27,7 +27,7 @@ from spinel.test_stream import MockStream
 class TestSniffer(unittest.TestCase):
     """ Unit TestCase class for sniffer relevant portions of spinel.codec.SpinelCodec. """
 
-    HEADER = "800671"     # CMD_PROP_IS RAW_STREAM
+    HEADER = "800671"  # CMD_PROP_IS RAW_STREAM
     VECTOR = [
         # Some raw 6lo packets: ICMPv6EchoRequest to ff02::1, fe80::1, and MLE Advertisement
         "2d00499880fffffffffeff0d0100000001a7acdf3be9272c2d88765ff76f0bf08a7c3df0a78e9c1b23eb019c58740300800000",
@@ -49,7 +49,7 @@ class TestSniffer(unittest.TestCase):
         wpan_api.queue_register(tid)
 
         for truth in self.VECTOR:
-            mock_stream.write_child_hex(self.HEADER+truth)
+            mock_stream.write_child_hex(self.HEADER + truth)
             result = wpan_api.queue_wait_for_prop(prop_id, tid)
-            packet = util.hexify_str(result.value,"")
+            packet = util.hexify_str(result.value, "")
             self.failUnless(packet == truth)

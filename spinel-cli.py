@@ -56,33 +56,27 @@ __version__ = "0.1.0"
 
 MASTER_PROMPT = "spinel-cli"
 
-
 import io
 import spinel.ipv6 as ipv6
 import spinel.common as common
 
 DEFAULT_BAUDRATE = 115200
 
+
 class IcmpV6Factory(object):
 
     ipv6_factory = ipv6.IPv6PacketFactory(
         ehf={
-            0:  ipv6.HopByHopFactory(
-                hop_by_hop_options_factory=ipv6.HopByHopOptionsFactory(
-                    options_factories={
-                        109: ipv6.MPLOptionFactory()
-                    }
-                )
-            )
+            0:
+                ipv6.HopByHopFactory(
+                    hop_by_hop_options_factory=ipv6.HopByHopOptionsFactory(
+                        options_factories={109: ipv6.MPLOptionFactory()}))
         },
         ulpf={
-            58: ipv6.ICMPv6Factory(
-                body_factories={
-                    129: ipv6.ICMPv6EchoBodyFactory()
-                }
-            )
-        }
-    )
+            58:
+                ipv6.ICMPv6Factory(
+                    body_factories={129: ipv6.ICMPv6EchoBodyFactory()})
+        })
 
     def _any_identifier(self):
         return random.getrandbits(16)
@@ -95,28 +89,27 @@ class IcmpV6Factory(object):
             seq_number += 1
             seq_number if seq_number < (1 << 16) else 0
 
-    def build_icmp_echo_request(self, src, dst, data, hop_limit=64, identifier=None, sequence_number=None):
-        identifier = self._any_identifier() if identifier is None else identifier
-        sequence_number = next(self._seq_number()) if sequence_number is None else sequence_number
+    def build_icmp_echo_request(self,
+                                src,
+                                dst,
+                                data,
+                                hop_limit=64,
+                                identifier=None,
+                                sequence_number=None):
+        identifier = self._any_identifier(
+        ) if identifier is None else identifier
+        sequence_number = next(
+            self._seq_number()) if sequence_number is None else sequence_number
 
         ping_req = ipv6.IPv6Packet(
-            ipv6_header=ipv6.IPv6Header(
-                source_address=src,
-                destination_address=dst,
-                hop_limit=hop_limit
-            ),
+            ipv6_header=ipv6.IPv6Header(source_address=src,
+                                        destination_address=dst,
+                                        hop_limit=hop_limit),
             upper_layer_protocol=ipv6.ICMPv6(
-                header=ipv6.ICMPv6Header(
-                    _type=ipv6.ICMP_ECHO_REQUEST,
-                    code=0
-                ),
-                body=ipv6.ICMPv6EchoBody(
-                    identifier=identifier,
-                    sequence_number=sequence_number,
-                    data=data
-                )
-            )
-        )
+                header=ipv6.ICMPv6Header(_type=ipv6.ICMP_ECHO_REQUEST, code=0),
+                body=ipv6.ICMPv6EchoBody(identifier=identifier,
+                                         sequence_number=sequence_number,
+                                         data=data)))
 
         return ping_req.to_bytes()
 
@@ -143,7 +136,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         PORT_OFFSET = int(os.getenv("PORT_OFFSET", "0"))
 
         self._addr = ('127.0.0.1', BASE_PORT * 2 + MAX_NODES * PORT_OFFSET)
-        self._simulator_addr = ('127.0.0.1', BASE_PORT + MAX_NODES * PORT_OFFSET)
+        self._simulator_addr = ('127.0.0.1',
+                                BASE_PORT + MAX_NODES * PORT_OFFSET)
 
     def __init__(self, stream, nodeid, *_a, **kw):
         if self.VIRTUAL_TIME:
@@ -185,7 +179,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 readline.parse_and_bind('tab: complete')
 
         if hasattr(stream, 'pipe'):
-            self.wpan_api.queue_wait_for_prop(SPINEL.PROP_LAST_STATUS, SPINEL.HEADER_ASYNC)
+            self.wpan_api.queue_wait_for_prop(SPINEL.PROP_LAST_STATUS,
+                                              SPINEL.HEADER_ASYNC)
         self.prop_set_value(SPINEL.PROP_IPv6_ICMP_PING_OFFLOAD, 1)
         self.prop_set_value(SPINEL.PROP_THREAD_RLOC16_DEBUG_PASSTHRU, 1)
 
@@ -197,7 +192,6 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'history',
         'debug',
         'debug-mem',
-
         'v',
         'h',
         'q',
@@ -272,12 +266,14 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                     CONFIG.LOGGER.debug(pkt)
 
                 timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
-                timestamp = (pkt.upper_layer_protocol.body.identifier << 16 | pkt.upper_layer_protocol.body.sequence_number)
+                timestamp = (pkt.upper_layer_protocol.body.identifier << 16 |
+                             pkt.upper_layer_protocol.body.sequence_number)
                 timedelta = (timenow - timestamp)
-                print("\n%d bytes from %s: icmp_seq=%d hlim=%d time=%dms" % (len(pkt.upper_layer_protocol.body.data),
-                                                                             pkt.ipv6_header.source_address,
-                                                                             pkt.upper_layer_protocol.body.sequence_number,
-                                                                             pkt.ipv6_header.hop_limit, timedelta))
+                print("\n%d bytes from %s: icmp_seq=%d hlim=%d time=%dms" %
+                      (len(pkt.upper_layer_protocol.body.data),
+                       pkt.ipv6_header.source_address,
+                       pkt.upper_layer_protocol.body.sequence_number,
+                       pkt.ipv6_header.hop_limit, timedelta))
             except RuntimeError:
                 pass
 
@@ -296,9 +292,12 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         return cmd, arg, line
 
     def completenames(self, text, *ignored):
-        return [name + ' ' for name in SpinelCliCmd.command_names
-                if name.startswith(text)
-                or self.short_command_name(name).startswith(text)]
+        return [
+            name + ' '
+            for name in SpinelCliCmd.command_names
+            if name.startswith(text) or
+            self.short_command_name(name).startswith(text)
+        ]
 
     @classmethod
     def short_command_name(cls, cmd):
@@ -345,10 +344,10 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """ Convert a command line argument to proper binary encoding (pre-pack). """
         value = line
         if line != None:
-            if mixed_format == 'U':         # For UTF8, just a pass through line unmodified
+            if mixed_format == 'U':  # For UTF8, just a pass through line unmodified
                 line += '\0'
                 value = line.encode('utf-8')
-            elif mixed_format == 'D':     # Expect raw data to be hex string w/o delimeters
+            elif mixed_format == 'D':  # Expect raw data to be hex string w/o delimeters
                 value = util.hex_to_bytes(line)
             elif isinstance(line, str):
                 # Most everything else is some type of integer
@@ -635,7 +634,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
                         print("Child ID: {}".format(id))
                         print("Rloc: {:04x}".format(child_data[1]))
-                        print("Ext Addr: {}".format(binascii.hexlify(child_data[0])))
+                        print("Ext Addr: {}".format(
+                            binascii.hexlify(child_data[0])))
                         print("Mode: {}".format(mode))
                         print("Net Data: {}".format(child_data[4]))
                         print("Timeout: {}".format(child_data[2]))
@@ -835,7 +835,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
                 for caps in caps_list[0]:
                     if SPINEL.CAP_MAC_RETRY_HISTOGRAM == caps[0][0]:
-                        histogram = self.prop_get_value(SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM)
+                        histogram = self.prop_get_value(
+                            SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM)
 
                 if result != None:
                     counters_tx = result[0][0]
@@ -858,17 +859,23 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                         if len(histogram_direct) != 0:
                             print("        TxDirectRetrySuccess: [", end='')
                             for retry in range(len(histogram_direct)):
-                                print(" %d:%s" % (retry, histogram_direct[retry][0]),
-                                    end=',' if retry != (len(histogram_direct) - 1) else " ]\n")
-                    print("        TxDirectMaxRetryExpiry: %s" % (counters_tx[15][0]))
+                                print(" %d:%s" %
+                                      (retry, histogram_direct[retry][0]),
+                                      end=',' if retry !=
+                                      (len(histogram_direct) - 1) else " ]\n")
+                    print("        TxDirectMaxRetryExpiry: %s" %
+                          (counters_tx[15][0]))
                     if histogram != None:
                         histogram_indirect = histogram[1][0]
                         if len(histogram_indirect) != 0:
                             print("        TxIndirectRetrySuccess: [", end='')
                             for retry in range(len(histogram_indirect)):
-                                print(" %d:%s" % (retry, histogram_indirect[retry][0]),
-                                    end=',' if retry != (len(histogram_indirect) - 1) else " ]\n")
-                    print("        TxIndirectMaxRetryExpiry: %s" % (counters_tx[16][0]))
+                                print(" %d:%s" %
+                                      (retry, histogram_indirect[retry][0]),
+                                      end=',' if retry !=
+                                      (len(histogram_indirect) - 1) else " ]\n")
+                    print("        TxIndirectMaxRetryExpiry: %s" %
+                          (counters_tx[16][0]))
                     print("    TxErrCca: %d" % counters_tx[12])
                     print("    TxAbort: %d" % counters_tx[13])
                     print("    TxErrBusyChannel: %d" % counters_tx[14])
@@ -897,7 +904,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 if params[1] == "reset":
                     self.prop_set_value(SPINEL.PROP_CNTR_ALL_MAC_COUNTERS, 1)
                     self.prop_set_value(SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM, 1)
-                    print("Done") 
+                    print("Done")
             else:
                 print("Error")
 
@@ -1041,8 +1048,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         elif sub_command == "start":
             py_format = self.prep_format(PSKd, 'U')
-            self.prop_set_value(SPINEL.PROP_MESHCOP_JOINER_CREDENTIAL,
-                                PSKd, py_format)
+            self.prop_set_value(SPINEL.PROP_MESHCOP_JOINER_CREDENTIAL, PSKd,
+                                py_format)
             self.prop_set_value(SPINEL.PROP_MESHCOP_JOINER_ENABLE, 1)
             print("Done")
             return
@@ -1156,27 +1163,21 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 print(str(addr))
 
         elif params[0] == "add":
-            arr += self.wpan_api.encode_fields('CLLC',
-                                               prefix_len,
-                                               valid,
-                                               preferred,
-                                               flags)
+            arr += self.wpan_api.encode_fields('CLLC', prefix_len, valid,
+                                               preferred, flags)
 
-            self.prop_insert_value(SPINEL.PROP_IPV6_ADDRESS_TABLE,
-                                   arr, str(len(arr)) + 's')
+            self.prop_insert_value(SPINEL.PROP_IPV6_ADDRESS_TABLE, arr,
+                                   str(len(arr)) + 's')
 
             if self.tun_if:
                 self.tun_if.addr_add(ipaddr)
 
         elif params[0] == "remove":
-            arr += self.wpan_api.encode_fields('CLLC',
-                                               prefix_len,
-                                               valid,
-                                               preferred,
-                                               flags)
+            arr += self.wpan_api.encode_fields('CLLC', prefix_len, valid,
+                                               preferred, flags)
 
-            self.prop_remove_value(SPINEL.PROP_IPV6_ADDRESS_TABLE,
-                                   arr, str(len(arr)) + 's')
+            self.prop_remove_value(SPINEL.PROP_IPV6_ADDRESS_TABLE, arr,
+                                   str(len(arr)) + 's')
             if self.tun_if:
                 self.tun_if.addr_del(ipaddr)
 
@@ -1219,11 +1220,13 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         if args[0] == "counter":
             newline = line.replace("counter", "")
-            self.handle_property(newline, SPINEL.PROP_NET_KEY_SEQUENCE_COUNTER, 'L')
+            self.handle_property(newline, SPINEL.PROP_NET_KEY_SEQUENCE_COUNTER,
+                                 'L')
 
         elif args[0] == "guardtime":
             newline = line.replace("guardtime", "")
-            self.handle_property(newline, SPINEL.PROP_NET_KEY_SWITCH_GUARDTIME, 'L')
+            self.handle_property(newline, SPINEL.PROP_NET_KEY_SWITCH_GUARDTIME,
+                                 'L')
 
     def do_leaderdata(self, line):
         """
@@ -1241,8 +1244,10 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         partition_id = self.prop_get_value(SPINEL.PROP_NET_PARTITION_ID)
         weighting = self.prop_get_value(SPINEL.PROP_THREAD_LEADER_WEIGHT)
-        data_version = self.prop_get_value(SPINEL.PROP_THREAD_NETWORK_DATA_VERSION)
-        stable_version = self.prop_get_value(SPINEL.PROP_THREAD_STABLE_NETWORK_DATA_VERSION)
+        data_version = self.prop_get_value(
+            SPINEL.PROP_THREAD_NETWORK_DATA_VERSION)
+        stable_version = self.prop_get_value(
+            SPINEL.PROP_THREAD_STABLE_NETWORK_DATA_VERSION)
         leader_id = self.prop_get_value(SPINEL.PROP_THREAD_LEADER_RID)
 
         if partition_id   is None or \
@@ -1417,8 +1422,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             Done
         """
         self.prop_set_value(SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE, 1)
-        self.handle_property(
-            "0", SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE)
+        self.handle_property("0",
+                             SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE)
 
     def do_networkidtimeout(self, line):
         """
@@ -1527,7 +1532,12 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             timenow = int(round(time.time() * 1000)) & 0xFFFFFFFF
             data = bytearray(int(_size))
 
-            ping_req = self.icmp_factory.build_icmp_echo_request(ml64, addr, data, identifier=(timenow >> 16), sequence_number=(timenow & 0xffff))
+            ping_req = self.icmp_factory.build_icmp_echo_request(
+                ml64,
+                addr,
+                data,
+                identifier=(timenow >> 16),
+                sequence_number=(timenow & 0xffff))
 
             self.wpan_api.ip_send(ping_req)
             # Let handler print result
@@ -1604,26 +1614,22 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             self.prop_get_value(SPINEL.PROP_THREAD_ON_MESH_NETS)
 
         elif params[0] == "add":
-            arr += self.wpan_api.encode_fields('CbC',
-                                               prefix.network.prefixlen,
-                                               stable,
-                                               flags)
+            arr += self.wpan_api.encode_fields('CbC', prefix.network.prefixlen,
+                                               stable, flags)
 
-            self.prop_set_value(
-                SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE, 1)
-            self.prop_insert_value(SPINEL.PROP_THREAD_ON_MESH_NETS,
-                                   arr, str(len(arr)) + 's')
+            self.prop_set_value(SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE,
+                                1)
+            self.prop_insert_value(SPINEL.PROP_THREAD_ON_MESH_NETS, arr,
+                                   str(len(arr)) + 's')
 
         elif params[0] == "remove":
-            arr += self.wpan_api.encode_fields('CbC',
-                                               prefix.network.prefixlen,
-                                               stable,
-                                               flags)
+            arr += self.wpan_api.encode_fields('CbC', prefix.network.prefixlen,
+                                               stable, flags)
 
-            self.prop_set_value(
-                SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE, 1)
-            self.prop_remove_value(SPINEL.PROP_THREAD_ON_MESH_NETS,
-                                   arr, str(len(arr)) + 's')
+            self.prop_set_value(SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE,
+                                1)
+            self.prop_remove_value(SPINEL.PROP_THREAD_ON_MESH_NETS, arr,
+                                   str(len(arr)) + 's')
 
         print("Done")
 
@@ -1703,21 +1709,19 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             self.prop_get_value(SPINEL.PROP_THREAD_LOCAL_ROUTES)
 
         elif params[0] == "add":
-            arr += self.wpan_api.encode_fields('CbC',
-                                               prefix.network.prefixlen,
-                                               stable,
-                                               prf)
+            arr += self.wpan_api.encode_fields('CbC', prefix.network.prefixlen,
+                                               stable, prf)
 
-            self.prop_set_value(
-                SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE, 1)
-            self.prop_insert_value(SPINEL.PROP_THREAD_LOCAL_ROUTES,
-                                   arr, str(len(arr)) + 's')
+            self.prop_set_value(SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE,
+                                1)
+            self.prop_insert_value(SPINEL.PROP_THREAD_LOCAL_ROUTES, arr,
+                                   str(len(arr)) + 's')
 
         elif params[0] == "remove":
-            self.prop_set_value(
-                SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE, 1)
-            self.prop_remove_value(SPINEL.PROP_THREAD_LOCAL_ROUTES,
-                                   arr, str(len(arr)) + 's')
+            self.prop_set_value(SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE,
+                                1)
+            self.prop_remove_value(SPINEL.PROP_THREAD_LOCAL_ROUTES, arr,
+                                   str(len(arr)) + 's')
 
         print("Done")
 
@@ -1819,8 +1823,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             > routerdowngradethreshold 16
             Done
         """
-        self.handle_property(
-            line, SPINEL.PROP_THREAD_ROUTER_DOWNGRADE_THRESHOLD)
+        self.handle_property(line,
+                             SPINEL.PROP_THREAD_ROUTER_DOWNGRADE_THRESHOLD)
 
     def do_scan(self, _line):
         """
@@ -2151,7 +2155,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             else:
                 value = self.prop_get_value(SPINEL.PROP_MAC_BLACKLIST_ENABLED)
                 if value == 1:
-                   mode = 2
+                    mode = 2
 
             print(map_arg_value[mode])
 
@@ -2166,9 +2170,10 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 if value == 1:
                     mode = 1
                 else:
-                    value = self.prop_get_value(SPINEL.PROP_MAC_BLACKLIST_ENABLED)
+                    value = self.prop_get_value(
+                        SPINEL.PROP_MAC_BLACKLIST_ENABLED)
                     if value == 1:
-                       mode = 2
+                        mode = 2
 
                 print(map_arg_value[mode])
                 #TODO: parse and show the content of entries
@@ -2195,14 +2200,15 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
                 arr += struct.pack('b', rssi)
                 value = self.prop_insert_value(SPINEL.PROP_MAC_WHITELIST, arr,
-                        str(len(arr)) + 's')
+                                               str(len(arr)) + 's')
 
             elif params[1] == "remove":
                 arr = util.hex_to_bytes(params[2])
                 value = self.prop_remove_value(SPINEL.PROP_MAC_WHITELIST, arr,
-                                           str(len(arr)) + 's')
+                                               str(len(arr)) + 's')
             elif params[1] == "clear":
-                 value = self.prop_set_value(SPINEL.PROP_MAC_WHITELIST, None, None)
+                value = self.prop_set_value(SPINEL.PROP_MAC_WHITELIST, None,
+                                            None)
 
         elif params[0] == "rss":
             if len(params) == 1:
@@ -2217,7 +2223,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 rssi = int(params[3])
                 arr += struct.pack('b', rssi)
                 value = self.prop_insert_value(SPINEL.PROP_MAC_FIXED_RSS, arr,
-                        str(len(arr)) + 's')
+                                               str(len(arr)) + 's')
 
             elif params[1] == "remove":
                 if params[2] == "*":
@@ -2226,7 +2232,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                     arr = util.hex_to_bytes(params[2])
 
                 value = self.prop_remove_value(SPINEL.PROP_MAC_FIXED_RSS, arr,
-                        str(len(arr)) + 's')
+                                               str(len(arr)) + 's')
 
             elif params[1] == "clear":
                 value = self.prop_set_value(SPINEL.PROP_MAC_FIXED_RSS, NULL, 0)
@@ -2344,8 +2350,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 _interval = params[3]
 
             if self.tun_if:
-                self.tun_if.ping6(
-                    " -c " + count + " -s " + size + " " + ipaddr)
+                self.tun_if.ping6(" -c " + count + " -s " + size + " " + ipaddr)
 
         print("Done")
 
@@ -2361,7 +2366,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         OT_SIM_EVENT_POSTCMD = 4
 
-        message = struct.pack('=QBHB', 0, OT_SIM_EVENT_POSTCMD, 1, int(self.nodeid))
+        message = struct.pack('=QBHB', 0, OT_SIM_EVENT_POSTCMD, 1,
+                              int(self.nodeid))
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.bind(self._addr)
         sock.sendto(message, self._simulator_addr)
@@ -2372,28 +2378,54 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             self._notify_simulator()
         return stop
 
+
 def parse_args():
     """" Send spinel commands to initialize sniffer node. """
     args = sys.argv[1:]
 
     opt_parser = optparse.OptionParser(usage=optparse.SUPPRESS_USAGE)
-    opt_parser.add_option("-u", "--uart", action="store",
-                          dest="uart", type="string")
-    opt_parser.add_option("-b", "--baudrate", action="store",
-                          dest="baudrate", type="int", default=DEFAULT_BAUDRATE)
-    opt_parser.add_option("--rtscts", action="store_true",
-                          dest="rtscts", default=False),
-    opt_parser.add_option("-p", "--pipe", action="store",
-                          dest="pipe", type="string")
-    opt_parser.add_option("-s", "--socket", action="store",
-                          dest="socket", type="string")
-    opt_parser.add_option("-n", "--nodeid", action="store",
-                          dest="nodeid", type="string", default="1")
+    opt_parser.add_option("-u",
+                          "--uart",
+                          action="store",
+                          dest="uart",
+                          type="string")
+    opt_parser.add_option("-b",
+                          "--baudrate",
+                          action="store",
+                          dest="baudrate",
+                          type="int",
+                          default=DEFAULT_BAUDRATE)
+    opt_parser.add_option("--rtscts",
+                          action="store_true",
+                          dest="rtscts",
+                          default=False),
+    opt_parser.add_option("-p",
+                          "--pipe",
+                          action="store",
+                          dest="pipe",
+                          type="string")
+    opt_parser.add_option("-s",
+                          "--socket",
+                          action="store",
+                          dest="socket",
+                          type="string")
+    opt_parser.add_option("-n",
+                          "--nodeid",
+                          action="store",
+                          dest="nodeid",
+                          type="string",
+                          default="1")
     opt_parser.add_option("-q", "--quiet", action="store_true", dest="quiet")
-    opt_parser.add_option(
-        "-v", "--verbose", action="store_true", dest="verbose")
-    opt_parser.add_option("-d", "--debug", action="store",
-                          dest="debug", type="int", default=CONFIG.DEBUG_ENABLE)
+    opt_parser.add_option("-v",
+                          "--verbose",
+                          action="store_true",
+                          dest="verbose")
+    opt_parser.add_option("-d",
+                          "--debug",
+                          action="store",
+                          dest="debug",
+                          type="int",
+                          default=CONFIG.DEBUG_ENABLE)
 
     return opt_parser.parse_args(args)
 
@@ -2424,10 +2456,12 @@ def main():
         if len(remaining_args) > 0:
             stream_descriptor = " ".join(remaining_args)
 
-    stream = StreamOpen(stream_type, stream_descriptor, options.verbose, options.baudrate, options.rtscts)
+    stream = StreamOpen(stream_type, stream_descriptor, options.verbose,
+                        options.baudrate, options.rtscts)
     try:
         vendor_ext = importlib.import_module('vendor.vendor')
-        cls = type(vendor_ext.VendorSpinelCliCmd.__name__, (SpinelCliCmd, vendor_ext.VendorSpinelCliCmd), {})
+        cls = type(vendor_ext.VendorSpinelCliCmd.__name__,
+                   (SpinelCliCmd, vendor_ext.VendorSpinelCliCmd), {})
         shell = cls(stream, nodeid=options.nodeid)
     except ImportError:
         shell = SpinelCliCmd(stream, nodeid=options.nodeid)
@@ -2439,6 +2473,7 @@ def main():
 
     if shell.wpan_api:
         shell.wpan_api.stream.close()
+
 
 if __name__ == "__main__":
     main()

@@ -29,11 +29,15 @@
 
 set -e
 
-pip install --upgrade .
+python3 -m pip install yapf
+
+./script/make-pretty check
+
+python3 -m pip install .
 
 (cd /tmp &&
     git clone --depth 1 https://github.com/openthread/openthread.git &&
     cd openthread &&
-    pip install -r tests/scripts/thread-cert/requirements.txt &&
+    pip3 install -r tests/scripts/thread-cert/requirements.txt &&
     ./bootstrap &&
     VIRTUAL_TIME=1 VERBOSE=1 NODE_TYPE=ncp-sim make -f examples/Makefile-simulation check)

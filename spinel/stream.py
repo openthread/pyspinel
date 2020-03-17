@@ -52,7 +52,9 @@ class StreamSerial(IStream):
 
     def __init__(self, dev, baudrate=115200, rtscts=False):
         try:
-            self.serial = serial.Serial(port=dev, baudrate=baudrate, rtscts=rtscts)
+            self.serial = serial.Serial(port=dev,
+                                        baudrate=baudrate,
+                                        rtscts=rtscts)
         except Exception as e:
             CONFIG.LOGGER.error(f"Couldn't open {dev} {str(e)}")
             raise
@@ -60,12 +62,14 @@ class StreamSerial(IStream):
     def write(self, data):
         self.serial.write(data)
         if CONFIG.DEBUG_STREAM_TX:
-            CONFIG.LOGGER.debug("TX Raw: " + binascii.hexlify(data).decode('utf-8'))
+            CONFIG.LOGGER.debug("TX Raw: " +
+                                binascii.hexlify(data).decode('utf-8'))
 
     def read(self, size=1):
         pkt = self.serial.read(size)
         if CONFIG.DEBUG_STREAM_RX:
-            CONFIG.LOGGER.debug("RX Raw: " + binascii.hexlify(pkt).decode('utf-8'))
+            CONFIG.LOGGER.debug("RX Raw: " +
+                                binascii.hexlify(pkt).decode('utf-8'))
 
         return pkt[0]
 
@@ -84,12 +88,14 @@ class StreamSocket(IStream):
     def write(self, data):
         self.sock.send(data)
         if CONFIG.DEBUG_STREAM_TX:
-            CONFIG.LOGGER.debug("TX Raw: " + binascii.hexlify(data).decode('utf-8'))
+            CONFIG.LOGGER.debug("TX Raw: " +
+                                binascii.hexlify(data).decode('utf-8'))
 
     def read(self, size=1):
         pkt = self.sock.recv(size)
         if CONFIG.DEBUG_STREAM_RX:
-            CONFIG.LOGGER.debug("RX Raw: " + binascii.hexlify(pkt).decode('utf-8'))
+            CONFIG.LOGGER.debug("RX Raw: " +
+                                binascii.hexlify(pkt).decode('utf-8'))
 
         return pkt[0]
 
@@ -101,7 +107,8 @@ class StreamPipe(IStream):
         """ Create a stream object from a piped system call """
         try:
             # use exec so that there will be no zombie processes on failure
-            self.pipe = subprocess.Popen('exec ' + filename, shell=True,
+            self.pipe = subprocess.Popen('exec ' + filename,
+                                         shell=True,
                                          stdin=subprocess.PIPE,
                                          stdout=subprocess.PIPE,
                                          stderr=sys.stderr)
@@ -114,8 +121,8 @@ class StreamPipe(IStream):
 
     def write(self, data):
         if CONFIG.DEBUG_STREAM_TX:
-            CONFIG.LOGGER.debug("TX Raw: (%d) %s",
-                          len(data), binascii.hexlify(data).decode('utf-8'))
+            CONFIG.LOGGER.debug("TX Raw: (%d) %s", len(data),
+                                binascii.hexlify(data).decode('utf-8'))
         self.pipe.stdin.write(data)
         self.pipe.stdin.flush()
         # let the NCP process UART events first
@@ -125,7 +132,8 @@ class StreamPipe(IStream):
         """ Blocking read on stream object """
         pkt = self.pipe.stdout.read(size)
         if CONFIG.DEBUG_STREAM_RX:
-            CONFIG.LOGGER.debug("RX Raw: " + binascii.hexlify(pkt).decode('utf-8'))
+            CONFIG.LOGGER.debug("RX Raw: " +
+                                binascii.hexlify(pkt).decode('utf-8'))
         if not pkt:
             sys.exit(0)
 
@@ -138,7 +146,11 @@ class StreamPipe(IStream):
             self.pipe = None
 
 
-def StreamOpen(stream_type, descriptor, verbose=True, baudrate=115200, rtscts=False):
+def StreamOpen(stream_type,
+               descriptor,
+               verbose=True,
+               baudrate=115200,
+               rtscts=False):
     """
     Factory function that creates and opens a stream connection.
 
@@ -168,7 +180,8 @@ def StreamOpen(stream_type, descriptor, verbose=True, baudrate=115200, rtscts=Fa
     elif stream_type == 'u':
         dev = str(descriptor)
         if verbose:
-            print("Opening serial to " + dev + " @ " + str(baudrate) + " rtscts " + str(rtscts))
+            print("Opening serial to " + dev + " @ " + str(baudrate) +
+                  " rtscts " + str(rtscts))
         return StreamSerial(dev, baudrate, rtscts)
 
     else:

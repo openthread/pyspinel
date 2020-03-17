@@ -43,11 +43,11 @@ class TestCodec(unittest.TestCase):
 
         mock_stream = MockStream({
             # Request:  Response
-            "810236": "810636ffff",                    # get panid = 65535
-            "810243": "81064300",                      # get state = detached
-            "81025e": "81065e0f",                      # mode = 0xF
+            "810236": "810636ffff",  # get panid = 65535
+            "810243": "81064300",  # get state = detached
+            "81025e": "81065e0f",  # mode = 0xF
             "810202": "8106024f50454e54485245414400",  # get version
-            "810247": "81064705000000",                # get keysequence
+            "810247": "81064705000000",  # get keysequence
             "810244": "8106444f70656e54687265616400",  # get networkname
         })
         nodeid = 1
@@ -74,7 +74,8 @@ class TestCodec(unittest.TestCase):
         wpan_api = WpanApi(mock_stream, nodeid, use_hdlc)
 
         self.test_callback_pass = False
-        wpan_api.callback_register(SPINEL.PROP_STREAM_NET, self.cb_test_callback)
+        wpan_api.callback_register(SPINEL.PROP_STREAM_NET,
+                                   self.cb_test_callback)
 
         for pkt in vector:
             mock_stream.write_child_hex(pkt)

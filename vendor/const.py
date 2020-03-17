@@ -18,6 +18,7 @@
 Module with vendor constants for vendor spinel extension.
 """
 
+
 class VENDOR_SPINEL(object):
     """
     Class to extend SPINEL constant variables for example:

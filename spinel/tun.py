@@ -38,6 +38,7 @@ IFF_NO_PI = 0x1000
 IFF_TUNSETIFF = 0x400454ca
 IFF_TUNSETOWNER = IFF_TUNSETIFF + 2
 
+
 class TunInterface(object):
     """ Utility class for creating a TUN network interface. """
 
@@ -53,7 +54,8 @@ class TunInterface(object):
         elif platform == "darwin":
             self.__init_osx()
         else:
-            raise RuntimeError("Platform \"{}\" is not supported.".format(platform))
+            raise RuntimeError(
+                "Platform \"{}\" is not supported.".format(platform))
 
         self.ifconfig("up")
         #self.ifconfig("inet6 add fd00::1/64")
@@ -74,8 +76,8 @@ class TunInterface(object):
         self.fd = self.tun.fileno()
 
         ifr = struct.pack("16sH", self.ifname, IFF_TUN | IFF_NO_PI)
-        fcntl.ioctl(self.tun, IFF_TUNSETIFF, ifr)      # Name interface tun#
-        fcntl.ioctl(self.tun, IFF_TUNSETOWNER, 1000)   # Allow non-sudo access
+        fcntl.ioctl(self.tun, IFF_TUNSETIFF, ifr)  # Name interface tun#
+        fcntl.ioctl(self.tun, IFF_TUNSETOWNER, 1000)  # Allow non-sudo access
 
     def close(self):
         """ Close this tunnel interface. """
@@ -116,8 +118,8 @@ class TunInterface(object):
         #gWpanApi.ip_send(packet)
         # os.write(self.fd, packet)    # Loop back
         if CONFIG.DEBUG_TUN:
-            CONFIG.LOGGER.debug("\nTUN: TX (" + str(len(packet)) +
-                                ") " + util.hexify_str(packet))
+            CONFIG.LOGGER.debug("\nTUN: TX (" + str(len(packet)) + ") " +
+                                util.hexify_str(packet))
 
     def __run_tun_thread(self):
         while self.fd:
@@ -126,8 +128,8 @@ class TunInterface(object):
                 if ready_fd == self.fd:
                     packet = os.read(self.fd, 4000)
                     if CONFIG.DEBUG_TUN:
-                        CONFIG.LOGGER.debug("\nTUN: RX (" + str(len(packet)) + ") " +
-                                            util.hexify_str(packet))
+                        CONFIG.LOGGER.debug("\nTUN: RX (" + str(len(packet)) +
+                                            ") " + util.hexify_str(packet))
                     self.write(packet)
             except:
                 traceback.print_exc()

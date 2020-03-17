@@ -23,6 +23,7 @@ import binascii
 
 from spinel.hdlc import Hdlc
 
+
 class TestHdlc(unittest.TestCase):
     """ Unittest class for spinel.hdlc.Hdlc class. """
 

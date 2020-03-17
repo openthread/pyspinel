@@ -16,6 +16,7 @@
 #
 """ Module-wide constants for spinel package. """
 
+
 class SPINEL(object):
     """ Singular class that contains all Spinel constants. """
     HEADER_ASYNC = 0x80
@@ -105,18 +106,18 @@ class SPINEL(object):
     # Format: `A(T(Ec))`
     # * `E`: EUI64 address of node
     # * `c`: Optional fixed RSSI. OT_MAC_FILTER_FIXED_RSS_OVERRIDE_DISABLED(127) means not set.
-    PROP_MAC_WHITELIST = PROP_MAC_EXT__BEGIN + 0   # < [A(T(Ec))]
+    PROP_MAC_WHITELIST = PROP_MAC_EXT__BEGIN + 0  # < [A(T(Ec))]
     PROP_MAC_WHITELIST_ENABLED = PROP_MAC_EXT__BEGIN + 1  # < [b]
 
     # Format: `A(T(E))`
     # * `E`: EUI64 address of node
-    PROP_MAC_BLACKLIST = PROP_MAC_EXT__BEGIN + 6   # <[A(T(E))]
+    PROP_MAC_BLACKLIST = PROP_MAC_EXT__BEGIN + 6  # <[A(T(E))]
     PROP_MAC_BLACKLIST_ENABLED = PROP_MAC_EXT__BEGIN + 7  # < [b]
 
     # Format: `A(T(Ec))`
     # * `E`: Optional EUI64 address of node. Set default RSS if not included.
     # * `c`: Fixed RSS. OT_MAC_FILTER_FIXED_RSS_OVERRIDE_DISABLED(127) means not set.
-    PROP_MAC_FIXED_RSS = PROP_MAC_EXT__BEGIN + 8   # < [A(T(Ec))]
+    PROP_MAC_FIXED_RSS = PROP_MAC_EXT__BEGIN + 8  # < [A(T(Ec))]
 
     # Format: `S`
     # * `S`: Current CCA (Clear Channel Assessment) failure rate.
@@ -442,6 +443,7 @@ class SPINEL(object):
 
     CAP_MAC_RETRY_HISTOGRAM = CAP_OPENTHREAD__BEGIN + 12
 
+
 class kThread(object):
     """ OpenThread constant class. """
     PrefixPreferenceOffset = 6
@@ -452,61 +454,108 @@ class kThread(object):
     PrefixDefaultRouteFlag = 1 << 1
     PrefixOnMeshFlag = 1 << 0
 
+
 #=========================================
 
 SPINEL_LAST_STATUS_MAP = {
-    0: "STATUS_OK: Operation has completed successfully.",
-    1: "STATUS_FAILURE: Operation has failed for some undefined reason.",
-    2: "STATUS_UNIMPLEMENTED: The given operation has not been implemented.",
-    3: "STATUS_INVALID_ARGUMENT: An argument to the given operation is invalid.",
-    4: "STATUS_INVALID_STATE : The given operation is invalid for the current state of the device.",
-    5: "STATUS_INVALID_COMMAND: The given command is not recognized.",
-    6: "STATUS_INVALID_INTERFACE: The given Spinel interface is not supported.",
-    7: "STATUS_INTERNAL_ERROR: An internal runtime error has occured.",
-    8: "STATUS_SECURITY_ERROR: A security or authentication error has occured.",
-    9: "STATUS_PARSE_ERROR: An error has occured while parsing the command.",
-    10: "STATUS_IN_PROGRESS: The operation is in progress and will be completed asynchronously.",
-    11: "STATUS_NOMEM: The operation has been prevented due to memory pressure.",
-    12: "STATUS_BUSY: The device is currently performing a mutually exclusive operation.",
-    13: "STATUS_PROPERTY_NOT_FOUND: The given property is not recognized.",
-    14: "STATUS_PACKET_DROPPED: The packet was dropped.",
-    15: "STATUS_EMPTY: The result of the operation is empty.",
-    16: "STATUS_CMD_TOO_BIG: The command was too large to fit in the internal buffer.",
-    17: "STATUS_NO_ACK: The packet was not acknowledged.",
-    18: "STATUS_CCA_FAILURE: The packet was not sent due to a CCA failure.",
-    19: "SPINEL_STATUS_ALREADY: The operation is already in progress.",
-    20: "SPINEL_STATUS_ITEM_NOT_FOUND: The given item could not be found.",
-
-    104: "SPINEL_STATUS_JOIN_FAILURE",
-    105: "SPINEL_STATUS_JOIN_SECURITY: The network key has been set incorrectly.",
-    106: "SPINEL_STATUS_JOIN_NO_PEERS: The node was unable to find any other peers on the network.",
-    107: "SPINEL_STATUS_JOIN_INCOMPATIBLE: The only potential peer nodes found are incompatible.",
-
-    112: "STATUS_RESET_POWER_ON",
-    113: "STATUS_RESET_EXTERNAL",
-    114: "STATUS_RESET_SOFTWARE",
-    115: "STATUS_RESET_FAULT",
-    116: "STATUS_RESET_CRASH",
-    117: "STATUS_RESET_ASSERT",
-    118: "STATUS_RESET_OTHER",
-    119: "STATUS_RESET_UNKNOWN",
-    120: "STATUS_RESET_WATCHDOG",
-
-    0x4000: "kThreadError_None",
-    0x4001: "kThreadError_Failed",
-    0x4002: "kThreadError_Drop",
-    0x4003: "kThreadError_NoBufs",
-    0x4004: "kThreadError_NoRoute",
-    0x4005: "kThreadError_Busy",
-    0x4006: "kThreadError_Parse",
-    0x4007: "kThreadError_InvalidArgs",
-    0x4008: "kThreadError_Security",
-    0x4009: "kThreadError_AddressQuery",
-    0x400A: "kThreadError_NoAddress",
-    0x400B: "kThreadError_NotReceiving",
-    0x400C: "kThreadError_Abort",
-    0x400D: "kThreadError_NotImplemented",
-    0x400E: "kThreadError_InvalidState",
-    0x400F: "kThreadError_NoTasklets",
-
+    0:
+        "STATUS_OK: Operation has completed successfully.",
+    1:
+        "STATUS_FAILURE: Operation has failed for some undefined reason.",
+    2:
+        "STATUS_UNIMPLEMENTED: The given operation has not been implemented.",
+    3:
+        "STATUS_INVALID_ARGUMENT: An argument to the given operation is invalid.",
+    4:
+        "STATUS_INVALID_STATE : The given operation is invalid for the current state of the device.",
+    5:
+        "STATUS_INVALID_COMMAND: The given command is not recognized.",
+    6:
+        "STATUS_INVALID_INTERFACE: The given Spinel interface is not supported.",
+    7:
+        "STATUS_INTERNAL_ERROR: An internal runtime error has occured.",
+    8:
+        "STATUS_SECURITY_ERROR: A security or authentication error has occured.",
+    9:
+        "STATUS_PARSE_ERROR: An error has occured while parsing the command.",
+    10:
+        "STATUS_IN_PROGRESS: The operation is in progress and will be completed asynchronously.",
+    11:
+        "STATUS_NOMEM: The operation has been prevented due to memory pressure.",
+    12:
+        "STATUS_BUSY: The device is currently performing a mutually exclusive operation.",
+    13:
+        "STATUS_PROPERTY_NOT_FOUND: The given property is not recognized.",
+    14:
+        "STATUS_PACKET_DROPPED: The packet was dropped.",
+    15:
+        "STATUS_EMPTY: The result of the operation is empty.",
+    16:
+        "STATUS_CMD_TOO_BIG: The command was too large to fit in the internal buffer.",
+    17:
+        "STATUS_NO_ACK: The packet was not acknowledged.",
+    18:
+        "STATUS_CCA_FAILURE: The packet was not sent due to a CCA failure.",
+    19:
+        "SPINEL_STATUS_ALREADY: The operation is already in progress.",
+    20:
+        "SPINEL_STATUS_ITEM_NOT_FOUND: The given item could not be found.",
+    104:
+        "SPINEL_STATUS_JOIN_FAILURE",
+    105:
+        "SPINEL_STATUS_JOIN_SECURITY: The network key has been set incorrectly.",
+    106:
+        "SPINEL_STATUS_JOIN_NO_PEERS: The node was unable to find any other peers on the network.",
+    107:
+        "SPINEL_STATUS_JOIN_INCOMPATIBLE: The only potential peer nodes found are incompatible.",
+    112:
+        "STATUS_RESET_POWER_ON",
+    113:
+        "STATUS_RESET_EXTERNAL",
+    114:
+        "STATUS_RESET_SOFTWARE",
+    115:
+        "STATUS_RESET_FAULT",
+    116:
+        "STATUS_RESET_CRASH",
+    117:
+        "STATUS_RESET_ASSERT",
+    118:
+        "STATUS_RESET_OTHER",
+    119:
+        "STATUS_RESET_UNKNOWN",
+    120:
+        "STATUS_RESET_WATCHDOG",
+    0x4000:
+        "kThreadError_None",
+    0x4001:
+        "kThreadError_Failed",
+    0x4002:
+        "kThreadError_Drop",
+    0x4003:
+        "kThreadError_NoBufs",
+    0x4004:
+        "kThreadError_NoRoute",
+    0x4005:
+        "kThreadError_Busy",
+    0x4006:
+        "kThreadError_Parse",
+    0x4007:
+        "kThreadError_InvalidArgs",
+    0x4008:
+        "kThreadError_Security",
+    0x4009:
+        "kThreadError_AddressQuery",
+    0x400A:
+        "kThreadError_NoAddress",
+    0x400B:
+        "kThreadError_NotReceiving",
+    0x400C:
+        "kThreadError_Abort",
+    0x400D:
+        "kThreadError_NotImplemented",
+    0x400E:
+        "kThreadError_InvalidState",
+    0x400F:
+        "kThreadError_NoTasklets",
 }
