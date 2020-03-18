@@ -144,10 +144,11 @@ node types by passing the NODE_TYPE environment variable:
 ```
 # From top-level of openthread tree
 $ ./bootstrap
-$ ./configure --with-examples=posix --enable-cli-app=all --enable-ncp-app=all --with-ncp-bus=uart
+$ ./configure --with-examples=simulation --enable-cli-app=all --enable-ncp-app=all --with-ncp-bus=uart
 $ make
 $ cd tests/scripts/thread-cert
-$ NODE_TYPE=ncp-sim top_builddir=../../.. python Cert_5_1_02_ChildAddressTimeout.py VERBOSE=1
+$ NODE_TYPE=ncp-sim ./script/test clean build
+$ NODE_TYPE=ncp-sim ./script/test cert tests/scripts/thread-cert/Cert_5_1_02_ChildAddressTimeout.py
 ```
 
 ### Run entire NCP thread-cert suite
@@ -156,7 +157,7 @@ $ NODE_TYPE=ncp-sim top_builddir=../../.. python Cert_5_1_02_ChildAddressTimeout
 # From top-level of openthread tree
 $ make distclean
 $ ./bootstrap
-$ NODE_TYPE=ncp-sim BUILD_TARGET=posix-distcheck DISTCHECK_CONFIGURE_FLAGS="--with-examples=simulation --enable-cli-app --enable-ncp-app=all --with-ncp-bus=uart --with-tests=all" make -f examples/Makefile-simulation distcheck BuildJobs=10 VERBOSE=1
+$ NODE_TYPE=ncp-sim ./script/test cert_suite tests/scripts/thread-cert/Cert_*
 ```
 
 ## Command reference
