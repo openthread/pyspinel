@@ -144,7 +144,7 @@ node types by passing the NODE_TYPE environment variable:
 ```
 # From top-level of openthread tree
 $ ./bootstrap
-$ ./configure --with-examples=simulation --enable-cli-app=all --enable-ncp-app=all --with-ncp-bus=uart
+$ ./configure --with-examples=simulation
 $ make
 $ cd tests/scripts/thread-cert
 $ NODE_TYPE=ncp-sim ./script/test clean build
