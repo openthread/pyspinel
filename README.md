@@ -143,10 +143,6 @@ node types by passing the NODE_TYPE environment variable:
 
 ```
 # From top-level of openthread tree
-$ ./bootstrap
-$ ./configure --with-examples=simulation
-$ make
-$ cd tests/scripts/thread-cert
 $ NODE_TYPE=ncp-sim ./script/test clean build
 $ NODE_TYPE=ncp-sim ./script/test cert tests/scripts/thread-cert/Cert_5_1_02_ChildAddressTimeout.py
 ```
@@ -155,8 +151,6 @@ $ NODE_TYPE=ncp-sim ./script/test cert tests/scripts/thread-cert/Cert_5_1_02_Chi
 
 ```
 # From top-level of openthread tree
-$ make distclean
-$ ./bootstrap
 $ NODE_TYPE=ncp-sim ./script/test cert_suite tests/scripts/thread-cert/Cert_*
 ```
 
