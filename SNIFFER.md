@@ -4,7 +4,9 @@ Any Spinel NCP node can be made into a promiscuous packet sniffer, and this
 tool both intializes a device into this mode and outputs a pcap stream that
 can be saved or piped directly into Wireshark.
 
-## System Requirements
+For a complete guide to installation and usage, see [Packet Sniffing with Pyspinel](https://openthread.io/guides/pyspinel/sniffer) on openthread.io.
+
+## System requirements
 
 The tool has been tested on the following platforms:
 
@@ -17,12 +19,18 @@ The tool has been tested on the following platforms:
 |-----------|------------------|
 | Python    | 3.6.8            |
 
-### Package Installation
+### Package installation
 
+Install dependencies:
 ```
-sudo easy_install pip
-sudo pip install --user pyserial
-sudo pip install --user ipaddress
+$ sudo apt install python3-pip
+$ pip3 install --user pyserial ipaddress
+```
+
+Install Pyspinel:
+```
+# From pyspinel root
+$ sudo python3 setup.py install
 ```
 
 ## Usage
@@ -97,19 +105,19 @@ sudo pip install --user ipaddress
         If not specified, DLT_IEEE802_15_4_WITHFCS(195) would be used by default with the additional RSSI, LQI following the PHY frame directly (TI style FCS format).
 ```
 
-## Quick Start
+## Quick start
 
 ```
     For building an OpenThread ncp to support sniffer:
     add --enable-raw-link-api as a build option
 
-    sudo ./sniffer.py -c 11 -n 1 -u /dev/ttyUSB0 | wireshark -k -i -
+    $ sudo ./sniffer.py -c 11 -n 1 -u /dev/ttyUSB0 | wireshark -k -i -
 
     For the sniffers that do not provide the crc:
-    sudo ./sniffer.py -c 11 -n 1 --crc -u /dev/ttyUSB0 | wireshark -k -i -
+    $ sudo ./sniffer.py -c 11 -n 1 --crc -u /dev/ttyUSB0 | wireshark -k -i -
 
     For the sniffers that are connected to the host with the native USB connection and reset during init results in failed start:
-    sudo ./sniffer.py -c 11 -n 1 --no-reset -u /dev/ttyUSB0 | wireshark -k -i -
+    $ sudo ./sniffer.py -c 11 -n 1 --no-reset -u /dev/ttyUSB0 | wireshark -k -i -
 
     To display RSSI on Wireshark:
     1. Configue Wireshark:
@@ -119,7 +127,7 @@ sudo pip install --user ipaddress
             Type:    Custom
             Fields:  wpan.rssi
     2. Run by command:
-        sudo ./sniffer.py -c 11 -n 1 --rssi -u /dev/ttyUSB0 | wireshark -k -i -
+        $ sudo ./sniffer.py -c 11 -n 1 --rssi -u /dev/ttyUSB0 | wireshark -k -i -
     
     To display Channel on Wireshark: (only for Wireshark 3.0 and later)
     1. Configue Wireshark:
@@ -128,7 +136,7 @@ sudo pip install --user ipaddress
             Type:    Custom
             Fields:  wpan-tap.ch_num
     2. Run by command:
-        sudo ./sniffer.py -c 11 --tap -u /dev/ttyUSB0 | wireshark -k -i -
+        $ sudo ./sniffer.py -c 11 --tap -u /dev/ttyUSB0 | wireshark -k -i -
 
 ```
 

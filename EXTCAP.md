@@ -4,6 +4,8 @@ Spinel Extcap provides a more user-friendly way to use OpenThread Sniffer.
 Spinel Extcap is primarily targeted for integrating OpenThread Sniffer with Wireshark,
 and is suitable for use with the Wireshark GUI.
 
+For a complete guide to installation and usage, see [Packet Sniffing using Extcap](https://openthread.io/guides/pyspinel/sniffer-extcap) on openthread.io.
+
 ## System requirements
 
 The tool has been tested on the following platforms:
@@ -37,23 +39,25 @@ Copy the path. It is refered to as `<extcap_path>` in the following sections.
 #### Automatic installation from source
 
 ```
-git clone https://github.com/openthread/pyspinel
-cd pyspinel
-sudo python setup.py install --extcap-path=<extcap_path>
+$ git clone https://github.com/openthread/pyspinel
+$ cd pyspinel
+$ sudo python3 setup.py install --extcap-path=<extcap_path>
 ```
 
 #### Automatic install from PYPI
 
 ```
-pip install pyspinel --install-option="--extcap-path=<extcap_path>"
+$ pip3 install pyspinel --install-option="--extcap-path=<extcap_path>"
 ```
 
 #### Manual installation
 
 **1. Install pyspinel package**
+
 ``` 
-pip install pyspinel 
+$ pip3 install pyspinel 
 ```
+
 **2. Install extcap script on Wireshark**
 
 Copy the provided `extcap_ot.py` to the extcap directory.
@@ -63,7 +67,7 @@ For Windows, also copy the provided `extcap_ot.bat` to the extcap directory.
 For Linux and macOS, verify that the `extcap_ot.py` file has the execute (x) permission. If not, add it using:
 
 ```
-chmod +x extcap_ot.py
+$ chmod +x extcap_ot.py
 ```
 
 ## Usage
@@ -113,8 +117,6 @@ chmod +x extcap_ot.py
 
 * Wireshark configuration - [Protocols](https://openthread.io/guides/ncp/sniffer#wireshark_configuration_-_protocols)
 * Wireshark configuration - [FCS Format](https://openthread.io/guides/ncp/sniffer#wireshark_configuration_-_rssi)
-    * For Wireshark 2.x: TI CC24xx metadata
-    * For Wireshark 3.x: ITU-T CRC-16
    
 ### Using the sniffer
 
@@ -138,16 +140,14 @@ There are three ways to start sniffing:
  
 #### Capture from multiple hardware interfaces/boards
  
- Select all hardware interfaces in the Wireshark welcome window and click 
- the Wireshark icon on the top left to start sniffing.
+Select all hardware interfaces in the Wireshark welcome window and click 
+the Wireshark icon on the top left to start sniffing.
  
- These fields are useful when capturing from multiple interfaces:
+These fields are useful when capturing from multiple interfaces:
  
-**Interface name (frame.interface_name)**
-Interface Identifier used by Wireshark to identify the capture interfaces 
+**Interface name (frame.interface_name)** — Interface Identifier used by Wireshark to identify the capture interfaces 
 
-**Channel (wpan-tap.ch_num)**
-IEEE 802.15.4 capture channel [11-26]
+**Channel (wpan-tap.ch_num)** — IEEE 802.15.4 capture channel [11-26]
 
 ## Troubleshooting
 
@@ -160,19 +160,28 @@ IEEE 802.15.4 capture channel [11-26]
 5. Restart Wireshark. If it still doesn’t appear, verify the python script located in the extcap folder is able to run. 
     
     For Linux and macOS:
-    1. Verify that the execute (x) permission is present for the extcap_ot.py file. 
+    1. Verify that the execute (x) permission is present for the `extcap_ot.py` file. 
         ```
-       ls -l extcap_ot.py
+       $ ls -l extcap_ot.py
         ```
     2. If the execute permission is missing:
        ```
-       chmod +x extcap_ot.py
+       $ chmod +x extcap_ot.py
        ```
-    3. Run ```./extcap_ot.py --extcap-interfaces``` to list the interface
+    3. List the interfaces:
+       ```
+       $ ./extcap_ot.py --extcap-interfaces
+       ```
     
     For Windows:
-    1. Run ```extcap_ot.bat --extcap-interfaces``` to list the interface.
-    2. If this exits with a python error, verify that python.exe can be run from the command line ```C:>py -3 --version```
+    1. List the interfaces:
+       ```
+       C:\> extcap_ot.bat --extcap-interfaces
+       ```
+    2. If this exits with a python error, verify that `python.exe` can be run from the command line:
+       ```
+       C:\> py -3 --version
+       ```
 
 ### Wireshark only allows the root user to capture packets
 
@@ -183,18 +192,23 @@ During the Wireshark installation on Ubuntu the user will be prompted to choose 
 **Note**: Using Wireshark as the root user is strongly discouraged.
 
 To change the settings after the installation, run the following command:
+
 ```
-sudo dpkg-reconfigure wireshark-common
+$ sudo dpkg-reconfigure wireshark-common
 ```
+
 If Wireshark was configured to restrict the capture to members of the `wireshark` group, add the correct user to the group:
+
 ```
-sudo usermod -a -G wireshark [user]
+$ sudo usermod -a -G wireshark [user]
 ```
 
 Add the correct user to the `dialout` group:
+
 ```
-sudo usermod -a -G dialout [user]
+$ sudo usermod -a -G dialout [user]
 ```
+
 Log out and log in again to apply the new user group settings.
 
 ### Wireshark format error when capturing on multiple USB interfaces on windows

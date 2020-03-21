@@ -27,11 +27,18 @@ The power of this tool is three fold:
 |----------|------------------|
 | Python   | 3.6.8            |
 
-### Package Installation
+### Package installation
 
+Install dependencies:
+```
+$ sudo apt install python3-pip
+$ pip3 install --user pyserial ipaddress
+```
+
+Install Pyspinel:
 ```
 # From pyspinel root
-sudo python setup.py install
+$ sudo python3 setup.py install
 ```
 
 ## Usage
@@ -84,7 +91,7 @@ sudo python setup.py install
         Specify the debug level.
 ```
 
-## Quick Start
+## Quick start
 
 The spinel-cli tool provides an intuitive command line interface, including
 all the standard OpenThread CLI commands, plus full history accessible by
@@ -92,14 +99,24 @@ pressing the up/down keys, or searchable via ^R.  There are a few commands
 that spinel-cli provides as well that aren't part of the standard set
 documented in the command reference section.
 
+First, clone and build a simulated OpenThread NCP, as described in
+[How to build OpenThread](https://openthread.io/guides/build#how_to_build_openthread)
+on openthread.io. After cloning bootstrapping, build the `simulation` example:
+
 ```
-openthread$ cd tools/spinel-cli/
-spinel-cli$ ./spinel-cli.py
+$ make -f <path-to-openthread>/examples/Makefile-simulation
+```
+
+Then run the Pyspinel CLI, using the path to your simulated build:
+
+```
+$ cd <path-to-pyspinel>
+$ spinel-cli.py -p <path-to-openthread>/output/x86_64-unknown-linux-gnu/bin/ot-ncp-ftd -n 1
 Opening pipe to ../../examples/apps/ncp/ot-ncp-ftd 1
 spinel-cli > version
-OPENTHREAD/gd4d4e9d-dirty; Aug 11 2016 14:40:44
+OPENTHREAD/20180926-01310-g9fdcef20; SIMULATION; Feb 11 2020 14:09:56
 Done
-spinel-cli > panid 0
+spinel-cli > panid 1234
 Done
 spinel-cli > ifconfig up
 Done
@@ -111,7 +128,7 @@ Done
 spinel-cli >
 ```
 
-## Running the NCP Tests
+## Running the NCP tests
 
 The OpenThread automated test suite can be run against any of the following
 node types by passing the NODE_TYPE environment variable:
@@ -126,25 +143,20 @@ node types by passing the NODE_TYPE environment variable:
 
 ```
 # From top-level of openthread tree
-./bootstrap
-./configure --with-examples=posix --enable-cli-app=all --enable-ncp-app=all --with-ncp-bus=uart
-make
-cd tests/scripts/thread-cert
-NODE_TYPE=ncp-sim top_builddir=../../.. python Cert_5_1_02_ChildAddressTimeout.py VERBOSE=1
+$ NODE_TYPE=ncp-sim ./script/test clean build
+$ NODE_TYPE=ncp-sim ./script/test cert tests/scripts/thread-cert/Cert_5_1_02_ChildAddressTimeout.py
 ```
 
 ### Run entire NCP thread-cert suite
 
 ```
 # From top-level of openthread tree
-make distclean
-./bootstrap
-NODE_TYPE=ncp-sim BUILD_TARGET=posix-distcheck DISTCHECK_CONFIGURE_FLAGS="--with-examples=posix --enable-cli-app --enable-ncp-app=all --with-ncp-bus=uart --with-tests=all" make -f examples/Makefile-posix distcheck BuildJobs=10 VERBOSE=1
+$ NODE_TYPE=ncp-sim ./script/test cert_suite tests/scripts/thread-cert/Cert_*
 ```
 
-## Command Reference
+## Command reference
 
-### OpenThread CLI Commands
+### OpenThread CLI commands
 
 The primary intent of spinel-cli is to support the exact syntax and output
 of the OpenThread CLI command set in order to seamlessly reapply the
@@ -154,7 +166,7 @@ See [cli module][1] for more information on these commands.
 
 [1]:https://github.com/openthread/openthread/blob/master/src/cli/README.md
 
-### Diagnostics CLI Commands
+### Diagnostics CLI commands
 
 The Diagnostics module is enabled only when building OpenThread with
 the --enable-diag configure option.
@@ -164,7 +176,7 @@ See [diag module][2] for more information on these commands.
 [2]:https://github.com/openthread/openthread/blob/master/src/core/diags/README.md
 
 
-### NCP CLI Commands
+### NCP CLI commands
 
 These commands extend beyond the core OpenThread CLI, and are specific to
 the spinel-cli tool for the purposes of debugging, access to NCP-specific
@@ -195,21 +207,21 @@ spinel-cli > help
 
 Available commands (type help <name> for more information):
 ============================================================
-bufferinfo         extaddr       ncp-filter        reset
-channel            extpanid      ncp-ll64          rloc16
-child              h             ncp-ml64          route
-childmax           help          ncp-raw           router
-childtimeout       history       ncp-tun           routerdowngradethreshold
-clear              ifconfig      netdataregister   routerselectionjitter
-commissioner       ipaddr        networkidtimeout  routerupgradethreshold
-contextreusedelay  joiner        networkname       scan
-counters           keysequence   panid             state
-debug              leaderdata    parent            thread
-debug-mem          leaderweight  ping              v
-diag               macfilter     prefix            vendor
-discover           masterkey     q                 version
-eidcache           mfg           quit
-exit               mode          releaserouterid
+bufferinfo         extaddr       mode              releaserouterid
+channel            extpanid      ncp-filter        reset
+child              h             ncp-ll64          rloc16
+childmax           help          ncp-ml64          route
+childtimeout       history       ncp-raw           router
+clear              ifconfig      ncp-tun           routerdowngradethreshold
+commissioner       ipaddr        netdataregister   routerselectionjitter
+contextreusedelay  joiner        networkidtimeout  routerupgradethreshold
+counters           keysequence   networkname       scan
+debug              leaderdata    panid             state
+debug-mem          leaderweight  parent            thread
+diag               mac           ping              txpower
+discover           macfilter     prefix            v
+eidcache           masterkey     q                 vendor
+exit               mfg           quit              version
 ```
 
 #### help \<command\>
@@ -224,7 +236,7 @@ version
     Print the build version information.
 
     > version
-    OPENTHREAD/gf4f2f04; Jul  1 2016 17:00:09
+    OPENTHREAD/20180926-01310-g9fdcef20; SIMULATION; Feb 11 2020 14:09:56
     Done
 ```
 
@@ -240,11 +252,11 @@ Copyright (c) 2016 The OpenThread Authors.
 
 #### exit
 
-Exit spinel-cli.  CTRL+C is also okay.
+Exit spinel-cli.  CTRL+C may also be used.
 
 #### quit
 
-Exit spinel-cli.  CTRL+C is also okay.
+Exit spinel-cli.  CTRL+C may also be used.
 
 ### clear
 
@@ -282,9 +294,9 @@ DEBUG_ENABLE = 0
 spinel-cli > debug 1
 DEBUG_ENABLE = 1
 spinel-cli > version
-TX Pay: (3) ['81', '02', '02']
-RX Pay: (53) ['81', '06', '02', '4F', '50', '45', '4E', '54', '48', '52', '45', '41', '44', '2F', '67', '38', '62', '63', '34', '62', '31', '64', '2D', '64', '69', '72', '74', '79', '3B', '20', '41', '75', '67', '20', '33', '31', '20', '32', '30', '31', '36', '20', '31', '30', '3A', '34', '38', '3A', '35', '33', '00', '40', '33']
-OPENTHREAD/g8bc4b1d-dirty; Aug 31 2016 10:48:53
+PROP_VALUE_GET [tid=1]: NCP_VERSION
+PROP_VALUE_IS [tid=1]: NCP_VERSION = 4f:50:45:4e:54:48:52:45:41:44:2f:32:30:31:38:30:39:32:36:2d:30:31:34:30:36:2d:67:63:33:30:33:64:30:66:63:3b:20:53:49:4d:55:4c:41:54:49:4f:4e:3b:20:4d:61:72:20:20:32:20:32:30:32:30:20:31:32:3a:31:37:3a:34:33
+OPENTHREAD/20180926-01406-gc303d0fc; SIMULATION; Mar  2 2020 12:17:43
 Done
 ```
 
@@ -373,11 +385,13 @@ The vendor package contains the following modules:
 | vendor        | Module that provides a specific vendor commands.   |
 | const         | Module with constants for vendor spinel extension. |
 | codec         | Module that provides a vendor property handlers.   |
+
 Each module comes with an example that shows how to add specific vendor codecs and constants.
 
 ### Vendor commands
 
 The vendor package adds several vendor-specific pyspinel commands. Use the help command to list them all.
+
 ```bash
 spinel-cli > vendor help
 Available vendor commands:
