@@ -2195,7 +2195,6 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 arr = util.hex_to_bytes(params[2])
                 try:
                     rssi = int(params[3])
-
                 except ValueError:
                     rssi = SPINEL.RSSI_OVERRIDE
 
