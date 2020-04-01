@@ -2159,7 +2159,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
             print(map_arg_value[mode])
 
-            #TODO: parse and show the content of entries
+            # TODO: parse and show the content of entries
             value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST)
             value = self.prop_get_value(SPINEL.PROP_MAC_FIXED_RSS)
 
@@ -2176,7 +2176,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                         mode = 2
 
                 print(map_arg_value[mode])
-                #TODO: parse and show the content of entries
+                # TODO: parse and show the content of entries
                 value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST)
 
             elif params[1] == "whitelist":
@@ -2195,47 +2195,42 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 arr = util.hex_to_bytes(params[2])
                 try:
                     rssi = int(params[3])
-                except:
+
+                except ValueError:
                     rssi = SPINEL.RSSI_OVERRIDE
 
                 arr += struct.pack('b', rssi)
-                value = self.prop_insert_value(SPINEL.PROP_MAC_WHITELIST, arr,
-                                               str(len(arr)) + 's')
+                self.prop_insert_value(SPINEL.PROP_MAC_WHITELIST, arr, str(len(arr)) + 's')
 
             elif params[1] == "remove":
                 arr = util.hex_to_bytes(params[2])
-                value = self.prop_remove_value(SPINEL.PROP_MAC_WHITELIST, arr,
-                                               str(len(arr)) + 's')
+                self.prop_remove_value(SPINEL.PROP_MAC_WHITELIST, arr, str(len(arr)) + 's')
             elif params[1] == "clear":
-                value = self.prop_set_value(SPINEL.PROP_MAC_WHITELIST, None,
-                                            None)
+                self.prop_set_value(SPINEL.PROP_MAC_WHITELIST, b'', '0s')
 
         elif params[0] == "rss":
             if len(params) == 1:
-                #TODO: parse and show the content of entries
+                # TODO: parse and show the content of entries
                 value = self.prop_get_value(SPINEL.PROP_MAC_FIXED_RSS)
 
             elif params[1] == "add":
                 if params[2] == "*":
-                    arr = ""
+                    arr = b''
                 else:
                     arr = util.hex_to_bytes(params[2])
                 rssi = int(params[3])
                 arr += struct.pack('b', rssi)
-                value = self.prop_insert_value(SPINEL.PROP_MAC_FIXED_RSS, arr,
-                                               str(len(arr)) + 's')
+                self.prop_insert_value(SPINEL.PROP_MAC_FIXED_RSS, arr, str(len(arr)) + 's')
 
             elif params[1] == "remove":
                 if params[2] == "*":
-                    arr = ""
+                    arr = b''
                 else:
                     arr = util.hex_to_bytes(params[2])
-
-                value = self.prop_remove_value(SPINEL.PROP_MAC_FIXED_RSS, arr,
-                                               str(len(arr)) + 's')
+                self.prop_remove_value(SPINEL.PROP_MAC_FIXED_RSS, arr, str(len(arr)) + 's')
 
             elif params[1] == "clear":
-                value = self.prop_set_value(SPINEL.PROP_MAC_FIXED_RSS, NULL, 0)
+                self.prop_set_value(SPINEL.PROP_MAC_FIXED_RSS, b'', '0s')
 
         print("Done")
 
