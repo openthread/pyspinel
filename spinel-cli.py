@@ -2195,7 +2195,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                 arr = util.hex_to_bytes(params[2])
                 try:
                     rssi = int(params[3])
-                except ValueError:
+                except:
                     rssi = SPINEL.RSSI_OVERRIDE
 
                 arr += struct.pack('b', rssi)
