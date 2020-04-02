@@ -2199,11 +2199,13 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                     rssi = SPINEL.RSSI_OVERRIDE
 
                 arr += struct.pack('b', rssi)
-                self.prop_insert_value(SPINEL.PROP_MAC_WHITELIST, arr, str(len(arr)) + 's')
+                self.prop_insert_value(SPINEL.PROP_MAC_WHITELIST, arr,
+                                       str(len(arr)) + 's')
 
             elif params[1] == "remove":
                 arr = util.hex_to_bytes(params[2])
-                self.prop_remove_value(SPINEL.PROP_MAC_WHITELIST, arr, str(len(arr)) + 's')
+                self.prop_remove_value(SPINEL.PROP_MAC_WHITELIST, arr,
+                                       str(len(arr)) + 's')
             elif params[1] == "clear":
                 self.prop_set_value(SPINEL.PROP_MAC_WHITELIST, b'', '0s')
 
@@ -2219,14 +2221,16 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                     arr = util.hex_to_bytes(params[2])
                 rssi = int(params[3])
                 arr += struct.pack('b', rssi)
-                self.prop_insert_value(SPINEL.PROP_MAC_FIXED_RSS, arr, str(len(arr)) + 's')
+                self.prop_insert_value(SPINEL.PROP_MAC_FIXED_RSS, arr,
+                                       str(len(arr)) + 's')
 
             elif params[1] == "remove":
                 if params[2] == "*":
                     arr = b''
                 else:
                     arr = util.hex_to_bytes(params[2])
-                self.prop_remove_value(SPINEL.PROP_MAC_FIXED_RSS, arr, str(len(arr)) + 's')
+                self.prop_remove_value(SPINEL.PROP_MAC_FIXED_RSS, arr,
+                                       str(len(arr)) + 's')
 
             elif params[1] == "clear":
                 self.prop_set_value(SPINEL.PROP_MAC_FIXED_RSS, b'', '0s')
