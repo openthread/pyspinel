@@ -29,7 +29,7 @@
 
 set -e
 
-python3 -m pip install yapf
+python3 -m pip install yapf==0.29.0
 
 ./script/make-pretty check
 
