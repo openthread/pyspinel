@@ -1,8 +1,6 @@
 # Spinel Sniffer Reference
 
-Any Spinel NCP node can be made into a promiscuous packet sniffer, and this
-tool both intializes a device into this mode and outputs a pcap stream that
-can be saved or piped directly into Wireshark.
+Any Spinel NCP node can be made into a promiscuous packet sniffer, and this tool both intializes a device into this mode and outputs a pcap stream that can be saved or piped directly into Wireshark.
 
 For a complete guide to installation and usage, see [Packet Sniffing with Pyspinel](https://openthread.io/guides/pyspinel/sniffer) on openthread.io.
 
@@ -11,23 +9,25 @@ For a complete guide to installation and usage, see [Packet Sniffing with Pyspin
 The tool has been tested on the following platforms:
 
 | Platforms | Version          |
-|-----------|------------------|
+| --------- | ---------------- |
 | Ubuntu    | 14.04 Trusty     |
 | Mac OS    | 10.11 El Capitan |
 
-| Language  | Version          |
-|-----------|------------------|
-| Python    | 3.6.8            |
+| Language | Version |
+| -------- | ------- |
+| Python   | 3.6.8   |
 
 ### Package installation
 
 Install dependencies:
+
 ```
 $ sudo apt install python3-pip
 $ pip3 install --user pyserial ipaddress
 ```
 
 Install Pyspinel:
+
 ```
 # From pyspinel root
 $ sudo python3 setup.py install
@@ -36,15 +36,17 @@ $ sudo python3 setup.py install
 ## Usage
 
 ### NAME
+
     sniffer.py - shell tool for controlling OpenThread NCP instances
 
 ### SYNOPSIS
+
     sniffer.py [-hupsnqvdxco]
 
 ### DESCRIPTION
 
 ```
-    -h, --help            
+    -h, --help
     	Show this help message and exit
 
     -u <UART>, --uart=<UART>
@@ -99,9 +101,9 @@ $ sudo python3 setup.py install
 
     --rssi
         Include RSSI information in pcap output.
-    
+
     --tap
-        Specify DLT_IEEE802_15_4_TAP(283) for frame format, with a pseudo-header containing TLVs with metadata (e.g. FCS, RSSI, LQI, channel etc). 
+        Specify DLT_IEEE802_15_4_TAP(283) for frame format, with a pseudo-header containing TLVs with metadata (e.g. FCS, RSSI, LQI, channel etc).
         If not specified, DLT_IEEE802_15_4_WITHFCS(195) would be used by default with the additional RSSI, LQI following the PHY frame directly (TI style FCS format).
 ```
 
@@ -128,7 +130,7 @@ $ sudo python3 setup.py install
             Fields:  wpan.rssi
     2. Run by command:
         $ sudo ./sniffer.py -c 11 -n 1 --rssi -u /dev/ttyUSB0 | wireshark -k -i -
-    
+
     To display Channel on Wireshark: (only for Wireshark 3.0 and later)
     1. Configue Wireshark:
         Edit->Preferences->Appearance->Columns, add a new entry:
@@ -140,11 +142,10 @@ $ sudo python3 setup.py install
 
 ```
 
-This will connect to stock openthread ncp firmware over the given UART,
-make the node into a promiscuous mode sniffer on the given channel,
-open up wireshark, and start streaming packets into wireshark.
+This will connect to stock openthread ncp firmware over the given UART, make the node into a promiscuous mode sniffer on the given channel, open up wireshark, and start streaming packets into wireshark.
 
 ## Troubleshooting
+
 Q1: high packet loss rate when sniffing heavy traffic
 
 A1: use higher uart baud rate in Sniffer firmware(NCP), and use '-b <baudrate>' option to set the same baud rate on host side.

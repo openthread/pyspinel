@@ -1,21 +1,20 @@
-
 We would love for you to contribute to OpenThread and help make it even better than it is today! As a contributor, here are the guidelines we would like you to follow.
 
-* [1 Code of Conduct](#code-of-conduct)
-* [2 Bugs](#bugs)
-* [3 New Features](#new-features)
-* [4 Contributing Code](#contributing-code)
-  * [4.1 Initial Setup](#initial-setup)
-  * [4.2 Contributor License Agreement (CLA)](#contributor-license-agreement--cla-)
-  * [4.3 Submitting a Pull Request](#submitting-a-pull-request)
+- [1 Code of Conduct](#code-of-conduct)
+- [2 Bugs](#bugs)
+- [3 New Features](#new-features)
+- [4 Contributing Code](#contributing-code)
+  - [4.1 Initial Setup](#initial-setup)
+  - [4.2 Contributor License Agreement (CLA)](#contributor-license-agreement--cla-)
+  - [4.3 Submitting a Pull Request](#submitting-a-pull-request)
 
 ## Code of Conduct
 
-Help us keep OpenThread open and inclusive.  Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+Help us keep OpenThread open and inclusive. Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## Bugs
 
-If you find a bug in the source code, you can help us by [submitting a GitHub Issue](https://github.com/openthread/pyspinel/issues/new).  The best bug reports provide a detailed description of the issue and step-by-step instructions for predictably reproducing the issue.  Even better, you can [submit a Pull Request](#submitting-a-pull-request) with a fix.
+If you find a bug in the source code, you can help us by [submitting a GitHub Issue](https://github.com/openthread/pyspinel/issues/new). The best bug reports provide a detailed description of the issue and step-by-step instructions for predictably reproducing the issue. Even better, you can [submit a Pull Request](#submitting-a-pull-request) with a fix.
 
 ## New Features
 
@@ -23,9 +22,9 @@ You can request a new feature by [submitting a GitHub Issue](https://github.com/
 
 If you would like to implement a new feature, please consider the scope of the new feature:
 
-* *Large feature*: first [submit a GitHub Issue](https://github.com/openthread/pyspinel/issues/new) and communicate your proposal so that the community can review and provide feedback.  Getting early feedback will help ensure your implementation work is accepted by the community.  This will also allow us to better coordinate our efforts and minimize duplicated effort.
+- _Large feature_: first [submit a GitHub Issue](https://github.com/openthread/pyspinel/issues/new) and communicate your proposal so that the community can review and provide feedback. Getting early feedback will help ensure your implementation work is accepted by the community. This will also allow us to better coordinate our efforts and minimize duplicated effort.
 
-* *Small feature*: can be implemented and directly [submitted as a Pull Request](#submitting-a-pull-request).
+- _Small feature_: can be implemented and directly [submitted as a Pull Request](#submitting-a-pull-request).
 
 ## Contributing Code
 
@@ -36,7 +35,7 @@ The OpenThread Project follows the "Fork-and-Pull" model for accepting contribut
 Setup your GitHub fork and continuous-integration services:
 
 1. Fork the [pyspinel repository](https://github.com/openthread/pyspinel) by clicking "Fork" on the web UI.
-2. Enable [Travis CI](https://travis-ci.org/) by logging in with your GitHub account and enabling your newly created fork.  We use Travis CI for continuous integration checks.  All contributions must pass these checks to be accepted.
+2. Enable [Travis CI](https://travis-ci.org/) by logging in with your GitHub account and enabling your newly created fork. We use Travis CI for continuous integration checks. All contributions must pass these checks to be accepted.
 
 Setup your local development environment:
 
@@ -100,7 +99,7 @@ Now, it may be desirable to squash some of your smaller commits down into a smal
 
 ```bash
 # Rebase all commits on your development branch
-git checkout 
+git checkout
 git rebase -i master
 ```
 
@@ -120,7 +119,7 @@ git checkout <branch-name>
 git push origin <branch-name>
 ```
 
-This will trigger the Travis CI continuous-integration checks.  You can view the results in the respective services.  Note that the integration checks will report failures on occasion.  If a failure occurs, you may try rerunning the test via the Travis web UI.
+This will trigger the Travis CI continuous-integration checks. You can view the results in the respective services. Note that the integration checks will report failures on occasion. If a failure occurs, you may try rerunning the test via the Travis web UI.
 
 #### Submit Pull Request
 
