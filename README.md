@@ -1,14 +1,8 @@
 # Spinel CLI Reference
 
-The Spinel CLI exposes the OpenThread configuration and management APIs
-running on an NCP build via a command line interface.  Spinel CLI is primarily
-targeted for driving the automated continuous integration tests, and is
-suitable for manual experimentation with controlling OpenThread NCP instances.
-For a production grade host driver, see [wpantund]: https://github.com/openthread/wpantund.
+The Spinel CLI exposes the OpenThread configuration and management APIs running on an NCP build via a command line interface. Spinel CLI is primarily targeted for driving the automated continuous integration tests, and is suitable for manual experimentation with controlling OpenThread NCP instances. For a production grade host driver, see [wpantund]: https://github.com/openthread/wpantund.
 
-Use the CLI to play with NCP builds of OpenThread on a Linux or Mac OS
-platform, including starting a basic tunnel interface to allow IPv6
-applications to run on the HOST and use the Thread network.
+Use the CLI to play with NCP builds of OpenThread on a Linux or Mac OS platform, including starting a basic tunnel interface to allow IPv6 applications to run on the HOST and use the Thread network.
 
 The power of this tool is three fold:
 
@@ -19,23 +13,25 @@ The power of this tool is three fold:
 ## System Requirements
 
 | OS     | Minimum Version  |
-|--------|------------------|
+| ------ | ---------------- |
 | Ubuntu | 14.04 Trusty     |
 | Mac OS | 10.11 El Capitan |
 
-| Language | Minimum Version  |
-|----------|------------------|
-| Python   | 3.6.8            |
+| Language | Minimum Version |
+| -------- | --------------- |
+| Python   | 3.6.8           |
 
 ### Package installation
 
 Install dependencies:
+
 ```
 $ sudo apt install python3-pip
 $ pip3 install --user pyserial ipaddress
 ```
 
 Install Pyspinel:
+
 ```
 # From pyspinel root
 $ sudo python3 setup.py install
@@ -44,15 +40,17 @@ $ sudo python3 setup.py install
 ## Usage
 
 ### NAME
+
     spinel-cli.py - shell tool for controlling OpenThread NCP instances
 
 ### SYNOPSIS
+
     spinel-cli.py [-hupsnqv]
 
 ### DESCRIPTION
 
 ```
-    -h, --help            
+    -h, --help
     	Show this help message and exit
 
     -u <UART>, --uart=<UART>
@@ -93,15 +91,9 @@ $ sudo python3 setup.py install
 
 ## Quick start
 
-The spinel-cli tool provides an intuitive command line interface, including
-all the standard OpenThread CLI commands, plus full history accessible by
-pressing the up/down keys, or searchable via ^R.  There are a few commands
-that spinel-cli provides as well that aren't part of the standard set
-documented in the command reference section.
+The spinel-cli tool provides an intuitive command line interface, including all the standard OpenThread CLI commands, plus full history accessible by pressing the up/down keys, or searchable via ^R. There are a few commands that spinel-cli provides as well that aren't part of the standard set documented in the command reference section.
 
-First, clone and build a simulated OpenThread NCP, as described in
-[How to build OpenThread](https://openthread.io/guides/build#how_to_build_openthread)
-on openthread.io. After cloning bootstrapping, build the `simulation` example:
+First, clone and build a simulated OpenThread NCP, as described in [How to build OpenThread](https://openthread.io/guides/build#how_to_build_openthread) on openthread.io. After cloning bootstrapping, build the `simulation` example:
 
 ```
 $ make -f <path-to-openthread>/examples/Makefile-simulation
@@ -130,14 +122,13 @@ spinel-cli >
 
 ## Running the NCP tests
 
-The OpenThread automated test suite can be run against any of the following
-node types by passing the NODE_TYPE environment variable:
+The OpenThread automated test suite can be run against any of the following node types by passing the NODE_TYPE environment variable:
 
-| NODE_TYPE     |    Description                                     |
-|---------------|----------------------------------------------------|
-| sim (default) | Runs against ot-cli posix emulator                 |
-| ncp-sim       | Runs against ot-ncp posix emulator with spinel-cli |
-| soc           | Runs against CLI firmware on a device connected via /dev/ttyUSB<nodeid>  |
+| NODE_TYPE | Description |
+| --- | --- |
+| sim (default) | Runs against ot-cli posix emulator |
+| ncp-sim | Runs against ot-ncp posix emulator with spinel-cli |
+| soc | Runs against CLI firmware on a device connected via /dev/ttyUSB<nodeid> |
 
 ### Manual run of NCP thread-cert test
 
@@ -158,45 +149,38 @@ $ NODE_TYPE=ncp-sim ./script/test cert_suite tests/scripts/thread-cert/Cert_*
 
 ### OpenThread CLI commands
 
-The primary intent of spinel-cli is to support the exact syntax and output
-of the OpenThread CLI command set in order to seamlessly reapply the
-thread-cert automated test suite against NCP targets.
+The primary intent of spinel-cli is to support the exact syntax and output of the OpenThread CLI command set in order to seamlessly reapply the thread-cert automated test suite against NCP targets.
 
 See [cli module][1] for more information on these commands.
 
-[1]:https://github.com/openthread/openthread/blob/master/src/cli/README.md
+[1]: https://github.com/openthread/openthread/blob/master/src/cli/README.md
 
 ### Diagnostics CLI commands
 
-The Diagnostics module is enabled only when building OpenThread with
-the --enable-diag configure option.
+The Diagnostics module is enabled only when building OpenThread with the --enable-diag configure option.
 
 See [diag module][2] for more information on these commands.
 
-[2]:https://github.com/openthread/openthread/blob/master/src/core/diags/README.md
-
+[2]: https://github.com/openthread/openthread/blob/master/src/core/diags/README.md
 
 ### NCP CLI commands
 
-These commands extend beyond the core OpenThread CLI, and are specific to
-the spinel-cli tool for the purposes of debugging, access to NCP-specific
-Spinel parameters, and support of advanced configurations.
+These commands extend beyond the core OpenThread CLI, and are specific to the spinel-cli tool for the purposes of debugging, access to NCP-specific Spinel parameters, and support of advanced configurations.
 
-* [help](#help)
-* [?](#help)
-* [v](#v)
-* [exit](#exit)
-* [quit](#quit)
-* [q](#quit)
-* [clear](#clear)
-* [history](#history)
-* [h](#history)
-* [debug](#debug)
-* [debug-term](#debug-term)
-* [ncp-tun](#ncp-tun)
-* [ncp-ml64](#ncp-ml64)
-* [ncp-ll64](#ncp-ll64)
-
+- [help](#help)
+- [?](#help)
+- [v](#v)
+- [exit](#exit)
+- [quit](#quit)
+- [q](#quit)
+- [clear](#clear)
+- [history](#history)
+- [h](#history)
+- [debug](#debug)
+- [debug-term](#debug-term)
+- [ncp-tun](#ncp-tun)
+- [ncp-ml64](#ncp-ml64)
+- [ncp-ll64](#ncp-ll64)
 
 #### help
 
@@ -252,11 +236,11 @@ Copyright (c) 2016 The OpenThread Authors.
 
 #### exit
 
-Exit spinel-cli.  CTRL+C may also be used.
+Exit spinel-cli. CTRL+C may also be used.
 
 #### quit
 
-Exit spinel-cli.  CTRL+C may also be used.
+Exit spinel-cli. CTRL+C may also be used.
 
 ### clear
 
@@ -287,8 +271,7 @@ DEBUG_ENABLE = 0
 
 Set whether debug verbose output is enabled.
 
-spinel-cli > debug
-DEBUG_ENABLE = 0
+spinel-cli > debug DEBUG_ENABLE = 0
 
 ```bash
 spinel-cli > debug 1
@@ -371,20 +354,17 @@ Done
 
 Return the Link Local 64-bit IPv6 address for the node.
 
-
 ## Vendor package
 
-Extension of the Spinel CLI with custom properties and commands.
-This plugin-like extension adds vendor-specific commands and properties to pyspinel in a way that does not impact the 
-implementation of core pyspinel functionalities.
+Extension of the Spinel CLI with custom properties and commands. This plugin-like extension adds vendor-specific commands and properties to pyspinel in a way that does not impact the implementation of core pyspinel functionalities.
 
 The vendor package contains the following modules:
 
-| MODULE        |    DESCRIPTION                                     |
-|---------------|----------------------------------------------------|
-| vendor        | Module that provides a specific vendor commands.   |
-| const         | Module with constants for vendor spinel extension. |
-| codec         | Module that provides a vendor property handlers.   |
+| MODULE | DESCRIPTION                                        |
+| ------ | -------------------------------------------------- |
+| vendor | Module that provides a specific vendor commands.   |
+| const  | Module with constants for vendor spinel extension. |
+| codec  | Module that provides a vendor property handlers.   |
 
 Each module comes with an example that shows how to add specific vendor codecs and constants.
 
