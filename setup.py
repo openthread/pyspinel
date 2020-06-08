@@ -84,7 +84,7 @@ setup(
     packages=find_packages(),
     install_requires=[
         'pyserial',
-        'ipaddress',
+        'ipaddress;python_version<"3.3"',
     ],
     scripts=['spinel-cli.py', 'sniffer.py', 'extcap_ot.py', 'extcap_ot.bat'],
     cmdclass={'install': _InstallCommand},
