@@ -290,6 +290,9 @@ def main():
                 #     3.2 Timestamp in microseconds(uint64)
                 # 4. Vendor data struct contains:
                 #     4.0 Receive error(uint8)
+                # 5. MAC data struct contains:
+                #     5.0 ACK key ID(uint8)
+                #     5.1 ACK frame counter(uint32)
                 if len(result.value) >= 2 + length + 19:
                     metadata = wpan_api.parse_fields(
                         result.value[2 + length:2 + length + 19],
