@@ -280,7 +280,7 @@ def main():
                 length = wpan_api.parse_S(result.value)
                 pkt = result.value[2:2 + length]
 
-                # metadata format (totally 19 bytes):
+                # metadata format (totally 19 bytes or 26 bytes):
                 # 0. RSSI(int8)
                 # 1. Noise Floor(int8)
                 # 2. Flags(uint16)
@@ -290,10 +290,10 @@ def main():
                 #     3.2 Timestamp in microseconds(uint64)
                 # 4. Vendor data struct contains:
                 #     4.0 Receive error(uint8)
-                # 5. MAC data struct contains:
+                # 5. (optional) MAC data struct contains:
                 #     5.0 ACK key ID(uint8)
                 #     5.1 ACK frame counter(uint32)
-                if len(result.value) >= 2 + length + 19:
+                if len(result.value) in [2 + length + 19, 2 + length + 26]:
                     metadata = wpan_api.parse_fields(
                         result.value[2 + length:2 + length + 19],
                         "ccSt(CCX)t(i)")
