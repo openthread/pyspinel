@@ -290,7 +290,7 @@ def main():
                 #     3.2 Timestamp in microseconds(uint64)
                 # 4. Vendor data struct contains:
                 #     4.0 Receive error(uint8)
-                if len(result.value) == 2 + length + 19:
+                if len(result.value) >= 2 + length + 19:
                     metadata = wpan_api.parse_fields(
                         result.value[2 + length:2 + length + 19],
                         "ccSt(CCX)t(i)")
