@@ -506,16 +506,16 @@ class SpinelPropertyHandler(SpinelCodec):
     def MAC_RAW_STREAM_ENABLED(self, _, payload):
         return self.parse_b(payload)
 
-    def MAC_WHITELIST(self, _, payload):
+    def MAC_ALLOWLIST(self, _, payload):
         pass
 
-    def MAC_WHITELIST_ENABLED(self, _, payload):
+    def MAC_ALLOWLIST_ENABLED(self, _, payload):
         return self.parse_b(payload)
 
-    def MAC_BLACKLIST(self, _, payload):
+    def MAC_DENYLIST(self, _, payload):
         pass
 
-    def MAC_BLACKLIST_ENABLED(self, _, payload):
+    def MAC_DENYLIST_ENABLED(self, _, payload):
         return self.parse_b(payload)
 
     def MAC_FIXED_RSS(self, _, payload):
@@ -889,14 +889,14 @@ SPINEL_PROP_DISPATCH = {
         WPAN_PROP_HANDLER.MAC_RAW_STREAM_ENABLED,
     SPINEL.PROP_MAC_FILTER_MODE:
         WPAN_PROP_HANDLER.MAC_FILTER_MODE,
-    SPINEL.PROP_MAC_WHITELIST:
-        WPAN_PROP_HANDLER.MAC_WHITELIST,
-    SPINEL.PROP_MAC_WHITELIST_ENABLED:
-        WPAN_PROP_HANDLER.MAC_WHITELIST_ENABLED,
-    SPINEL.PROP_MAC_BLACKLIST:
-        WPAN_PROP_HANDLER.MAC_BLACKLIST,
-    SPINEL.PROP_MAC_BLACKLIST_ENABLED:
-        WPAN_PROP_HANDLER.MAC_BLACKLIST_ENABLED,
+    SPINEL.PROP_MAC_ALLOWLIST:
+        WPAN_PROP_HANDLER.MAC_ALLOWLIST,
+    SPINEL.PROP_MAC_ALLOWLIST_ENABLED:
+        WPAN_PROP_HANDLER.MAC_ALLOWLIST_ENABLED,
+    SPINEL.PROP_MAC_DENYLIST:
+        WPAN_PROP_HANDLER.MAC_DENYLIST,
+    SPINEL.PROP_MAC_DENYLIST_ENABLED:
+        WPAN_PROP_HANDLER.MAC_DENYLIST_ENABLED,
     SPINEL.PROP_MAC_FIXED_RSS:
         WPAN_PROP_HANDLER.MAC_FIXED_RSS,
     SPINEL.PROP_MAC_MAX_RETRY_NUMBER_DIRECT:
