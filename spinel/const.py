@@ -106,13 +106,13 @@ class SPINEL(object):
     # Format: `A(T(Ec))`
     # * `E`: EUI64 address of node
     # * `c`: Optional fixed RSSI. OT_MAC_FILTER_FIXED_RSS_OVERRIDE_DISABLED(127) means not set.
-    PROP_MAC_WHITELIST = PROP_MAC_EXT__BEGIN + 0  # < [A(T(Ec))]
-    PROP_MAC_WHITELIST_ENABLED = PROP_MAC_EXT__BEGIN + 1  # < [b]
+    PROP_MAC_ALLOWLIST = PROP_MAC_EXT__BEGIN + 0  # < [A(T(Ec))]
+    PROP_MAC_ALLOWLIST_ENABLED = PROP_MAC_EXT__BEGIN + 1  # < [b]
 
     # Format: `A(T(E))`
     # * `E`: EUI64 address of node
-    PROP_MAC_BLACKLIST = PROP_MAC_EXT__BEGIN + 6  # <[A(T(E))]
-    PROP_MAC_BLACKLIST_ENABLED = PROP_MAC_EXT__BEGIN + 7  # < [b]
+    PROP_MAC_DENYLIST = PROP_MAC_EXT__BEGIN + 6  # <[A(T(E))]
+    PROP_MAC_DENYLIST_ENABLED = PROP_MAC_EXT__BEGIN + 7  # < [b]
 
     # Format: `A(T(Ec))`
     # * `E`: Optional EUI64 address of node. Set default RSS if not included.
@@ -296,7 +296,7 @@ class SPINEL(object):
     # Format: `L` (Read-only) */
     PROP_CNTR_RX_PKT_OTHER = PROP_CNTR__BEGIN + 105
 
-    # The number of received packets filtered by whitelist.
+    # The number of received packets filtered by allowlist.
     # Format: `L` (Read-only) */
     PROP_CNTR_RX_PKT_FILT_WL = PROP_CNTR__BEGIN + 106
 
@@ -379,7 +379,7 @@ class SPINEL(object):
     #     'L': RxBeacon             (The number of received beacon).
     #     'L': RxBeaconRequest      (The number of received beacon request).
     #     'L': RxOther              (The number of received other types of frames).
-    #     'L': RxAddressFiltered    (The number of received packets filtered by address filter (whitelist or blacklist)).
+    #     'L': RxAddressFiltered    (The number of received packets filtered by address filter (allowlist or denylist)).
     #     'L': RxDestAddrFiltered   (The number of received packets filtered by destination check).
     #     'L': RxDuplicated         (The number of received duplicated packets).
     #     'L': RxErrNoFrame         (The number of received packets with no or malformed content).

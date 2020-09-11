@@ -1967,7 +1967,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
     def complete_macfilter(self, text, _line, _begidx, _endidx):
         """ Subcommand completion handler for macfilter command. """
         #TODO: autocomplete the secondary sub commands
-        #for 'addr': 'disable', 'blacklist', 'whitelist', 'add', 'remove', 'clear'
+        #for 'addr': 'disable', 'denylist', 'allowlist', 'add', 'remove', 'clear'
         #for 'rss' : 'add', 'remove', 'clear'
         map_sub_commands = ('addr', 'rss')
         return [i for i in map_sub_commands if i.startswith(text)]
@@ -2050,7 +2050,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
            List the macfilter status, including address and received signal strength filter settings.
 
            > macfilter
-           Whitelist
+           Allowlist
            Done
 
         macfilter addr
@@ -2058,7 +2058,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             List the address filter status.
 
             > macfilter addr
-            Whitelist
+            Allowlist
             Done
 
         macfilter addr disable
@@ -2067,16 +2067,16 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             > macfilter addr disable
             Done
 
-        macfilter addr whitelist
-            Enable whitelist address filter mode.
+        macfilter addr allowlist
+            Enable allowlist address filter mode.
 
-            > macfilter addr whitelist
+            > macfilter addr allowlist
             Done
 
-        macfilter addr blacklist
-            Enable blacklist address filter mode.
+        macfilter addr denylist
+            Enable denylist address filter mode.
 
-            > macfilter addr blacklist
+            > macfilter addr denylist
             Done
 
         macfilter addr add <extaddr> [rssi]
@@ -2141,54 +2141,54 @@ class SpinelCliCmd(Cmd, SpinelCodec):
 
         map_arg_value = {
             0: "Disabled",
-            1: "Whitelist",
-            2: "Blacklist",
+            1: "Allowlist",
+            2: "Denylist",
         }
 
         params = line.split(" ")
 
         if params[0] == "":
             mode = 0
-            value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST_ENABLED)
+            value = self.prop_get_value(SPINEL.PROP_MAC_ALLOWLIST_ENABLED)
             if value == 1:
                 mode = 1
             else:
-                value = self.prop_get_value(SPINEL.PROP_MAC_BLACKLIST_ENABLED)
+                value = self.prop_get_value(SPINEL.PROP_MAC_DENYLIST_ENABLED)
                 if value == 1:
                     mode = 2
 
             print(map_arg_value[mode])
 
             # TODO: parse and show the content of entries
-            value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST)
+            value = self.prop_get_value(SPINEL.PROP_MAC_ALLOWLIST)
             value = self.prop_get_value(SPINEL.PROP_MAC_FIXED_RSS)
 
         if params[0] == "addr":
             if len(params) == 1:
                 mode = 0
-                value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST_ENABLED)
+                value = self.prop_get_value(SPINEL.PROP_MAC_ALLOWLIST_ENABLED)
                 if value == 1:
                     mode = 1
                 else:
                     value = self.prop_get_value(
-                        SPINEL.PROP_MAC_BLACKLIST_ENABLED)
+                        SPINEL.PROP_MAC_DENYLIST_ENABLED)
                     if value == 1:
                         mode = 2
 
                 print(map_arg_value[mode])
                 # TODO: parse and show the content of entries
-                value = self.prop_get_value(SPINEL.PROP_MAC_WHITELIST)
+                value = self.prop_get_value(SPINEL.PROP_MAC_ALLOWLIST)
 
-            elif params[1] == "whitelist":
-                self.prop_set(SPINEL.PROP_MAC_WHITELIST_ENABLED, '1')
+            elif params[1] == "allowlist":
+                self.prop_set(SPINEL.PROP_MAC_ALLOWLIST_ENABLED, '1')
                 return
 
-            elif params[1] == "blacklist":
-                self.prop_set(SPINEL.PROP_MAC_BLACKLIST_ENABLED, '1')
+            elif params[1] == "denylist":
+                self.prop_set(SPINEL.PROP_MAC_DENYLIST_ENABLED, '1')
                 return
 
             elif params[1] == "disable":
-                self.prop_set(SPINEL.PROP_MAC_WHITELIST_ENABLED, '0')
+                self.prop_set(SPINEL.PROP_MAC_ALLOWLIST_ENABLED, '0')
                 return
 
             elif params[1] == "add":
@@ -2199,15 +2199,15 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                     rssi = SPINEL.RSSI_OVERRIDE
 
                 arr += struct.pack('b', rssi)
-                self.prop_insert_value(SPINEL.PROP_MAC_WHITELIST, arr,
+                self.prop_insert_value(SPINEL.PROP_MAC_ALLOWLIST, arr,
                                        str(len(arr)) + 's')
 
             elif params[1] == "remove":
                 arr = util.hex_to_bytes(params[2])
-                self.prop_remove_value(SPINEL.PROP_MAC_WHITELIST, arr,
+                self.prop_remove_value(SPINEL.PROP_MAC_ALLOWLIST, arr,
                                        str(len(arr)) + 's')
             elif params[1] == "clear":
-                self.prop_set_value(SPINEL.PROP_MAC_WHITELIST, b'', '0s')
+                self.prop_set_value(SPINEL.PROP_MAC_ALLOWLIST, b'', '0s')
 
         elif params[0] == "rss":
             if len(params) == 1:
