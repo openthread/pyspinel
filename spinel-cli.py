@@ -222,7 +222,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'masterkey',
         'mfg',
         'mode',
-        'netdataregister',
+        'netdata',
         'networkidtimeout',
         'networkname',
         'panid',
@@ -1412,18 +1412,21 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         else:
             print("Error")
 
-    def do_netdataregister(self, _line):
+    def do_netdata(self, line):
         """
-        netdataregister
+        netdata
 
             Register local network data with Thread Leader.
 
-            > netdataregister
+            > netdata register
             Done
         """
-        self.prop_set_value(SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE, 1)
-        self.handle_property("0",
-                             SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE)
+        params = line.split(" ")
+        if params[0] == "register":
+            self.prop_set_value(SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE,
+                                1)
+            self.handle_property("0",
+                                 SPINEL.PROP_THREAD_ALLOW_LOCAL_NET_DATA_CHANGE)
 
     def do_networkidtimeout(self, line):
         """
