@@ -1338,20 +1338,18 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             Get the Thread Device Mode value.
 
               r: rx-on-when-idle
-              s: Secure IEEE 802.15.4 data requests
               d: Full Function Device
               n: Full Network Data
 
             > mode
-            rsdn
+            rdn
             Done
 
-        mode [rsdn]
+        mode [rdn]
 
             Set the Thread Device Mode value.
 
               r: rx-on-when-idle
-              s: Secure IEEE 802.15.4 data requests
               d: Full Function Device
               n: Full Network Data
 
@@ -1359,41 +1357,25 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             Done
         """
         map_arg_value = {
-            0x00: "0",
+            0x00: "-",
             0x01: "n",
             0x02: "d",
             0x03: "dn",
-            0x04: "s",
-            0x05: "sn",
-            0x06: "sd",
-            0x07: "sdn",
             0x08: "r",
             0x09: "rn",
             0x0A: "rd",
             0x0B: "rdn",
-            0x0C: "rs",
-            0x0D: "rsn",
-            0x0E: "rsd",
-            0x0F: "rsdn",
         }
 
         map_arg_name = {
-            "0": 0x00,
+            "-": "0",
             "n": 0x01,
             "d": 0x02,
             "dn": 0x03,
-            "s": 0x04,
-            "sn": 0x05,
-            "sd": 0x06,
-            "sdn": 0x07,
             "r": 0x08,
             "rn": 0x09,
             "rd": 0x0A,
             "rdn": 0x0B,
-            "rs": 0x0C,
-            "rsn": 0x0D,
-            "rsd": 0x0E,
-            "rsdn": 0x0F
         }
 
         if line:
