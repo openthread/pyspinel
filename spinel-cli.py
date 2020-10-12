@@ -347,7 +347,9 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             if mixed_format == 'U':  # For UTF8, just a pass through line unmodified
                 line += '\0'
                 value = line.encode('utf-8')
-            elif mixed_format == 'D':  # Expect raw data to be hex string w/o delimeters
+            elif mixed_format in (
+                    'D',
+                    'E'):  # Expect raw data to be hex string w/o delimeters
                 value = util.hex_to_bytes(line)
             elif isinstance(line, str):
                 # Most everything else is some type of integer
@@ -360,7 +362,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         py_format = mixed_format
         if value == "":
             py_format = '0s'
-        elif mixed_format == 'D' or mixed_format == 'U':
+        elif mixed_format in ('D', 'U', 'E'):
             py_format = str(len(value)) + 's'
         return py_format
 
