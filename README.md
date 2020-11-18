@@ -87,6 +87,13 @@ $ sudo python3 setup.py install
 
     -d <DEBUG_LEVEL>, --debug=<DEBUG_LEVEL>
         Specify the debug level.
+
+    --vendor-path
+        Provide a custom location of the vendor package. If not specified, the
+        default location will be used (the vendor package shipped with the
+        pyspinel installation).
+        Note: The vendor package location can also be specified with
+        SPINEL_VENDOR_PATH environment variable.
 ```
 
 ## Quick start
@@ -367,6 +374,8 @@ The vendor package contains the following modules:
 | codec  | Module that provides a vendor property handlers.   |
 
 Each module comes with an example that shows how to add specific vendor codecs and constants.
+
+By default, pyspinel will use the vendor package shipped with pyspinel installation. You can provide a custom vendor package location with --vendor-path option or SPINEL_VENDOR_PATH environment variable.
 
 ### Vendor commands
 
