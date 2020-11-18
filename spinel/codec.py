@@ -1023,7 +1023,8 @@ class WpanApi(SpinelCodec):
                  stream,
                  nodeid,
                  use_hdlc=FEATURE_USE_HDLC,
-                 timeout=TIMEOUT_PROP):
+                 timeout=TIMEOUT_PROP,
+                 vendor_module=None):
         self.stream = stream
         self.nodeid = nodeid
 
@@ -1033,12 +1034,13 @@ class WpanApi(SpinelCodec):
         if self.use_hdlc:
             self.hdlc = Hdlc(self.stream)
 
-        # Hook vendor properties
-        try:
-            codec = importlib.import_module('vendor.codec')
-            SPINEL_PROP_DISPATCH.update(codec.VENDOR_SPINEL_PROP_DISPATCH)
-        except ImportError:
-            pass
+        if vendor_module:
+            # Hook vendor properties
+            try:
+                codec = importlib.import_module(vendor_module + '.codec')
+                SPINEL_PROP_DISPATCH.update(codec.VENDOR_SPINEL_PROP_DISPATCH)
+            except ImportError:
+                pass
 
         # PARSER state
         self.rx_pkt = []

@@ -139,13 +139,13 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         self._simulator_addr = ('127.0.0.1',
                                 BASE_PORT + MAX_NODES * PORT_OFFSET)
 
-    def __init__(self, stream, nodeid, *_a, **kw):
+    def __init__(self, stream, nodeid, vendor_module, *_a, **kw):
         if self.VIRTUAL_TIME:
             self._init_virtual_time()
         self.nodeid = nodeid
         self.tun_if = None
 
-        self.wpan_api = WpanApi(stream, nodeid)
+        self.wpan_api = WpanApi(stream, nodeid, vendor_module=vendor_module)
         self.wpan_api.queue_register(SPINEL.HEADER_DEFAULT)
         self.wpan_api.callback_register(SPINEL.PROP_STREAM_NET,
                                         self.wpan_callback)
@@ -2411,6 +2411,10 @@ def parse_args():
                           dest="debug",
                           type="int",
                           default=CONFIG.DEBUG_ENABLE)
+    opt_parser.add_option("--vendor-path",
+                          action="store",
+                          dest="vendor_path",
+                          type="string")
 
     return opt_parser.parse_args(args)
 
@@ -2421,6 +2425,17 @@ def main():
 
     if options.debug:
         CONFIG.debug_set_level(options.debug)
+
+    # Obtain the vendor module path, if provided
+    if not options.vendor_path:
+        options.vendor_path = os.environ.get("SPINEL_VENDOR_PATH")
+
+    if options.vendor_path:
+        options.vendor_path = os.path.abspath(options.vendor_path)
+        vendor_path, vendor_module = os.path.split(options.vendor_path)
+        sys.path.insert(0, vendor_path)
+    else:
+        vendor_module = "vendor"
 
     # Set default stream to pipe
     stream_type = 'p'
@@ -2444,12 +2459,14 @@ def main():
     stream = StreamOpen(stream_type, stream_descriptor, options.verbose,
                         options.baudrate, options.rtscts)
     try:
-        vendor_ext = importlib.import_module('vendor.vendor')
+        vendor_ext = importlib.import_module(vendor_module + '.vendor')
         cls = type(vendor_ext.VendorSpinelCliCmd.__name__,
                    (SpinelCliCmd, vendor_ext.VendorSpinelCliCmd), {})
-        shell = cls(stream, nodeid=options.nodeid)
+        shell = cls(stream, nodeid=options.nodeid, vendor_module=vendor_module)
     except ImportError:
-        shell = SpinelCliCmd(stream, nodeid=options.nodeid)
+        shell = SpinelCliCmd(stream,
+                             nodeid=options.nodeid,
+                             vendor_module=vendor_module)
 
     try:
         shell.cmdloop()
