@@ -822,15 +822,7 @@ SPINEL_COMMAND_DISPATCH = {
     SPINEL.RSP_PROP_VALUE_REMOVED: WPAN_CMD_HANDLER.PROP_VALUE_REMOVED,
 }
 
-try:
-    codec = importlib.import_module('vendor.codec')
-    cls = type(codec.VendorSpinelPropertyHandler.__name__,
-               (SpinelPropertyHandler, codec.VendorSpinelPropertyHandler),
-               {'__name__': codec.VendorSpinelPropertyHandler.__name__})
-    WPAN_PROP_HANDLER = cls()
-except ImportError:
-    codec = None
-    WPAN_PROP_HANDLER = SpinelPropertyHandler()
+WPAN_PROP_HANDLER = SpinelPropertyHandler()
 
 SPINEL_PROP_DISPATCH = {
     SPINEL.PROP_LAST_STATUS:
@@ -1023,9 +1015,6 @@ SPINEL_PROP_DISPATCH = {
         WPAN_PROP_HANDLER.NEST_STREAM_MFG
 }
 
-if codec is not None:
-    SPINEL_PROP_DISPATCH.update(codec.VENDOR_SPINEL_PROP_DISPATCH)
-
 
 class WpanApi(SpinelCodec):
     """ Helper class to format wpan command packets """
@@ -1043,6 +1032,13 @@ class WpanApi(SpinelCodec):
         self.use_hdlc = use_hdlc
         if self.use_hdlc:
             self.hdlc = Hdlc(self.stream)
+
+        # Hook vendor properties
+        try:
+            codec = importlib.import_module('vendor.codec')
+            SPINEL_PROP_DISPATCH.update(codec.VENDOR_SPINEL_PROP_DISPATCH)
+        except ImportError:
+            pass
 
         # PARSER state
         self.rx_pkt = []
