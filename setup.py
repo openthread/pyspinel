@@ -61,7 +61,7 @@ def _copy_script(src, dest):
 
 setup(
     name='pyspinel',
-    version='1.0.2',
+    version='1.0.3',
     description=
     'A Python interface to the OpenThread Network Co-Processor (NCP)',
     url='https://github.com/openthread/openthread',
