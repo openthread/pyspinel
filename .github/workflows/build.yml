@@ -1,5 +1,5 @@
 #
-#  Copyright (c) 2017, The OpenThread Authors.
+#  Copyright (c) 2020, The OpenThread Authors.
 #  All rights reserved.
 #
 #  Redistribution and use in source and binary forms, with or without
@@ -26,13 +26,54 @@
 #  POSSIBILITY OF SUCH DAMAGE.
 #
 
-language: python
-python: "3.6"
-dist: bionic
+name: Check
 
-compiler: clang
+on: [push, pull_request]
 
-git:
-  depth: 1
+jobs:
 
-script: .travis/script.sh
+  cancel-previous-runs:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: rokroskar/workflow-run-cleanup-action@master
+      env:
+        GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      if: "github.ref != 'refs/heads/master'"
+
+  pretty:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - name: Bootstrap
+      run: |
+        python3 -m pip install yapf==0.29.0
+    - name: Check
+      run: |
+        script/make-pretty check
+
+  ncp-sim:
+    runs-on: ubuntu-20.04
+    env:
+      NODE_TYPE: ncp-sim
+      PYTHONUNBUFFERED: 1
+      REFERENCE_DEVICE: 1
+      VIRTUAL_TIME: 1
+    steps:
+    - uses: actions/checkout@v2
+    - name: Bootstrap
+      run: |
+        sudo rm /etc/apt/sources.list.d/* && sudo apt-get update
+        sudo apt-get --no-install-recommends install -y python3-setuptools python3-wheel
+        sudo python3 -m pip install .
+    - name: Build
+      run: |
+        cd /tmp
+        git clone --depth 1 https://github.com/openthread/openthread.git
+        cd openthread
+        python3 -m pip install -r tests/scripts/thread-cert/requirements.txt
+        ./bootstrap
+        make -f examples/Makefile-simulation
+    - name: Run
+      run: |
+        cd /tmp/openthread
+        VERBOSE=1 make -f examples/Makefile-simulation check
