@@ -33,6 +33,7 @@ import socket
 import struct
 import string
 import textwrap
+import ipaddress
 
 import logging
 import logging.config
@@ -42,14 +43,13 @@ from cmd import Cmd
 
 from spinel.const import SPINEL
 from spinel.const import kThread
+from spinel.codec import OperationalDataset
 from spinel.codec import WpanApi
 from spinel.codec import SpinelCodec
 from spinel.stream import StreamOpen
 from spinel.tun import TunInterface
 import spinel.config as CONFIG
 import spinel.util as util
-
-import ipaddress
 
 __copyright__ = "Copyright (c) 2016 The OpenThread Authors."
 __version__ = "0.1.0"
@@ -140,6 +140,8 @@ class SpinelCliCmd(Cmd, SpinelCodec):
                                 BASE_PORT + MAX_NODES * PORT_OFFSET)
 
     def __init__(self, stream, nodeid, vendor_module, *_a, **kw):
+        self._dataset = OperationalDataset(b'')
+
         if self.VIRTUAL_TIME:
             self._init_virtual_time()
         self.nodeid = nodeid
@@ -206,6 +208,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'commissioner',
         'contextreusedelay',
         'counters',
+        'dataset',
         'diag',
         'discover',
         'eidcache',
@@ -941,6 +944,103 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             print("Done")
         else:
             print("Error")
+
+    def do_dataset(self, line):
+        params = line.split(' ')
+
+        if not line:
+            print(self._dataset, end='')
+
+        elif params[0] == 'active':
+            print(self.prop_get_value(SPINEL.PROP_THREAD_ACTIVE_DATASET),
+                  end='')
+
+        elif params[0] == 'clear':
+            self._dataset = OperationalDataset(b'')
+
+        elif params[0] == 'activetimestamp':
+            if len(params) == 1:
+                print(self._dataset.active_timestamp)
+            else:
+                self._dataset.active_timestamp = int(params[1])
+
+        elif params[0] == 'panid':
+            if len(params) == 1:
+                print(f'{self._dataset.pan_id:04x}')
+            else:
+                self._dataset.pan_id = int(params[1], 0)
+
+        elif params[0] == 'channel':
+            if len(params) == 1:
+                print(self._dataset.channel)
+            else:
+                self._dataset.channel = int(params[1])
+
+        elif params[0] == 'channelmask':
+            if len(params) == 1:
+                print(f'{self._dataset.channel_mask:08x}')
+            else:
+                self._dataset.channel_mask = int(params[1])
+
+        elif params[0] == 'masterkey':
+            if len(params) == 1:
+                print(binascii.hexlify(self._dataset.master_key).decode())
+            else:
+                self._dataset.master_key = binascii.unhexlify(params[1])
+
+        elif params[0] == 'securitypolicy':
+            if len(params) == 1:
+                print(self._dataset.security_policy)
+            else:
+                self._dataset.security_policy = OperationalDataset.SecurityPolicy(
+                    int(params[1]),
+                    OperationalDataset.SecurityPolicy.flags_from_string(
+                        params[2]))
+
+        elif params[0] == 'networkname':
+            if len(params) == 1:
+                print(self._dataset.network_name)
+            else:
+                self._dataset.network_name = params[1]
+
+        elif params[0] == 'extpanid':
+            if len(params) == 1:
+                print(binascii.hexlify(self._dataset.extended_pan_id).decode())
+            else:
+                self._dataset.extended_pan_id = binascii.unhexlify(params[1])
+
+        elif params[0] == 'pskc':
+            if len(params) == 1:
+                print(binascii.hexlify(self._dataset.pskc).decode())
+            else:
+                self._dataset.pskc = binascii.unhexlify(params[1])
+
+        elif params[0] == 'meshlocalprefix':
+            if len(params) == 1:
+                print(
+                    f'{format(self._dataset.mesh_local_prefix[0])}/{self._dataset.mesh_local_prefix[1]}'
+                )
+            else:
+                if '/' in params[1]:
+                    address, length = params[1].split('/')
+                else:
+                    address = params[1]
+                    length = 64
+                self._dataset.mesh_local_prefix = (
+                    ipaddress.IPv6Address(address), int(length))
+
+        elif params[0] == 'commit':
+            if params[1] == 'active':
+                payload = self._dataset.encode()
+                self.prop_set_value(SPINEL.PROP_THREAD_ACTIVE_DATASET, payload,
+                                    f'{len(payload)}s')
+
+        elif params[0] == 'init':
+            if params[1] == 'active':
+                self._dataset = self.prop_get_value(
+                    SPINEL.PROP_THREAD_ACTIVE_DATASET)
+
+        print('Done')
 
     def do_discover(self, line):
         """

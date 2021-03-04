@@ -344,6 +344,10 @@ class SpinelCodec(object):
         return pack('<L', value)
 
     @classmethod
+    def encode_X(cls, value):
+        return pack('<Q', value)
+
+    @classmethod
     def encode_6(cls, value):
         return value[:16]
 
@@ -357,7 +361,7 @@ class SpinelCodec(object):
 
     @classmethod
     def encode_U(cls, value):
-        return value + '\0'
+        return (value + '\0').encode()
 
     @classmethod
     def encode_D(cls, value):
@@ -377,6 +381,7 @@ class SpinelCodec(object):
             'S': cls.encode_S,
             'L': cls.encode_L,
             'l': cls.encode_l,
+            'X': cls.encode_X,
             '6': cls.encode_6,
             'E': cls.encode_E,
             'e': cls.encode_e,
@@ -421,6 +426,9 @@ class SpinelCodec(object):
 
 
 class SpinelPropertyHandler(SpinelCodec):
+
+    def DATASET_ACTIVE(self, _, payload):
+        return OperationalDataset(payload)
 
     def LAST_STATUS(self, _, payload):
         return self.parse_i(payload)[0]
@@ -1012,7 +1020,9 @@ SPINEL_PROP_DISPATCH = {
     SPINEL.PROP_CNTR_MAC_RETRY_HISTOGRAM:
         WPAN_PROP_HANDLER.MAC_RETRY_HISTOGRAM,
     SPINEL.PROP_NEST_STREAM_MFG:
-        WPAN_PROP_HANDLER.NEST_STREAM_MFG
+        WPAN_PROP_HANDLER.NEST_STREAM_MFG,
+    SPINEL.PROP_THREAD_ACTIVE_DATASET:
+        WPAN_PROP_HANDLER.DATASET_ACTIVE,
 }
 
 
@@ -1356,3 +1366,205 @@ class WpanApi(SpinelCodec):
             addr = addr[2:18]
             ipaddrs.append(ipaddress.IPv6Address(addr))
         return ipaddrs
+
+
+#=========================================
+
+
+class OperationalDataset:
+
+    def __init__(self, payload):
+        codec = SpinelCodec()
+        fields = list(
+            map(lambda x: (x[0][0][0], x[0][1]),
+                codec.parse_fields(payload, 'A(t(iD))')[0]))
+
+        for prop_type, prop_value in fields:
+
+            if prop_type == SPINEL.PROP_DATASET_ACTIVE_TIMESTAMP:
+                self.active_timestamp = codec.parse_X(prop_value)
+
+            elif prop_type == SPINEL.PROP_PHY_CHAN:
+                self.channel = codec.parse_C(prop_value)
+
+            elif prop_type == SPINEL.PROP_PHY_CHAN_SUPPORTED:
+                mask = 0
+
+                for entry in codec.parse_fields(prop_value, 'A(C)')[0]:
+                    mask |= (1 << entry[0])
+
+                if mask != 0:
+                    self.channel_mask = mask
+
+            elif prop_type == SPINEL.PROP_DATASET_DELAY_TIMER:
+                self.delay = codec.parse_L(prop_value)
+
+            elif prop_type == SPINEL.PROP_NET_XPANID:
+                self.extended_pan_id = codec.parse_D(prop_value)
+
+            elif prop_type == SPINEL.PROP_IPV6_ML_PREFIX:
+                address, length = codec.parse_fields(prop_value, '6C')
+                self.mesh_local_prefix = (ipaddress.IPv6Address(address),
+                                          length)
+
+            elif prop_type == SPINEL.PROP_NET_MASTER_KEY:
+                self.master_key = codec.parse_D(prop_value)
+
+            elif prop_type == SPINEL.PROP_NET_NETWORK_NAME:
+                self.network_name = codec.parse_U(prop_value)
+
+            elif prop_type == SPINEL.PROP_MAC_15_4_PANID:
+                self.pan_id = codec.parse_S(prop_value)
+
+            elif prop_type == SPINEL.PROP_DATASET_PENDING_TIMESTAMP:
+                self.pending_timestamp = codec.parse_X(prop_value)
+
+            elif prop_type == SPINEL.PROP_NET_PSKC:
+                self.pskc = codec.parse_D(prop_value)
+
+            elif prop_type == SPINEL.PROP_DATASET_SECURITY_POLICY:
+                decoded = codec.parse_fields(prop_value, 'SC')
+                self.security_policy = self.SecurityPolicy(
+                    decoded[0], decoded[1])
+
+    def __str__(self):
+        result = ''
+        if hasattr(self, 'active_timestamp'):
+            result += f'Active Timestamp: {self.active_timestamp}\n'
+        if hasattr(self, 'channel'):
+            result += f'Channel: {self.channel}\n'
+        if hasattr(self, 'channel_mask'):
+            result += f'Channel Mask: 0x{self.channel_mask:08x}\n'
+        if hasattr(self, 'delay'):
+            result += f'Delay: {self.delay}\n'
+        if hasattr(self, 'extended_pan_id'):
+            result += f'Extended Pan ID: {binascii.hexlify(self.extended_pan_id).decode()}\n'
+        if hasattr(self, 'mesh_local_prefix'):
+            result += f'Mesh Local Prefix: {format(self.mesh_local_prefix[0])}/{self.mesh_local_prefix[1]}\n'
+        if hasattr(self, 'master_key'):
+            result += f'Master Key: {binascii.hexlify(self.master_key).decode()}\n'
+        if hasattr(self, 'network_name'):
+            result += f'Network Name: {self.network_name}\n'
+        if hasattr(self, 'pan_id'):
+            result += f'Pan ID: 0x{self.pan_id:04x}\n'
+        if hasattr(self, 'pending_timestamp'):
+            result += f'Pending Timestamp: {self.pending_timestamp}\n'
+        if hasattr(self, 'pskc'):
+            result += f'PSKc: {binascii.hexlify(self.pskc).decode()}\n'
+        if hasattr(self, 'security_policy'):
+            result += f'Security Policy: {self.security_policy}\n'
+        return result
+
+    def encode(self):
+        result = b''
+        codec = SpinelCodec()
+
+        if hasattr(self, 'active_timestamp'):
+            result += self._encode_prop(SPINEL.PROP_DATASET_ACTIVE_TIMESTAMP,
+                                        codec.encode_X(self.active_timestamp))
+
+        if hasattr(self, 'channel'):
+            result += self._encode_prop(SPINEL.PROP_PHY_CHAN,
+                                        codec.encode_C(self.channel))
+
+        if hasattr(self, 'channel_mask'):
+            shift = 0
+            payload = b''
+            channel_mask = self.channel_mask
+
+            while channel_mask != 0:
+                if channel_mask & 1:
+                    payload += codec.encode_C(shift)
+
+                channel_mask >>= 1
+                shift += 1
+
+            result += self._encode_prop(SPINEL.PROP_PHY_CHAN_SUPPORTED, payload)
+
+        if hasattr(self, 'delay'):
+            result += self._encode_prop(SPINEL.PROP_DATASET_DELAY_TIMER,
+                                        codec.encode_L(self.delay))
+
+        if hasattr(self, 'extended_pan_id'):
+            result += self._encode_prop(SPINEL.PROP_NET_XPANID,
+                                        codec.encode_D(self.extended_pan_id))
+
+        if hasattr(self, 'mesh_local_prefix'):
+            result += self._encode_prop(
+                SPINEL.PROP_IPV6_ML_PREFIX,
+                codec.encode_fields('6C', self.mesh_local_prefix[0].packed,
+                                    self.mesh_local_prefix[1]))
+
+        if hasattr(self, 'master_key'):
+            result += self._encode_prop(SPINEL.PROP_NET_MASTER_KEY,
+                                        codec.encode_D(self.master_key))
+
+        if hasattr(self, 'network_name'):
+            result += self._encode_prop(SPINEL.PROP_NET_NETWORK_NAME,
+                                        codec.encode_U(self.network_name))
+
+        if hasattr(self, 'pan_id'):
+            result += self._encode_prop(SPINEL.PROP_MAC_15_4_PANID,
+                                        codec.encode_S(self.pan_id))
+
+        if hasattr(self, 'pending_timestamp'):
+            result += self._encode_prop(SPINEL.PROP_DATASET_PENDING_TIMESTAMP,
+                                        codec.encode_X(self.pending_timestamp))
+
+        if hasattr(self, 'pskc'):
+            result += self._encode_prop(SPINEL.PROP_NET_PSKC,
+                                        codec.encode_D(self.pskc))
+
+        if hasattr(self, 'security_policy'):
+            result += self._encode_prop(
+                SPINEL.PROP_DATASET_SECURITY_POLICY,
+                codec.encode_fields('SC', self.security_policy.rotation_time,
+                                    self.security_policy.flags))
+
+        return result
+
+    @staticmethod
+    def _encode_prop(prop_type, prop_payload):
+        return SpinelCodec.encode_d(
+            SpinelCodec.encode_i(prop_type) +
+            SpinelCodec.encode_D(prop_payload))
+
+    class SecurityPolicy:
+        OBTAIN_MASTER_KEY = 1 << 7
+        NATIVE_COMMISSIONING = 1 << 6
+        ROUTERS = 1 << 5
+        EXTERNAL_COMMISSIONER = 1 << 4
+        BEACONS = 1 << 3
+
+        def __init__(self, rotation_time, flags):
+            self.rotation_time = rotation_time
+            self.flags = flags
+
+        def __str__(self):
+            result = f'{self.rotation_time}, '
+            if self.flags & self.OBTAIN_MASTER_KEY:
+                result += 'o'
+            if self.flags & self.NATIVE_COMMISSIONING:
+                result += 'n'
+            if self.flags & self.ROUTERS:
+                result += 'r'
+            if self.flags & self.EXTERNAL_COMMISSIONER:
+                result += 'c'
+            if self.flags & self.BEACONS:
+                result += 'b'
+            return result
+
+        @staticmethod
+        def flags_from_string(string):
+            flags = 0
+            if 'o' in string:
+                flags |= OperationalDataset.SecurityPolicy.OBTAIN_MASTER_KEY
+            if 'n' in string:
+                flags |= OperationalDataset.SecurityPolicy.NATIVE_COMMISSIONING
+            if 'r' in string:
+                flags |= OperationalDataset.SecurityPolicy.ROUTERS
+            if 'c' in string:
+                flags |= OperationalDataset.SecurityPolicy.EXTERNAL_COMMISSIONER
+            if 'b' in string:
+                flags |= OperationalDataset.SecurityPolicy.BEACONS
+            return flags
