@@ -160,7 +160,7 @@ The primary intent of spinel-cli is to support the exact syntax and output of th
 
 See [cli module][1] for more information on these commands.
 
-[1]: https://github.com/openthread/openthread/blob/master/src/cli/README.md
+[1]: https://github.com/openthread/openthread/blob/main/src/cli/README.md
 
 ### Diagnostics CLI commands
 
@@ -168,7 +168,7 @@ The Diagnostics module is enabled only when building OpenThread with the --enabl
 
 See [diag module][2] for more information on these commands.
 
-[2]: https://github.com/openthread/openthread/blob/master/src/core/diags/README.md
+[2]: https://github.com/openthread/openthread/blob/main/src/core/diags/README.md
 
 ### NCP CLI commands
 
