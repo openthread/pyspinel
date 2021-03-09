@@ -1309,7 +1309,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         mfg <diagnostic command>
 
         Check all the factory diagnostic commands here:
-        https://github.com/openthread/openthread/blob/master/src/core/diags/README.md
+        https://github.com/openthread/openthread/blob/main/src/core/diags/README.md
 
         For example:
 
