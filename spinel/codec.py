@@ -794,7 +794,7 @@ class SpinelCommandHandler(SpinelCodec):
                     CONFIG.LOGGER.debug("PROP_VALUE_" + name + ": " + prop_name)
 
                 elif prop_id == SPINEL.PROP_STREAM_DEBUG:
-                    CONFIG.LOGGER.debug("DEBUG: " + prop_value)
+                    CONFIG.LOGGER.debug("DEBUG: " + str(prop_value))
 
             if wpan_api:
                 wpan_api.queue_add(prop_id, prop_value, tid)
