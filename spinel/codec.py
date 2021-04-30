@@ -120,10 +120,8 @@ class SpinelCodec(object):
     @classmethod
     def parse_U(cls, payload):
         nullchar = b'\0'
-        if payload.find(nullchar) >= 0:
-            return payload[:payload.index(nullchar)].decode('utf-8')  # strip null
-        else:
-            return payload.decode('utf-8')
+        return payload[:payload.index(nullchar)].decode('utf-8')  # strip null
+
 
     @classmethod
     def parse_D(cls, payload):
