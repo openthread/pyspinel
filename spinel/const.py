@@ -109,6 +109,10 @@ class SPINEL(object):
     PROP_MAC_ALLOWLIST = PROP_MAC_EXT__BEGIN + 0  # < [A(T(Ec))]
     PROP_MAC_ALLOWLIST_ENABLED = PROP_MAC_EXT__BEGIN + 1  # < [b]
 
+    PROP_MAC_SRC_MATCH_ENABLED = PROP_MAC_EXT__BEGIN + 3  # < [b]
+    PROP_MAC_SRC_MATCH_SHORT_ADDRESSES = PROP_MAC_EXT__BEGIN + 4  # < [A(S)]
+    PROP_MAC_SRC_MATCH_EXTENDED_ADDRESSES = PROP_MAC_EXT__BEGIN + 5  # < [A(E)]
+
     # Format: `A(T(E))`
     # * `E`: EUI64 address of node
     PROP_MAC_DENYLIST = PROP_MAC_EXT__BEGIN + 6  # <[A(T(E))]
@@ -435,6 +439,13 @@ class SPINEL(object):
     #=========================================
 
     RSSI_OVERRIDE = 127
+
+    #=========================================
+
+    SCAN_STATE_IDLE = 0
+    SCAN_STATE_BEACON = 1
+    SCAN_STATE_ENERGY = 2
+    SCAN_STATE_DISCOVER = 3
 
     #=========================================
 
