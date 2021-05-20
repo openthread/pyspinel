@@ -478,7 +478,7 @@ class SpinelPropertyHandler(SpinelCodec):
         return self.parse_C(payload)
 
     def MAC_SCAN_MASK(self, _, payload):
-        return self.parse_U(payload)
+        return list(map(lambda x: x[0], self.parse_fields(payload, 'A(C)')[0]))
 
     def MAC_SCAN_PERIOD(self, _, payload):
         return self.parse_S(payload)
@@ -506,6 +506,15 @@ class SpinelPropertyHandler(SpinelCodec):
 
     def MAC_ALLOWLIST_ENABLED(self, _, payload):
         return self.parse_b(payload)
+
+    def MAC_SRC_MATCH_ENABLED(self, _, payload):
+        return self.parse_b(payload)
+
+    def MAC_SRC_MATCH_SHORT_ADDRESSES(self, _, payload):
+        return self.parse_S(payload)
+
+    def MAC_SRC_MATCH_EXTENDED_ADDRESSES(self, _, payload):
+        return self.parse_E(payload)
 
     def MAC_DENYLIST(self, _, payload):
         pass
@@ -880,6 +889,12 @@ SPINEL_PROP_DISPATCH = {
         WPAN_PROP_HANDLER.MAC_ALLOWLIST,
     SPINEL.PROP_MAC_ALLOWLIST_ENABLED:
         WPAN_PROP_HANDLER.MAC_ALLOWLIST_ENABLED,
+    SPINEL.PROP_MAC_SRC_MATCH_ENABLED:
+        WPAN_PROP_HANDLER.MAC_SRC_MATCH_ENABLED,
+    SPINEL.PROP_MAC_SRC_MATCH_SHORT_ADDRESSES:
+        WPAN_PROP_HANDLER.MAC_SRC_MATCH_SHORT_ADDRESSES,
+    SPINEL.PROP_MAC_SRC_MATCH_EXTENDED_ADDRESSES:
+        WPAN_PROP_HANDLER.MAC_SRC_MATCH_EXTENDED_ADDRESSES,
     SPINEL.PROP_MAC_DENYLIST:
         WPAN_PROP_HANDLER.MAC_DENYLIST,
     SPINEL.PROP_MAC_DENYLIST_ENABLED:
