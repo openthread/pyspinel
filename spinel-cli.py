@@ -54,7 +54,7 @@ import ipaddress
 __copyright__ = "Copyright (c) 2016 The OpenThread Authors."
 __version__ = "0.1.0"
 
-MASTER_PROMPT = "spinel-cli"
+NETWORK_PROMPT = "spinel-cli"
 
 import io
 import spinel.ipv6 as ipv6
@@ -154,7 +154,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         Cmd.identchars = string.ascii_letters + string.digits + '-'
 
         if sys.stdin.isatty():
-            self.prompt = MASTER_PROMPT + " > "
+            self.prompt = NETWORK_PROMPT + " > "
         else:
             self.use_rawinput = 0
             self.prompt = ""
@@ -219,11 +219,11 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         'leaderweight',
         'mac',
         'macfilter',
-        'masterkey',
         'mfg',
         'mode',
         'netdata',
         'networkidtimeout',
+        'networkkey',
         'networkname',
         'panid',
         'parent',
@@ -445,7 +445,7 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         version
             Shows detailed version information on spinel-cli tool:
         """
-        self.log(MASTER_PROMPT + " ver. " + __version__)
+        self.log(NETWORK_PROMPT + " ver. " + __version__)
         self.log(__copyright__)
 
     @classmethod
@@ -1285,25 +1285,6 @@ class SpinelCliCmd(Cmd, SpinelCodec):
         """
         self.handle_property(line, SPINEL.PROP_THREAD_LOCAL_LEADER_WEIGHT)
 
-    def do_masterkey(self, line):
-        """
-        masterkey
-
-            Get the Thread Master Key value.
-
-            > masterkey
-            00112233445566778899aabbccddeeff
-            Done
-
-        masterkey <key>
-
-            Set the Thread Master Key value.
-
-            > masterkey 00112233445566778899aabbccddeeff
-            Done
-        """
-        self.handle_property(line, SPINEL.PROP_NET_MASTER_KEY, 'D')
-
     def do_mfg(self, line):
         """
         mfg <diagnostic command>
@@ -1430,6 +1411,25 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             Done
         """
         self.handle_property(line, SPINEL.PROP_THREAD_NETWORK_ID_TIMEOUT)
+
+    def do_networkkey(self, line):
+        """
+        networkkey
+
+            Get the Thread Network Key value.
+
+            > networkkey
+            00112233445566778899aabbccddeeff
+            Done
+
+        networkkey <key>
+
+            Set the Thread Network Key value.
+
+            > networkkey 00112233445566778899aabbccddeeff
+            Done
+        """
+        self.handle_property(line, SPINEL.PROP_NET_NETWORK_KEY, 'D')
 
     def do_networkname(self, line):
         """
