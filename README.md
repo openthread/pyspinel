@@ -211,7 +211,7 @@ debug              leaderdata    panid             state
 debug-mem          leaderweight  parent            thread
 diag               mac           ping              txpower
 discover           macfilter     prefix            v
-eidcache           masterkey     q                 vendor
+eidcache           networkkey    q                 vendor
 exit               mfg           quit              version
 ```
 

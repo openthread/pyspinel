@@ -549,7 +549,7 @@ class SpinelPropertyHandler(SpinelCodec):
     def NET_XPANID(self, _, payload):
         return self.parse_D(payload)
 
-    def NET_MASTER_KEY(self, _, payload):
+    def NET_NETWORK_KEY(self, _, payload):
         return self.parse_D(payload)
 
     def NET_KEY_SEQUENCE_COUNTER(self, _, payload):
@@ -917,8 +917,8 @@ SPINEL_PROP_DISPATCH = {
         WPAN_PROP_HANDLER.NET_NETWORK_NAME,
     SPINEL.PROP_NET_XPANID:
         WPAN_PROP_HANDLER.NET_XPANID,
-    SPINEL.PROP_NET_MASTER_KEY:
-        WPAN_PROP_HANDLER.NET_MASTER_KEY,
+    SPINEL.PROP_NET_NETWORK_KEY:
+        WPAN_PROP_HANDLER.NET_NETWORK_KEY,
     SPINEL.PROP_NET_KEY_SEQUENCE_COUNTER:
         WPAN_PROP_HANDLER.NET_KEY_SEQUENCE_COUNTER,
     SPINEL.PROP_NET_PARTITION_ID:
