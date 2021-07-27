@@ -98,8 +98,8 @@ class PcapCodec(object):
             else:
                 # TI style FCS format: replace the last two bytes (should be FCS) with RSSI and LQI and always
                 # assume FCS right
-                frame[-1] = metadata[0] & 0xFF
-                frame[-2] = metadata[3][1] & 0xFF
+                frame[-2] = metadata[0] & 0xFF
+                frame[-1] = metadata[3][1] & 0xFF
 
         if cls._dlt == DLT_IEEE802_15_4_TAP:
             length = len(frame) + TLVs_length
