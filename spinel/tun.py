@@ -72,10 +72,10 @@ class TunInterface(object):
 
     def __init_linux(self):
         CONFIG.LOGGER.info("TUN: Starting linux " + self.ifname)
-        self.tun = open("/dev/net/tun", "r+b")
-        self.fd = self.tun.fileno()
+        self.tun = os.open("/dev/net/tun", os.O_RDWR)
+        self.fd = self.tun
 
-        ifr = struct.pack("16sH", self.ifname, IFF_TUN | IFF_NO_PI)
+        ifr = struct.pack("16sH", bytes(self.ifname[:15], 'utf-8'), IFF_TUN | IFF_NO_PI)
         fcntl.ioctl(self.tun, IFF_TUNSETIFF, ifr)  # Name interface tun#
         fcntl.ioctl(self.tun, IFF_TUNSETOWNER, 1000)  # Allow non-sudo access
 
