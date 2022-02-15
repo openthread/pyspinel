@@ -37,6 +37,7 @@ IFF_TAP = 0x0002
 IFF_NO_PI = 0x1000
 IFF_TUNSETIFF = 0x400454ca
 IFF_TUNSETOWNER = IFF_TUNSETIFF + 2
+IFF_TUN_NAMELIMIT = 15
 
 
 class TunInterface(object):
@@ -75,7 +76,7 @@ class TunInterface(object):
         self.tun = os.open("/dev/net/tun", os.O_RDWR)
         self.fd = self.tun
 
-        ifr = struct.pack("16sH", bytes(self.ifname[:15], 'utf-8'), IFF_TUN | IFF_NO_PI)
+        ifr = struct.pack("16sH", bytes(self.ifname[:IFF_TUN_NAMELIMIT], 'utf-8'), IFF_TUN | IFF_NO_PI)
         fcntl.ioctl(self.tun, IFF_TUNSETIFF, ifr)  # Name interface tun#
         fcntl.ioctl(self.tun, IFF_TUNSETOWNER, 1000)  # Allow non-sudo access
 
