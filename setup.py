@@ -66,7 +66,6 @@ setup(
     'A Python interface to the OpenThread Network Co-Processor (NCP)',
     url='https://github.com/openthread/openthread',
     author='The OpenThread Authors',
-    author_email='openthread-users@googlegroups.com',
     license='Apache-2.0',
     classifiers=[
         'Development Status :: 3 - Alpha',
