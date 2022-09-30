@@ -509,7 +509,7 @@ class SpinelPropertyHandler(SpinelCodec):
                 return self.parse_fields(payload, format)
             except struct.error:
                 pass
-        return None        
+        return None
 
     def MAC_ALLOWLIST_ENABLED(self, _, payload):
         return self.parse_b(payload)
