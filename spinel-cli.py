@@ -1618,6 +1618,12 @@ class SpinelCliCmd(Cmd, SpinelCodec):
             self.prop_remove_value(SPINEL.PROP_THREAD_ON_MESH_NETS, arr,
                                    str(len(arr)) + 's')
 
+        elif params[0] == "meshlocal":
+            arr += self.wpan_api.encode_fields('CbC', prefix.network.prefixlen)
+
+            self.prop_set_value(SPINEL.PROP_IPV6_ML_PREFIX, arr,
+                                str(len(arr)) + 's')
+
         print("Done")
 
     def do_releaserouterid(self, line):
