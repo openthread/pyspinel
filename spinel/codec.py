@@ -21,6 +21,7 @@ Module providing a Spienl coder / decoder class.
 import binascii
 import time
 import logging
+import struct
 import threading
 import traceback
 import queue
@@ -502,7 +503,13 @@ class SpinelPropertyHandler(SpinelCodec):
         return self.parse_b(payload)
 
     def MAC_ALLOWLIST(self, _, payload):
-        pass
+        formats = ["A(t(EC))", "EC", "E"]
+        for format in formats:
+            try:
+                return self.parse_fields(payload, format)
+            except struct.error:
+                pass
+        return None
 
     def MAC_ALLOWLIST_ENABLED(self, _, payload):
         return self.parse_b(payload)
