@@ -39,7 +39,7 @@ jobs:
   pretty:
     runs-on: ubuntu-20.04
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Bootstrap
       run: |
         python3 -m pip install yapf==0.29.0
@@ -55,7 +55,7 @@ jobs:
       REFERENCE_DEVICE: 1
       VIRTUAL_TIME: 1
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Bootstrap
       run: |
         sudo rm /etc/apt/sources.list.d/* && sudo apt-get update
