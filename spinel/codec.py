@@ -604,7 +604,7 @@ class SpinelPropertyHandler(SpinelCodec):
         self.wpan_api = None
         self.__queue_prefix = queue.Queue()
         self.prefix_thread = threading.Thread(target=self.__run_prefix_handler)
-        self.prefix_thread.setDaemon(True)
+        self.prefix_thread.daemon = True
         self.prefix_thread.start()
 
     def handle_prefix_change(self, payload):
